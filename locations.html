@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sites</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 <style>
   :root{
     --navy:#1b2a4a;
-    --navy-dark:#141d33;
+    --navy-dark:#100e13;
     --blue:#2f6bff;
     --blue-hover:#1f5aed;
     --text:#1b2a4a;
@@ -22,19 +26,18 @@
     --panel:#f8f9fc;
   }
   :root[data-theme="dark"]{
-    --navy:#e7ebf3;
-    --navy-dark:#0b101b;
+    --navy:#e9e9ec;
     --blue:#4d8bff;
     --blue-hover:#3f7bf0;
-    --text:#e7ebf3;
-    --muted:#7c8598;
-    --muted2:#a7b0c2;
-    --border:#2a3346;
-    --bg:#0e1320;
-    --card:#161d2b;
-    --sidebar-active-bg:#243046;
-    --input-bg:#1e2637;
-    --panel:#111826;
+    --text:#e9e9ec;
+    --muted:#8a8a92;
+    --muted2:#adadb5;
+    --border:#38383e;
+    --bg:#17171a;
+    --card:#222226;
+    --sidebar-active-bg:#2a2a30;
+    --input-bg:#2a2a2f;
+    --panel:#1c1c20;
   }
   /* Overrides de superficies claras en modo oscuro */
   [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background-color:var(--input-bg);color:var(--text);border-color:var(--border);}
@@ -50,8 +53,13 @@
   [data-theme="dark"] .btn-outline,[data-theme="dark"] .stepper-num button{background:var(--card);color:var(--text);}
   [data-theme="dark"] .filters-btn:hover,[data-theme="dark"] .btn-back:hover,[data-theme="dark"] .btn-export:hover,[data-theme="dark"] .btn-outline:hover{background:var(--panel);}
   [data-theme="dark"] .adm-banner{background:#16233b;border-color:#2b3d5e;}
-  [data-theme="dark"] .role-chip2,[data-theme="dark"] .role-tip,[data-theme="dark"] .u-pop,[data-theme="dark"] .cap-wrap{background:var(--card);border-color:var(--border);}
+  [data-theme="dark"] .role-chip2,[data-theme="dark"] .role-tip,[data-theme="dark"] .u-pop,[data-theme="dark"] .autocomplete-pop,[data-theme="dark"] .cap-wrap{background:var(--card);border-color:var(--border);}
   [data-theme="dark"] .group-item.active,[data-theme="dark"] .sp-item.active{background:var(--sidebar-active-bg);}
+  [data-theme="dark"] .group-item:hover:not(.active){background:var(--panel);}
+  [data-theme="dark"] .grp-del:hover{background:#3a1f1f;}
+  [data-theme="dark"] .at-tpl-item:hover{background:var(--panel);}
+  [data-theme="dark"] .at-tpl-del:hover{background:#3a1f1f;}
+  [data-theme="dark"] #atTplTip{background:var(--card);border-color:var(--border);}
   /* Chips y badges legibles en oscuro */
   [data-theme="dark"] .rev-chip,[data-theme="dark"] .ud-block .rev-chip,[data-theme="dark"] .u-tab .tcount{background:var(--panel);border:1px solid var(--border);color:var(--text);}
   [data-theme="dark"] .role-badge,[data-theme="dark"] .sp-badge{background:#1f2b45;border-color:#33456a;color:#9db8ff;}
@@ -61,8 +69,8 @@
   [data-theme="dark"] .badge-error{background:#2b1616;border-color:#5a2b2b;color:#ff8a80;}
   [data-theme="dark"] .site-pill{background:#16233b;}
   [data-theme="dark"] .info-box b,[data-theme="dark"] .preview-line b,[data-theme="dark"] .ud-v{color:var(--text);}
-  [data-theme="dark"] .modal-overlay{background:rgba(4,8,16,.55);}
-  [data-theme="dark"] .empty .pic svg circle[fill="#eef1f7"],[data-theme="dark"] .modal .pic svg circle[fill="#eef1f7"]{fill:#1e2637;}
+  [data-theme="dark"] .modal-overlay{background:rgba(19,16,23,.6);}
+  [data-theme="dark"] .empty .pic svg circle[fill="#eef1f7"],[data-theme="dark"] .modal .pic svg circle[fill="#eef1f7"]{fill:var(--card);}
 
   /* Toggle claro/oscuro */
   .theme-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border-radius:9px;color:#c9cfdb;cursor:pointer;font-size:15px;font-weight:500;user-select:none;}
@@ -75,66 +83,84 @@
   :root[data-theme="dark"] .theme-switch span{left:21px;}
 
   *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
-  .app{display:flex;min-height:100vh;}
+  .app{display:flex;height:100vh;}
 
-  /* Sidebar */
-  .sidebar{width:230px;background:var(--navy-dark);color:#c9cfdb;display:flex;flex-direction:column;padding:18px 14px;flex-shrink:0;}
+  /* Sidebar: alto fijo al viewport y con scroll propio, para que nunca
+     dependa de la altura del contenido de .main (evita perder Data/Help
+     center o el resto del menú si la ventana es más baja o hay zoom 100%). */
+  .sidebar{width:230px;background:var(--navy-dark);color:#c9cfdb;display:flex;flex-direction:column;padding:18px 14px;flex-shrink:0;transition:width .18s ease;overflow-y:auto;}
   .sb-top{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 26px;}
   .logo{display:flex;align-items:center;gap:6px;}
-  .logo svg{width:34px;height:34px;}
-  .collapse{color:#7d8698;font-size:20px;cursor:pointer;background:none;border:none;}
+  .logo img{width:34px;height:23px;display:block;}
+  .collapse{color:#7d8698;font-size:20px;cursor:pointer;background:none;border:none;flex-shrink:0;}
   .nav{display:flex;flex-direction:column;gap:4px;flex:1;}
-  .nav a{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:9px;color:#c9cfdb;text-decoration:none;font-size:15px;font-weight:500;}
+  .nav a{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:9px;color:#c9cfdb;text-decoration:none;font-size:15px;font-weight:500;white-space:nowrap;}
   .nav a:hover{background:#1f2a44;}
   .nav a.active{color:#4d8bff;font-weight:600;}
   .nav a svg{width:20px;height:20px;stroke-width:1.8;flex-shrink:0;}
   .nav-bottom{display:flex;flex-direction:column;gap:4px;padding-top:12px;}
-  .nav-bottom a{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:9px;color:#c9cfdb;text-decoration:none;font-size:15px;font-weight:500;}
+  .nav-bottom a{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:9px;color:#c9cfdb;text-decoration:none;font-size:15px;font-weight:500;white-space:nowrap;}
   .nav-bottom a:hover{background:#1f2a44;}
   .nav-bottom a svg{width:20px;height:20px;stroke-width:1.8;flex-shrink:0;}
 
+  /* Sidebar colapsado: solo iconos */
+  .sidebar.collapsed{width:74px;padding:18px 10px;}
+  .sidebar.collapsed .sb-top{justify-content:center;padding:6px 0 26px;}
+  .sidebar.collapsed .logo{display:none;}
+  .sidebar.collapsed .nav a,.sidebar.collapsed .nav-bottom a{justify-content:center;padding:11px;}
+  .sidebar.collapsed .nav a svg,.sidebar.collapsed .nav-bottom a svg{margin:0;}
+  .sidebar.collapsed .lbl-text{display:none;}
+  .sidebar.collapsed .theme-toggle{justify-content:center;padding:11px;}
+  .sidebar.collapsed .theme-toggle .tt-left{gap:0;}
+  .sidebar.collapsed .theme-switch,.sidebar.collapsed #themeLabel{display:none;}
+
   /* Main */
-  .main{flex:1;padding:26px 34px;overflow:auto;}
-  .page-title{font-size:44px;font-weight:800;color:var(--navy);letter-spacing:-1px;}
-  .page-sub{color:var(--muted2);font-size:16px;margin-top:4px;}
+  .main{flex:1;padding:20px 28px;overflow:auto;display:flex;flex-direction:column;}
+  .page-title{font-size:32px;font-weight:800;color:var(--navy);letter-spacing:-0.5px;}
+  .page-sub{color:var(--muted2);font-size:14px;margin-top:3px;}
   .header-row{display:flex;justify-content:space-between;align-items:flex-start;}
 
-  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(47,107,255,.35);}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border:none;padding:9px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(47,107,255,.35);}
   .btn:hover{background:var(--blue-hover);}
   .btn svg{width:16px;height:16px;}
-  .btn-lg{padding:14px 22px;font-size:15px;}
-  .btn-export{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;}
+  .btn-lg{padding:12px 20px;font-size:15px;}
+  .btn-export{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);padding:9px 16px;border-radius:10px;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;}
   .btn-export:hover{background:#f6f7fb;}
   .btn-export svg{width:16px;height:16px;}
 
-  .layout{display:flex;gap:22px;margin-top:22px;}
+  .layout{display:flex;gap:18px;margin-top:16px;flex:1;min-height:0;}
 
   /* Left card - groups */
-  .groups{width:300px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;}
-  .groups h2{font-size:20px;font-weight:700;color:var(--navy);}
-  .groups .desc{color:var(--muted2);font-size:14px;margin:10px 0 18px;line-height:1.5;}
-  .new-group{width:100%;justify-content:center;margin-bottom:20px;}
-  .group-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:9px;font-size:15px;color:var(--navy);}
+  .groups{width:280px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;overflow-y:auto;}
+  .groups h2{font-size:17px;font-weight:700;color:var(--navy);}
+  .groups .desc{color:var(--muted2);font-size:13px;margin:8px 0 14px;line-height:1.45;}
+  .new-group{width:100%;justify-content:center;margin-bottom:14px;}
+  .group-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:9px;font-size:14px;color:var(--navy);cursor:pointer;}
+  .group-item:hover:not(.active){background:#f6f8fc;}
   .group-item.active{background:var(--sidebar-active-bg);font-weight:600;}
   .group-item .cnt{color:var(--muted);font-weight:500;}
   .group-item .lbl{display:flex;align-items:center;gap:9px;}
   .group-item .lbl svg{width:16px;height:16px;color:var(--muted);}
-  .groups-note{margin-top:auto;border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--muted2);font-size:13px;line-height:1.5;}
+  .group-item .right{display:flex;align-items:center;gap:8px;}
+  .grp-del{opacity:0;transition:opacity .15s;}
+  .group-item:hover .grp-del{opacity:1;}
+  .groups-note{margin-top:auto;border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--muted2);font-size:12.5px;line-height:1.45;}
 
   /* Right column */
-  .content{flex:1;display:flex;flex-direction:column;gap:20px;}
+  .content{flex:1;display:flex;flex-direction:column;gap:14px;min-height:0;}
 
   /* Stepper */
-  .stepper-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 40px;}
+  .stepper-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 30px;}
   .stepper{display:flex;align-items:flex-start;justify-content:space-between;position:relative;}
   .step{display:flex;flex-direction:column;align-items:center;text-align:center;flex:1;position:relative;z-index:2;}
-  .step .circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;margin-bottom:12px;}
+  .step .circle{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-bottom:8px;}
   .step.active .circle{background:var(--blue);color:#fff;}
   .step .circle.clickable{cursor:pointer;transition:transform .12s,box-shadow .12s;}
   .step .circle.clickable:hover{transform:scale(1.12);box-shadow:0 0 0 4px rgba(47,107,255,.18);}
   .step .circle.done{background:#1c8a4b;color:#fff;}
-  .step .circle.done svg{width:16px;height:16px;}
+  .step .circle.done svg{width:14px;height:14px;}
   .step .circle.done.clickable:hover{box-shadow:0 0 0 4px rgba(28,138,75,.2);}
   .st-title.clickable{cursor:pointer;}
   .st-title.clickable:hover{color:var(--blue);text-decoration:underline;}
@@ -142,36 +168,47 @@
   .step.locked .circle{background:#eef0f5;color:#aeb6c4;border:1px solid #e0e4ec;position:relative;}
   .step .lock{position:absolute;top:-6px;right:-6px;width:16px;height:16px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;}
   .step .lock svg{width:11px;height:11px;color:#aeb6c4;}
-  .step .st-title{font-weight:700;font-size:15px;color:var(--navy);}
+  .step .st-title{font-weight:700;font-size:14px;color:var(--navy);}
   .step.locked .st-title{color:#aeb6c4;}
-  .step .st-sub{font-size:12.5px;color:var(--muted);margin-top:3px;}
-  .step .badge{margin-top:8px;background:#fdf3d6;color:#b58a00;font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:6px;}
-  .line{position:absolute;top:17px;height:2px;background:#e5e8ef;z-index:1;}
+  .step .st-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .step .badge{margin-top:6px;background:#fdf3d6;color:#b58a00;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;}
+  .line{position:absolute;top:15px;height:2px;background:#e5e8ef;z-index:1;}
   .line.l1{left:20%;right:50%;}
   .line.l2{left:50%;right:20%;}
 
-  /* Sites card */
-  .sites-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;flex:1;display:flex;flex-direction:column;min-height:560px;}
-  .sites-toolbar{display:flex;align-items:center;gap:14px;}
-  .sites-toolbar .all{font-size:16px;font-weight:700;color:var(--navy);}
+  /* Sites card: tamaño fijo (llena el espacio disponible); si hay más filas
+     de las que caben, solo #rows hace scroll interno, la tarjeta no crece. */
+  .sites-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;flex:1;display:flex;flex-direction:column;min-height:0;}
+  #rows{flex:1;overflow-y:auto;min-height:0;}
+  #usersCard{overflow-y:auto;}
+
+  /* Scrollbar de color propio en las zonas con scroll interno, para que se
+     note a simple vista que hay más filas/opciones debajo. */
+  #rows,#usersCard,.groups{scrollbar-width:thin;scrollbar-color:var(--blue) transparent;}
+  #rows::-webkit-scrollbar,#usersCard::-webkit-scrollbar,.groups::-webkit-scrollbar{width:8px;}
+  #rows::-webkit-scrollbar-track,#usersCard::-webkit-scrollbar-track,.groups::-webkit-scrollbar-track{background:transparent;}
+  #rows::-webkit-scrollbar-thumb,#usersCard::-webkit-scrollbar-thumb,.groups::-webkit-scrollbar-thumb{background:var(--blue);border-radius:20px;border:2px solid transparent;background-clip:padding-box;}
+  #rows::-webkit-scrollbar-thumb:hover,#usersCard::-webkit-scrollbar-thumb:hover,.groups::-webkit-scrollbar-thumb:hover{background:var(--blue-hover);background-clip:padding-box;}
+  .sites-toolbar{display:flex;align-items:center;gap:12px;}
+  .sites-toolbar .all{font-size:15px;font-weight:700;color:var(--navy);}
   .search{flex:1;max-width:420px;}
-  .search input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:#fbfcfe;}
+  .search input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:#fbfcfe;}
   .search input::placeholder{color:var(--muted);}
-  .filters-btn{padding:11px 18px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;}
+  .filters-btn{padding:9px 14px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;}
   .spacer{flex:1;}
 
-  .table-head{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:20px 6px 16px;border-bottom:1px solid var(--border);color:var(--navy);font-weight:700;font-size:14px;}
+  .table-head{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:10px 6px 8px;border-bottom:1px solid var(--border);color:var(--navy);font-weight:700;font-size:14px;}
   .table-head .r{text-align:center;}
 
-  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px;}
-  .empty .pic{display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
-  .empty .pic svg{width:230px;height:auto;}
-  .empty h3{font-size:28px;font-weight:800;color:var(--navy);max-width:440px;line-height:1.25;}
-  .empty p{color:var(--muted2);font-size:16px;margin:16px 0 28px;max-width:470px;line-height:1.5;}
+  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 20px;}
+  .empty .pic{display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .empty .pic svg{width:190px;height:auto;}
+  .empty h3{font-size:24px;font-weight:800;color:var(--navy);max-width:440px;line-height:1.25;}
+  .empty p{color:var(--muted2);font-size:14px;margin:12px 0 20px;max-width:470px;line-height:1.5;}
 
-  .table-footer{display:flex;justify-content:flex-end;align-items:center;gap:24px;color:var(--muted2);font-size:13px;padding-top:14px;margin-top:auto;}
+  .table-footer{display:flex;justify-content:flex-end;align-items:center;gap:24px;color:var(--muted2);font-size:13px;padding-top:10px;margin-top:auto;}
 
-  .site-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:16px 6px;border-bottom:1px solid var(--border);font-size:14px;align-items:center;}
+  .site-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:8px 6px;border-bottom:1px solid var(--border);font-size:13.5px;align-items:center;}
   .icon-btn.danger:hover{background:#fdecec;color:#e2453b;}
   .site-row .name{font-weight:600;color:var(--navy);}
   .site-row .r{text-align:center;color:var(--muted2);}
@@ -181,7 +218,7 @@
   .icon-btn svg{width:17px;height:17px;}
 
   /* Users table */
-  .u-row{display:grid;grid-template-columns:1.7fr 1.1fr 1.3fr 90px 110px 44px;padding:14px 6px;border-bottom:1px solid var(--border);font-size:14px;align-items:center;gap:8px;}
+  .u-row{display:grid;grid-template-columns:1.7fr 1.1fr 1.3fr 90px 110px 44px;padding:8px 6px;border-bottom:1px solid var(--border);font-size:13.5px;align-items:center;gap:8px;}
   .u-name-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;color:var(--navy);font-weight:600;outline:none;}
   .u-name-input:focus{border-color:var(--blue);}
   .u-site{color:var(--muted2);font-size:13px;}
@@ -194,6 +231,12 @@
   .u-pop-head .mini-link{margin-left:0;}
   .u-pop label{display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13px;color:var(--navy);cursor:pointer;}
   .u-pop input{accent-color:var(--blue);width:15px;height:15px;}
+  /* Autocomplete de sites en el modal de grupo (independiente del cierre global de .u-pop).
+     position:fixed para que no aporte al scrollHeight del modal ni quede recortado por su overflow:hidden;
+     top/left/width se calculan en JS a partir del input. */
+  .autocomplete-pop{position:fixed;z-index:250;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 30px rgba(20,29,51,.16);padding:10px 12px;}
+  .autocomplete-pop label{display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13px;color:var(--navy);cursor:pointer;}
+  .autocomplete-pop input{accent-color:var(--blue);width:15px;height:15px;}
   .sw{position:relative;display:inline-block;width:40px;height:22px;cursor:pointer;}
   .sw span{position:absolute;inset:0;background:#dfe3ea;border-radius:20px;transition:.2s;}
   .sw span::before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2);}
@@ -214,12 +257,20 @@
   .u-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
   .u-tab .tcount{font-size:12px;font-weight:700;background:#eef1f6;color:var(--muted2);padding:1px 8px;border-radius:20px;}
   .u-tab.active .tcount{background:#eaf1ff;color:var(--blue);}
-  .u-sec-head{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--navy);margin:26px 0 6px;}
+  .u-sec-head{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--navy);margin:18px 0 6px;}
   .u-sec-head:first-child{margin-top:0;}
   .u-sec-head .cnt{font-size:13px;font-weight:600;color:var(--muted);}
-  .m-row{display:grid;grid-template-columns:1.8fr 1.1fr 1fr 110px 44px;padding:14px 6px;border-bottom:1px solid var(--border);font-size:14px;align-items:center;gap:8px;}
+  .m-row{display:grid;grid-template-columns:1.8fr 1.1fr 1fr 110px 44px;padding:8px 6px;border-bottom:1px solid var(--border);font-size:13.5px;align-items:center;gap:8px;}
   .m-email{font-weight:600;color:var(--navy);}
   .role-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#eef2ff;color:#3b53a0;border:1px solid #cdd8fb;}
+
+  /* Tools tab */
+  .tools-grid{display:flex;flex-wrap:wrap;gap:14px;padding:24px 6px;}
+  .tool-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:150px;height:110px;border:1px solid var(--border);border-radius:12px;background:var(--card);cursor:pointer;font-family:inherit;color:var(--navy);transition:border-color .15s,box-shadow .15s;}
+  .tool-card:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(20,29,51,.08);}
+  .tool-card-ico{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:#eaf1ff;color:var(--blue);}
+  .tool-card-ico svg{width:18px;height:18px;}
+  .tool-card-label{font-size:13px;font-weight:600;}
 
   /* Wizard tabs + managers editor */
   .wiz-tabs{display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border);}
@@ -238,8 +289,24 @@
   .adm-roles-lbl{font-size:11px;font-weight:700;color:#7d8bab;letter-spacing:.4px;}
   .role-chip2{position:relative;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--navy);background:#fff;border:1px solid #c7d4f0;border-radius:20px;padding:6px 13px;cursor:default;}
   .role-chip2 svg{width:15px;height:15px;color:#4b6cb7;}
+  /* Chip de template aplicado (toggle: un click aplica, otro click sobre el mismo lo quita).
+     El ícono visible va en .rc-ico para no afectar los íconos del tooltip (.role-tip), que
+     conserva su fondo blanco siempre. */
+  .role-chip2.selected{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .role-chip2.selected .rc-ico svg{color:#fff;}
   .role-tip{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:70;width:260px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 34px rgba(20,29,51,.18);padding:14px 16px;cursor:default;}
   .role-chip2:hover .role-tip{display:block;}
+
+  /* Lista de "Existing templates" del modal de actions template */
+  .at-tpl-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 10px;border-radius:9px;cursor:default;}
+  .at-tpl-item:hover{background:#f6f8fc;}
+  .at-tpl-item .lbl{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .at-tpl-item .lbl svg{width:15px;height:15px;color:#4b6cb7;flex-shrink:0;}
+  .at-tpl-del{opacity:0;transition:opacity .15s;flex-shrink:0;}
+  .at-tpl-item:hover .at-tpl-del{opacity:1;}
+  /* Tooltip único y compartido (position:fixed) que previsualiza las acciones al hacer hover
+     sobre un template de la lista; evita el bug de scroll de un .role-tip absoluto dentro del modal. */
+  #atTplTip{display:none;position:fixed;z-index:260;width:260px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 34px rgba(20,29,51,.18);padding:14px 16px;}
   .rt-cap{font-size:11px;font-weight:700;color:#9aa3b4;letter-spacing:.5px;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
   .rt-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--navy);}
   .rt-title svg{width:16px;height:16px;}
@@ -355,7 +422,7 @@
   .hidden{display:none !important;}
 
   /* Modal */
-  .modal-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  .modal-overlay{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;
     background:rgba(27,42,74,.25);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}
   .modal-overlay.hidden{display:none;}
   .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;
@@ -391,6 +458,15 @@
     color:var(--text);background:#fff;font-family:inherit;margin-bottom:20px;}
   .fld::placeholder{color:var(--muted);}
   .fld:focus{outline:none;border-color:var(--blue);}
+  .fld.err{border-color:#e2453b;background:#fff6f6;}
+  .fld.err:focus{border-color:#e2453b;}
+  .fld-err{color:#e2453b;font-size:12.5px;font-weight:600;margin:-14px 0 16px;min-height:15px;}
+  .addr-hint{font-size:12.5px;color:var(--muted2);margin:-14px 0 16px;display:flex;align-items:center;gap:6px;}
+  .addr-hint.ok{color:#1c8a4b;font-weight:600;}
+  .addr-item{display:flex;align-items:flex-start;gap:9px;padding:9px 8px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--navy);line-height:1.4;}
+  .addr-item:hover{background:#f6f8fc;}
+  .addr-item svg{width:15px;height:15px;color:var(--muted);flex-shrink:0;margin-top:1px;}
+  .addr-empty{padding:10px 8px;font-size:13px;color:var(--muted2);}
   .fld-search{position:relative;margin-bottom:20px;}
   .fld-search .fld{margin-bottom:0;padding-right:44px;}
   .fld-search svg{position:absolute;right:15px;top:50%;transform:translateY(-50%);width:19px;height:19px;color:var(--muted);}
@@ -494,6 +570,32 @@
   .sp-r-empty h3{font-size:19px;}
   .sp-r-empty p{font-size:13px;margin:10px 0 18px;}
   .sp-illus{width:150px;height:120px;margin-bottom:14px;}
+
+  /* Map page */
+  .map-page-wrap{display:flex;flex-direction:column;height:100%;}
+  .map-card{position:relative;flex:1;min-height:620px;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  #siteMap{position:absolute;inset:0;background:var(--panel);}
+  .map-controls{position:absolute;top:16px;left:16px;z-index:500;display:flex;gap:10px;flex-wrap:wrap;max-width:calc(100% - 32px);}
+  .map-add-btn{position:absolute;top:16px;right:16px;z-index:500;}
+  .map-pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:24px;box-shadow:0 2px 10px rgba(20,29,51,.18);padding:11px 16px;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;border:none;font-family:inherit;white-space:nowrap;}
+  .map-pill svg{width:16px;height:16px;color:var(--muted2);flex-shrink:0;}
+  .map-pill.search-pill{padding:0 14px 0 0;}
+  .map-pill.search-pill svg{margin-left:14px;}
+  .map-pill.search-pill input{border:none;outline:none;background:transparent;font-size:14px;font-family:inherit;color:var(--navy);padding:11px 0 11px 8px;width:170px;}
+  .map-pill.search-pill input::placeholder{color:var(--muted);}
+  [data-theme="dark"] .map-pill{background:var(--card);color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.45);}
+  .map-empty-overlay{position:absolute;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+  .map-empty-card{pointer-events:auto;background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(20,29,51,.18);padding:30px 34px;text-align:center;max-width:320px;}
+  [data-theme="dark"] .map-empty-card{background:var(--card);}
+  .map-empty-card h3{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+  .map-empty-card p{font-size:13px;color:var(--muted2);margin-bottom:18px;line-height:1.5;}
+  .site-pin{background:transparent;border:none;}
+  .leaflet-popup-content-wrapper{border-radius:12px;}
+  .map-popup .mp-name{font-weight:700;color:var(--navy);font-size:13.5px;margin-bottom:2px;}
+  .map-popup .mp-type{font-size:11.5px;font-weight:600;color:var(--blue);margin-bottom:3px;}
+  .map-popup .mp-loc{font-size:12px;color:var(--muted2);}
+  .site-cluster{background:transparent;border:none;}
+  .cluster-bubble{width:38px;height:38px;border-radius:50%;background:#f2b21e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 3px 10px rgba(242,178,30,.5);border:3px solid #fff;}
 </style>
 </head>
 <body>
@@ -502,31 +604,28 @@
   <aside class="sidebar">
     <div class="sb-top">
       <div class="logo">
-        <svg viewBox="0 0 40 40" fill="none">
-          <path d="M6 12h20l-6 8H8z" fill="#f6c445"/>
-          <path d="M4 20h20l-6 8H6z" fill="#2f6bff"/>
-        </svg>
+        <img src="inarix-epi-signature.png" alt="Inarix" />
       </div>
-      <button class="collapse">&laquo;</button>
+      <button class="collapse" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Collapse sidebar">&laquo;</button>
     </div>
     <nav class="nav">
-      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3Z"/><path d="M9 3v15M15 6v15"/></svg>Map</a>
-      <a href="#" class="active" id="navSites" data-page="sites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>Sites</a>
-      <a href="#" id="navUsers" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.5-1-4-3-4.6"/></svg>Users</a>
-      <a href="#" id="navLicenses" data-page="licenses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg>Licenses</a>
-      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg>Dashboard</a>
-      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg>Devices</a>
+      <a href="#" id="navMap" data-page="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3Z"/><path d="M9 3v15M15 6v15"/></svg><span class="lbl-text">Map</span></a>
+      <a href="#" class="active" id="navSites" data-page="sites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg><span class="lbl-text">Sites</span></a>
+      <a href="#" id="navUsers" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.5-1-4-3-4.6"/></svg><span class="lbl-text">Users</span></a>
+      <a href="#" id="navLicenses" data-page="licenses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg><span class="lbl-text">Licenses</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg><span class="lbl-text">Dashboard</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg><span class="lbl-text">Devices</span></a>
     </nav>
     <div class="nav-bottom">
       <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark">
         <span class="tt-left">
           <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-          <span id="themeLabel">Dark mode</span>
+          <span id="themeLabel" class="lbl-text">Dark mode</span>
         </span>
         <span class="theme-switch"><span></span></span>
       </div>
-      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 9v11M15 9v11"/></svg>Data</a>
-      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.6 2.6c-.7.3-1.3.9-1.3 1.8v.4"/><circle cx="11.9" cy="17" r="0.4" fill="currentColor" stroke="none"/></svg>Help center</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 9v11M15 9v11"/></svg><span class="lbl-text">Data</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.6 2.6c-.7.3-1.3.9-1.3 1.8v.4"/><circle cx="11.9" cy="17" r="0.4" fill="currentColor" stroke="none"/></svg><span class="lbl-text">Help center</span></a>
     </div>
   </aside>
 
@@ -545,16 +644,17 @@
       <section class="groups" id="siteGroups">
         <h2>Site groups</h2>
         <p class="desc">Organize your sites into groups so you can more easily assign them to your users</p>
-        <button class="btn new-group">New group</button>
-        <div class="group-item active">
+        <button class="btn new-group" onclick="openGroupModal()">New group</button>
+        <div class="group-item active" id="grpAll" onclick="selectGroupFilter('all')">
           <span class="lbl">All sites</span>
           <span class="cnt">0</span>
         </div>
-        <div class="group-item">
+        <div class="group-item" id="grpShared" onclick="selectGroupFilter('shared')">
           <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8 15.8 6.2M8.2 13.2l7.6 4.6"/></svg>Sites shared by me</span>
           <span class="cnt">0</span>
         </div>
-        <div class="groups-note">This looks like a new organization. There are currently 0 groups and 0 sites.</div>
+        <div id="customGroups"></div>
+        <div class="groups-note" id="groupsNote">This looks like a new organization. There are currently 0 groups and 0 sites.</div>
       </section>
 
       <!-- Content -->
@@ -567,7 +667,7 @@
         <!-- Sites -->
         <div class="sites-card">
           <div class="sites-toolbar">
-            <span class="all">All sites</span>
+            <span class="all" id="tableGroupLabel">All sites</span>
             <div class="search"><input type="text" placeholder="Search sites..."></div>
             <button class="filters-btn">Filters</button>
             <div class="spacer"></div>
@@ -674,6 +774,47 @@
       </div>
     </div>
    </div><!-- /page-licenses -->
+
+   <!-- ================= MAP PAGE ================= -->
+   <div id="page-map" style="display:none;">
+    <div class="header-row">
+      <div>
+        <h1 class="page-title">Map</h1>
+        <p class="page-sub">View all your sites on the map.</p>
+      </div>
+    </div>
+
+    <div class="map-page-wrap" style="margin-top:22px;">
+      <div class="map-card">
+        <div id="siteMap"></div>
+        <div class="map-controls">
+          <div class="map-pill search-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="mapSearch" placeholder="Search sites..." oninput="mapSearchSites(this.value)">
+          </div>
+          <button class="map-pill" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.6l-5.2 2.9 1-5.8-4.2-4.1 5.8-.8L12 3.5Z"/></svg>
+            My views
+          </button>
+          <button class="map-pill" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg>
+            Date range
+          </button>
+        </div>
+        <button class="btn map-add-btn" onclick="openForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+          Add new site
+        </button>
+        <div class="map-empty-overlay" id="mapEmptyOverlay">
+          <div class="map-empty-card">
+            <h3 id="mapEmptyTitle">No sites on the map yet</h3>
+            <p id="mapEmptyDesc">Add a site with an address or coordinates to see it appear here.</p>
+            <button class="btn" onclick="openForm()">Add new site</button>
+          </div>
+        </div>
+      </div>
+    </div>
+   </div><!-- /page-map -->
   </main>
 </div>
 
@@ -720,22 +861,36 @@
         <label class="fld-label">Site name <span class="req">*</span></label>
         <input class="fld" id="fName" placeholder="Enter site name">
 
-        <label class="fld-label">Search address <span class="req">*</span></label>
-        <div class="fld-search">
-          <input class="fld" id="fAddress" placeholder="Search for an address">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        </div>
+        <label class="fld-label">Site type <span class="req">*</span></label>
+        <select class="fld" id="fType">
+          <option value="" disabled selected>Select a type</option>
+          <option value="farm">Farm</option>
+          <option value="storage">Storage</option>
+          <option value="industrial">Industrial site</option>
+        </select>
+        <div class="fld-err" id="fTypeErr"></div>
 
-        <div class="divider-text">Or enter coordinates manually</div>
+        <label class="fld-label">Search address (optional)</label>
+        <div class="fld-search" id="fAddressWrap" style="position:relative;">
+          <input class="fld" id="fAddress" placeholder="Search for an address" autocomplete="off"
+            oninput="onAddressInput()" onfocus="if(this.value.trim().length>=3) showAddressDropdown()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <div class="autocomplete-pop" id="fAddressDropdown" style="display:none;max-height:260px;overflow:auto;"></div>
+        </div>
+        <p class="addr-hint" id="fAddressHint" style="display:none;"></p>
+
+        <div class="divider-text">Coordinates</div>
 
         <div class="two-col">
           <div>
-            <label class="fld-label">Latitude</label>
-            <input class="fld" id="fLat" placeholder="Enter latitude (e.g., 40.7128)">
+            <label class="fld-label">Latitude <span class="req">*</span></label>
+            <input class="fld" id="fLat" type="number" step="any" min="-90" max="90" placeholder="e.g., 40.7128" oninput="validateCoordField('fLat',-90,90,'latitude')" onblur="validateCoordField('fLat',-90,90,'latitude',true)">
+            <div class="fld-err" id="fLatErr"></div>
           </div>
           <div>
-            <label class="fld-label">Longitude</label>
-            <input class="fld" id="fLng" placeholder="Enter longitude (e.g., -74.0060)">
+            <label class="fld-label">Longitude <span class="req">*</span></label>
+            <input class="fld" id="fLng" type="number" step="any" min="-180" max="180" placeholder="e.g., -74.0060" oninput="validateCoordField('fLng',-180,180,'longitude')" onblur="validateCoordField('fLng',-180,180,'longitude',true)">
+            <div class="fld-err" id="fLngErr"></div>
           </div>
         </div>
 
@@ -747,6 +902,37 @@
     <div class="form-footer">
       <button class="btn-back" onclick="closeForm()">Back</button>
       <button class="btn" onclick="submitForm()">Create site</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: crear un grupo de sites -->
+<div class="modal-overlay hidden" id="groupModal">
+  <div class="form-modal" style="max-width:480px;">
+    <div class="form-scroll">
+      <p class="form-top">Create a group to organize your sites.</p>
+
+      <div class="form-card">
+        <h4>Group details</h4>
+
+        <label class="fld-label">Group name <span class="req">*</span></label>
+        <input class="fld" id="gName" placeholder="Enter group name">
+
+        <label class="fld-label" style="margin-bottom:6px;">Sites in this group</label>
+        <div class="fld-search" id="gSiteSearchWrap" style="position:relative;">
+          <input class="fld" id="gSiteSearch" placeholder="Search sites..." autocomplete="off"
+            oninput="gFilterSites()" onfocus="gShowSiteDropdown()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <div class="autocomplete-pop" id="gSiteDropdown" style="display:none;max-height:230px;overflow:auto;"></div>
+        </div>
+
+        <div id="gSiteChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;"></div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn-back" onclick="closeGroupModal()">Back</button>
+      <button class="btn" onclick="submitGroupForm()">Create group</button>
     </div>
   </div>
 </div>
@@ -805,7 +991,20 @@
                 <button type="button" class="mini-link" onclick="genActionsAll(false)">Remove all</button>
               </span>
             </div>
-            <div id="genActions" style="margin-top:8px;"></div>
+
+            <div class="fld-search" id="genActionSearchWrap" style="position:relative;margin-top:10px;margin-bottom:0;">
+              <input class="fld" id="genActionSearch" placeholder="Search actions..." autocomplete="off"
+                oninput="genFilterActions()" onfocus="genShowActionDropdown()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <div class="autocomplete-pop" id="genActionDropdown" style="display:none;max-height:230px;overflow:auto;"></div>
+            </div>
+
+            <div id="genActionChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;"></div>
+
+            <div style="margin-top:20px;">
+              <div class="gen-q" style="font-size:13px;">Or apply an actions template</div>
+              <div id="genTemplatesList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
+            </div>
           </div>
 
           <div class="gen-nav">
@@ -969,6 +1168,36 @@
   </div>
 </div>
 
+<!-- Modal: confirmar borrado de grupo -->
+<div class="modal-overlay hidden" id="deleteGroupModal">
+  <div class="modal" style="max-width:440px;padding:36px 34px;">
+    <div class="del-ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+    </div>
+    <h3 style="font-size:22px;">Delete this group?</h3>
+    <p style="font-size:15px;">You're about to delete <b id="delGroupName">this group</b>. Its sites won't be deleted, only ungrouped. This action can't be undone.</p>
+    <div style="display:flex;gap:12px;width:100%;justify-content:center;">
+      <button class="btn-back" onclick="closeDeleteGroup()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeleteGroup()">Delete group</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: confirmar borrado de actions template -->
+<div class="modal-overlay hidden" id="deleteActionsTemplateModal" style="z-index:200;">
+  <div class="modal" style="max-width:440px;padding:36px 34px;">
+    <div class="del-ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+    </div>
+    <h3 style="font-size:22px;">Delete this template?</h3>
+    <p style="font-size:15px;">You're about to delete <b id="delAtName">this template</b>. This action can't be undone.</p>
+    <div style="display:flex;gap:12px;width:100%;justify-content:center;">
+      <button class="btn-back" onclick="closeDeleteActionsTemplate()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeleteActionsTemplate()">Delete template</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: storage spaces (capacity de cada site) -->
 <div class="modal-overlay hidden" id="storageModal">
   <div class="storage-modal">
@@ -1009,12 +1238,66 @@
   </div>
 </div>
 
+<!-- Modal: crear un actions template -->
+<div class="modal-overlay hidden" id="actionsTemplateModal">
+  <div class="form-modal" style="max-width:840px;">
+    <div class="form-scroll">
+      <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:22px;">
+        <div style="flex:none;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:12px;background:#eef1f7;">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#6b7789" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.5 4.7L3 17.2V21h3.8l6.2-6.2a4 4 0 0 0 4.7-5.5l-2.8 2.8-2.1-2.1z"/></svg>
+        </div>
+        <div>
+          <h3 style="font-size:19px;font-weight:800;color:var(--navy);margin:0 0 6px;">Actions template</h3>
+          <p style="color:var(--muted2);font-size:14px;margin:0;line-height:1.5;">Create preconfigured presets of actions so that, when creating users, you can pick a template and instantly assign that whole set of actions to a group of users — instead of selecting each action one by one.</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:20px;align-items:flex-start;">
+        <div class="form-card" style="flex:1;min-width:0;margin-bottom:0;">
+          <h4>Template details</h4>
+
+          <label class="fld-label">Template name <span class="req">*</span></label>
+          <input class="fld" id="atName" placeholder="Enter template name">
+
+          <label class="fld-label" style="margin-bottom:6px;">Actions in this template</label>
+          <div class="fld-search" id="atActionSearchWrap" style="position:relative;">
+            <input class="fld" id="atActionSearch" placeholder="Search actions..." autocomplete="off"
+              oninput="atFilterActions()" onfocus="atShowDropdown()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <div class="autocomplete-pop" id="atActionDropdown" style="display:none;max-height:230px;overflow:auto;"></div>
+          </div>
+
+          <div id="atActionChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;"></div>
+        </div>
+
+        <div style="width:250px;flex-shrink:0;border:1px solid var(--border);border-radius:14px;padding:16px;align-self:stretch;">
+          <div class="sp-head" style="margin-bottom:8px;">Existing templates</div>
+          <div id="atTemplatesList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="atTplTip"></div>
+
+    <div class="form-footer">
+      <button class="btn-back" onclick="closeActionsTemplate()">Back</button>
+      <button class="btn" onclick="submitActionsTemplate()">Save template</button>
+    </div>
+  </div>
+</div>
+
 <!-- Snackbar -->
 <div id="snackbar"></div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
   // Lista de sitios. Vacía = estado inicial (sin sitios).
   let sites = [];
+  let nextSiteId = 1;
+  // Grupo actualmente seleccionado en el panel izquierdo: 'all' | 'shared' | índice en `groups`
+  let activeGroupFilter = 'all';
 
   // Persistencia solo de sites en localStorage
   const SITES_KEY = 'fleetview_sites_v1';
@@ -1026,6 +1309,29 @@
       const raw = localStorage.getItem(SITES_KEY);
       if(raw){ const arr = JSON.parse(raw); if(Array.isArray(arr)) sites = arr; }
     }catch(e){}
+    // Asigna un id estable a cada site (para poder referenciarlos desde los grupos
+    // incluso si la lista se reordena o se borran otros sites).
+    let maxId = sites.reduce((m,s) => Math.max(m, s.id||0), 0);
+    let migrated = false;
+    sites.forEach(s => { if(!s.id){ s.id = ++maxId; migrated = true; } });
+    nextSiteId = maxId + 1;
+    if (migrated) persistSites();
+  }
+
+  // Sites visibles según el grupo seleccionado en el panel izquierdo
+  function visibleSites(){
+    if (activeGroupFilter === 'all') return sites.map((s,i) => ({ s, i }));
+    if (activeGroupFilter === 'shared') return []; // no hay sites "compartidos" en este prototipo
+    const g = groups[activeGroupFilter];
+    if (!g) return sites.map((s,i) => ({ s, i }));
+    const ids = g.siteIds || [];
+    return sites.map((s,i) => ({ s, i })).filter(({s}) => ids.includes(s.id));
+  }
+
+  // Selecciona un grupo del panel izquierdo y refiltra la tabla de sites
+  function selectGroupFilter(key){
+    activeGroupFilter = key;
+    render();
   }
 
   function render(){
@@ -1037,6 +1343,7 @@
     // Sin sitios -> solo el botón dentro de la tabla (estado vacío)
     // Con sitios -> solo el botón del header de la tabla (toolbar)
     empty.classList.toggle('hidden', hasSites);
+    rows.classList.toggle('hidden', !hasSites);
     btnToolbar.classList.toggle('hidden', !hasSites);
 
     // Ocultar el panel "Site groups" mientras no haya ningún site
@@ -1053,13 +1360,16 @@
     document.getElementById('stepperSites').innerHTML = sh;
     document.getElementById('stepperUsers').innerHTML = sh;
 
-    rows.innerHTML = sites.map((s, idx) => `
+    const visible = hasSites ? visibleSites() : [];
+
+    rows.innerHTML = visible.length
+      ? visible.map(({s, i}) => `
       <div class="site-row">
         <span class="name">${s.name}</span>
         <span class="r">${s.localisation}</span>
         <span class="r">${s.group}</span>
         <span class="r cap-cell">${capacityLabel(s)}
-          <button class="icon-btn" title="Edit capacity" onclick="openStorage(${idx})">
+          <button class="icon-btn" title="Edit capacity" onclick="openStorage(${i})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
           </button>
         </span>
@@ -1069,25 +1379,164 @@
           </button>
         </span>
         <span class="r">
-          <button class="icon-btn danger" title="Delete site" onclick="askDeleteSite(${idx})">
+          <button class="icon-btn danger" title="Delete site" onclick="askDeleteSite(${i})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
           </button>
         </span>
-      </div>`).join('');
+      </div>`).join('')
+      : (hasSites ? `<div class="draft-empty">No sites in this group yet.</div>` : '');
 
-    const n = sites.length;
+    const n = visible.length;
     document.getElementById('pageCount').textContent =
       n === 0 ? '0—0 of 0' : `1—${n} of ${n}`;
-    document.querySelectorAll('.group-item .cnt')[0].textContent = n;
+    document.querySelectorAll('.group-item .cnt')[0].textContent = sites.length;
+
+    const groupLabel = document.getElementById('tableGroupLabel');
+    if (groupLabel){
+      groupLabel.textContent = activeGroupFilter === 'all' ? 'All sites'
+        : activeGroupFilter === 'shared' ? 'Sites shared by me'
+        : (groups[activeGroupFilter] ? groups[activeGroupFilter].name : 'All sites');
+    }
+    renderGroupsList();
+    if (siteMap) refreshMapMarkers();
   }
 
   // Abre el formulario de creación de site
   function openForm(){
     document.getElementById('formModal').classList.remove('hidden');
     ['fName','fAddress','fLat','fLng','fId'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fType').value = '';
+    document.getElementById('fType').classList.remove('err');
+    document.getElementById('fTypeErr').textContent = '';
+    clearCoordError('fLat'); clearCoordError('fLng');
+    setAddressHint('');
+    hideAddressDropdown();
     document.getElementById('fName').focus();
   }
   function closeForm(){ document.getElementById('formModal').classList.add('hidden'); }
+
+  // Valida un campo de coordenada (lat o lng) en vivo y refleja el error en el campo
+  function coordFieldMessage(id, min, max, label){
+    const raw = document.getElementById(id).value.trim();
+    if (!raw) return `The ${label} is required.`;
+    if (isNaN(Number(raw))) return `The ${label} must be a number.`;
+    const val = Number(raw);
+    if (val < min || val > max) return `The ${label} must be between ${min} and ${max} degrees.`;
+    return '';
+  }
+  function clearCoordError(id){
+    const input = document.getElementById(id);
+    const errEl = document.getElementById(id + 'Err');
+    if (input) input.classList.remove('err');
+    if (errEl) errEl.textContent = '';
+  }
+  function validateCoordField(id, min, max, label, requireNow){
+    const raw = document.getElementById(id).value.trim();
+    // Mientras el usuario está escribiendo, no se marca "required" hasta que sale del campo (blur) o envía
+    if (!raw && !requireNow){ clearCoordError(id); return true; }
+    const msg = coordFieldMessage(id, min, max, label);
+    document.getElementById(id).classList.toggle('err', !!msg);
+    document.getElementById(id + 'Err').textContent = msg;
+    return !msg;
+  }
+
+  /* ================= GEOCODER (buscador de direcciones) ================= */
+  // Nominatim (OpenStreetMap) vía leaflet-control-geocoder: gratis, sin API key.
+  const addressGeocoder = L.Control.Geocoder.nominatim();
+  let addrSearchToken = 0;   // descarta respuestas de búsquedas ya obsoletas
+  let addrDebounceTimer = null;
+  const ADDR_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>`;
+
+  function onAddressInput(){
+    const q = document.getElementById('fAddress').value.trim();
+    setAddressHint('');
+    clearTimeout(addrDebounceTimer);
+    if (q.length < 3){ hideAddressDropdown(); return; }
+    addrDebounceTimer = setTimeout(() => runAddressSearch(q), 450);
+  }
+
+  function runAddressSearch(q){
+    const myToken = ++addrSearchToken;
+    renderAddressDropdown(null); // estado "Searching..."
+    showAddressDropdown();
+    addressGeocoder.geocode(q, results => {
+      if (myToken !== addrSearchToken) return; // llegó tarde, ya no aplica
+      renderAddressDropdown(results || []);
+    });
+  }
+
+  function renderAddressDropdown(results){
+    const dd = document.getElementById('fAddressDropdown');
+    if (!dd) return;
+    if (results === null){
+      dd.innerHTML = `<div class="addr-empty">Searching…</div>`;
+      return;
+    }
+    if (!results.length){
+      dd.innerHTML = `<div class="addr-empty">No addresses found.</div>`;
+      return;
+    }
+    dd.innerHTML = results.map((r, i) => `
+      <div class="addr-item" onclick="selectAddressResult(${i})">
+        ${ADDR_ICON}
+        <span>${r.name}</span>
+      </div>`).join('');
+    window._addrResults = results;
+  }
+
+  function selectAddressResult(i){
+    const r = (window._addrResults || [])[i];
+    if (!r) return;
+    document.getElementById('fAddress').value = r.name;
+    document.getElementById('fLat').value = r.center.lat.toFixed(6);
+    document.getElementById('fLng').value = r.center.lng.toFixed(6);
+    validateCoordField('fLat', -90, 90, 'latitude', true);
+    validateCoordField('fLng', -180, 180, 'longitude', true);
+    setAddressHint(`Coordinates set from address (${r.center.lat.toFixed(4)}, ${r.center.lng.toFixed(4)})`, true);
+    hideAddressDropdown();
+  }
+
+  function setAddressHint(text, ok){
+    const hint = document.getElementById('fAddressHint');
+    if (!hint) return;
+    hint.textContent = text;
+    hint.classList.toggle('ok', !!ok);
+    hint.style.display = text ? 'flex' : 'none';
+  }
+
+  // Posiciona el dropdown con position:fixed (mismo patrón que gSiteDropdown) para que
+  // no aporte altura al .form-scroll ni quede recortado por su overflow.
+  function positionAddressDropdown(){
+    const input = document.getElementById('fAddress');
+    const dd = document.getElementById('fAddressDropdown');
+    if (!input || !dd) return;
+    const r = input.getBoundingClientRect();
+    dd.style.left = r.left + 'px';
+    dd.style.top = (r.bottom + 5) + 'px';
+    dd.style.width = r.width + 'px';
+  }
+  function showAddressDropdown(){
+    const dd = document.getElementById('fAddressDropdown');
+    if (!dd) return;
+    positionAddressDropdown();
+    dd.style.display = 'block';
+  }
+  function hideAddressDropdown(){
+    const dd = document.getElementById('fAddressDropdown');
+    if (dd) dd.style.display = 'none';
+  }
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('fAddressWrap');
+    if (wrap && !wrap.contains(e.target)) hideAddressDropdown();
+  });
+  window.addEventListener('resize', () => {
+    const dd = document.getElementById('fAddressDropdown');
+    if (dd && dd.style.display === 'block') positionAddressDropdown();
+  });
+  document.addEventListener('scroll', () => {
+    const dd = document.getElementById('fAddressDropdown');
+    if (dd && dd.style.display === 'block') positionAddressDropdown();
+  }, true);
 
   // Borrado de site con confirmación
   let siteToDelete = null;
@@ -1103,27 +1552,377 @@
     render();
   }
 
-  // Crea el site a partir del formulario
+  // Crea el site a partir del formulario. Lat/Lng son obligatorios y deben respetar
+  // los rangos válidos de coordenadas (-90..90 / -180..180); sin eso no hay pin que mostrar en el mapa.
   function submitForm(){
     const name = document.getElementById('fName').value.trim();
+    const type = document.getElementById('fType').value;
     const address = document.getElementById('fAddress').value.trim();
-    const lat = document.getElementById('fLat').value.trim();
-    const lng = document.getElementById('fLng').value.trim();
+
+    const typeEl = document.getElementById('fType');
+    const typeOk = !!type;
+    typeEl.classList.toggle('err', !typeOk);
+    document.getElementById('fTypeErr').textContent = typeOk ? '' : 'Please select a site type.';
+
+    const latOk = validateCoordField('fLat', -90, 90, 'latitude', true);
+    const lngOk = validateCoordField('fLng', -180, 180, 'longitude', true);
+
     if (!name){ document.getElementById('fName').focus(); return; }
+    if (!typeOk){ typeEl.focus(); return; }
+    if (!latOk){ document.getElementById('fLat').focus(); return; }
+    if (!lngOk){ document.getElementById('fLng').focus(); return; }
 
-    let loc = address;
-    if (!loc && lat && lng) loc = lat + ', ' + lng;
-    if (!loc) loc = '—';
+    const lat = Number(document.getElementById('fLat').value.trim());
+    const lng = Number(document.getElementById('fLng').value.trim());
+    const localisation = address || `${lat}, ${lng}`;
 
-    sites.push({ name, localisation: loc, group: '—', storages: [] });
+    sites.push({ id: nextSiteId++, name, type, localisation, lat, lng, group: '—', storages: [] });
     persistSites();
     render();
     closeForm();
+    showSnack('Site created');
   }
 
   // Cerrar el formulario al hacer click fuera
   document.getElementById('formModal').addEventListener('click', e => {
     if (e.target.id === 'formModal') closeForm();
+  });
+
+  /* ================= MAP ================= */
+  let siteMap = null;
+  let siteTileLayer = null;
+  let siteClusterGroup = null;
+  let siteMarkers = [];
+  // Estilo topográfico (OpenTopoMap) en claro: bosques en verde, agua en azul y relieve/montañas
+  // sombreadas con curvas de nivel. En oscuro se mantiene CARTO Dark Matter (no hay variante oscura
+  // de OpenTopoMap) para conservar la legibilidad del modo oscuro del resto de la app.
+  const MAP_TILE_CONFIG = {
+    light: {
+      url: 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png',
+      maxZoom: 20,
+      attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank" rel="noopener">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
+    },
+    dark: {
+      url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      subdomains: 'abcd',
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+    },
+  };
+  function buildTileLayer(isDark){
+    const cfg = MAP_TILE_CONFIG[isDark ? 'dark' : 'light'];
+    return L.tileLayer(cfg.url, { attribution: cfg.attribution, maxZoom: cfg.maxZoom, subdomains: cfg.subdomains });
+  }
+
+  // Pin por tipo de site: color + glifo blanco, igual al esquema de la referencia
+  // (verde/hoja = farm, amarillo/silo = storage, azul/fábrica = industrial).
+  const SITE_TYPES = {
+    farm:       { label: 'Farm',            color: '#22a55e', glyph: '<path d="M12 5c3.5 3.5 3.5 10.5 0 14-3.5-3.5-3.5-10.5 0-14Z" fill="#fff"/>' },
+    storage:    { label: 'Storage',         color: '#f2b21e', glyph: '<path d="M6 13a3.5 3.5 0 0 1 7 0v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1Z" fill="#fff"/><path d="M13 15a2.8 2.8 0 0 1 5.6 0v6a1 1 0 0 1-1 1h-3.6a1 1 0 0 1-1-1Z" fill="#fff"/>' },
+    industrial: { label: 'Industrial site',  color: '#2f6bff', glyph: '<path d="M4 21V11L12 5L20 11V21Z" fill="#fff"/>' },
+  };
+  const DEFAULT_SITE_TYPE = 'industrial'; // fallback solo para sites guardados antes de que "type" existiera
+
+  function buildPinIcon(typeKey){
+    const t = SITE_TYPES[typeKey] || SITE_TYPES[DEFAULT_SITE_TYPE];
+    return L.divIcon({
+      className: 'site-pin',
+      html: `<svg width="32" height="42" viewBox="0 0 24 32" fill="none"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12Z" fill="${t.color}"/>${t.glyph}</svg>`,
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -38],
+    });
+  }
+  const PIN_ICONS = Object.fromEntries(Object.keys(SITE_TYPES).map(k => [k, buildPinIcon(k)]));
+
+  // Interpreta "localisation" como "lat, lng" — fallback para sites guardados antes de que
+  // lat/lng se volvieran campos estructurados y obligatorios en el formulario.
+  function parseLatLng(loc){
+    if (!loc) return null;
+    const m = String(loc).trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+    if (!m) return null;
+    const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+    if (isNaN(lat) || isNaN(lng)) return null;
+    return [lat, lng];
+  }
+
+  // Coordenadas de un site: usa lat/lng estructurados si existen y son válidos,
+  // si no cae al parseo de la localisation (sites creados antes de este cambio).
+  function siteCoords(s){
+    if (typeof s.lat === 'number' && typeof s.lng === 'number' &&
+        !isNaN(s.lat) && !isNaN(s.lng) &&
+        s.lat >= -90 && s.lat <= 90 && s.lng >= -180 && s.lng <= 180){
+      return [s.lat, s.lng];
+    }
+    return parseLatLng(s.localisation);
+  }
+
+  function initMap(){
+    if (siteMap) return;
+    siteMap = L.map('siteMap', { zoomControl: true }).setView([46.6, 2.4], 6);
+    siteMap.zoomControl.setPosition('bottomright');
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    siteTileLayer = buildTileLayer(isDark).addTo(siteMap);
+    // Agrupa pines cercanos en clusters para no saturar el mapa con muchos sites juntos.
+    // Si el plugin de clustering no llegó a cargar (CDN caído/bloqueado), cae a un layer
+    // group simple para que los pines igual se muestren sin agrupar.
+    siteClusterGroup = (typeof L.markerClusterGroup === 'function')
+      ? L.markerClusterGroup({
+          maxClusterRadius: 50,
+          spiderfyOnMaxZoom: true,
+          showCoverageOnHover: false,
+          iconCreateFunction: cluster => L.divIcon({
+            html: `<div class="cluster-bubble">${cluster.getChildCount()}</div>`,
+            className: 'site-cluster',
+            iconSize: [38, 38],
+          }),
+        })
+      : L.layerGroup();
+    siteMap.addLayer(siteClusterGroup);
+  }
+
+  // Cambia el estilo de tiles cuando se alterna el tema claro/oscuro
+  function setMapThemeTiles(isDark){
+    if (!siteMap || !siteTileLayer) return;
+    siteMap.removeLayer(siteTileLayer);
+    siteTileLayer = buildTileLayer(isDark).addTo(siteMap);
+  }
+
+  function refreshMapMarkers(){
+    if (!siteMap || !siteClusterGroup) return;
+    siteClusterGroup.clearLayers();
+    siteMarkers = [];
+    const pts = [];
+    sites.forEach(s => {
+      const ll = siteCoords(s);
+      if (!ll) return;
+      const typeKey = SITE_TYPES[s.type] ? s.type : DEFAULT_SITE_TYPE;
+      const marker = L.marker(ll, { icon: PIN_ICONS[typeKey] });
+      marker.bindPopup(`<div class="map-popup"><div class="mp-name">${s.name}</div><div class="mp-type">${SITE_TYPES[typeKey].label}</div><div class="mp-loc">${s.localisation}</div></div>`);
+      marker._siteName = s.name.toLowerCase();
+      siteMarkers.push(marker);
+      siteClusterGroup.addLayer(marker);
+      pts.push(ll);
+    });
+    const overlay = document.getElementById('mapEmptyOverlay');
+    if (overlay){
+      const title = document.getElementById('mapEmptyTitle');
+      const desc = document.getElementById('mapEmptyDesc');
+      if (pts.length === 0 && sites.length > 0){
+        // Hay sites, pero ninguno tiene coordenadas válidas (ej. creados antes de que
+        // lat/lng fueran obligatorios) — se lo dejamos claro en vez de mostrar un mensaje genérico.
+        if (title) title.textContent = 'No sites have valid coordinates';
+        if (desc) desc.textContent = `You have ${sites.length} site(s), but none have a valid latitude/longitude. Edit or recreate them with coordinates to see them here.`;
+      } else {
+        if (title) title.textContent = 'No sites on the map yet';
+        if (desc) desc.textContent = 'Add a site with an address or coordinates to see it appear here.';
+      }
+      overlay.style.display = pts.length ? 'none' : 'flex';
+    }
+    if (pts.length === 1) siteMap.setView(pts[0], 13);
+    else if (pts.length > 1) siteMap.fitBounds(pts, { padding: [60, 60] });
+    else siteMap.setView([46.6, 2.4], 6);
+  }
+
+  // Pill de búsqueda del mapa: hace zoom/spiderfy hasta mostrar el marker (aunque esté
+  // agrupado en un cluster) y abre su popup. Si el cluster group cayó al fallback sin
+  // clustering (L.layerGroup), no tiene zoomToShowLayer, así que centra directo.
+  function mapSearchSites(q){
+    q = q.trim().toLowerCase();
+    if (!q || !siteMap || !siteClusterGroup) return;
+    const match = siteMarkers.find(m => m._siteName.includes(q));
+    if (!match) return;
+    if (typeof siteClusterGroup.zoomToShowLayer === 'function'){
+      siteClusterGroup.zoomToShowLayer(match, () => match.openPopup());
+    } else {
+      siteMap.setView(match.getLatLng(), 15);
+      match.openPopup();
+    }
+  }
+
+  /* ---------- Site groups ---------- */
+  let groups = []; // { name, siteIds: [] } — siteIds referencia site.id (estable ante borrados/reordenamientos)
+  const GROUPS_KEY = 'fleetview_groups_v1';
+  function persistGroups(){
+    try{ localStorage.setItem(GROUPS_KEY, JSON.stringify(groups)); }catch(e){}
+  }
+  function loadGroups(){
+    try{
+      const raw = localStorage.getItem(GROUPS_KEY);
+      if(raw){ const arr = JSON.parse(raw); if(Array.isArray(arr)) groups = arr; }
+    }catch(e){}
+  }
+
+  function renderGroupsList(){
+    const list = document.getElementById('customGroups');
+    const note = document.getElementById('groupsNote');
+    if (!list || !note) return;
+
+    list.innerHTML = groups.map((g,i) => {
+      // Cuenta solo los sites que todavía existen (ids de sites borrados no inflan el contador)
+      const cnt = (g.siteIds||[]).filter(id => sites.some(s => s.id === id)).length;
+      return `
+      <div class="group-item ${activeGroupFilter===i?'active':''}" onclick="selectGroupFilter(${i})">
+        <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>${g.name}</span>
+        <span class="right">
+          <span class="cnt">${cnt}</span>
+          <button class="icon-btn danger grp-del" title="Delete group" onclick="event.stopPropagation(); askDeleteGroup(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+          </button>
+        </span>
+      </div>`;
+    }).join('');
+
+    const grpAll = document.getElementById('grpAll');
+    const grpShared = document.getElementById('grpShared');
+    if (grpAll) grpAll.classList.toggle('active', activeGroupFilter === 'all');
+    if (grpShared) grpShared.classList.toggle('active', activeGroupFilter === 'shared');
+
+    note.textContent = `This looks like a new organization. There are currently ${groups.length} group${groups.length===1?'':'s'} and ${sites.length} site${sites.length===1?'':'s'}.`;
+  }
+
+  // Selección de sites en curso dentro del modal de grupo (autocomplete + chips).
+  // Se referencia por site.id, no por índice, para que sea estable ante borrados.
+  let gSelected = [];
+
+  function gRenderChips(){
+    const box = document.getElementById('gSiteChips');
+    if (!box) return;
+    box.innerHTML = gSelected.length
+      ? gSelected.map(id => {
+          const s = sites.find(x => x.id === id);
+          return s ? `
+        <span class="rev-chip" style="display:inline-flex;align-items:center;gap:7px;">
+          ${s.name}
+          <span style="cursor:pointer;font-weight:700;line-height:1;" onclick="gToggleSite(${id})">&times;</span>
+        </span>` : '';
+        }).join('')
+      : `<p style="color:var(--muted2);font-size:12.5px;margin:2px 0 0;">No sites selected yet.</p>`;
+  }
+
+  function gRenderDropdown(filter){
+    const dd = document.getElementById('gSiteDropdown');
+    if (!dd) return;
+    if (!sites.length){
+      dd.innerHTML = `<p style="color:var(--muted2);font-size:13px;padding:8px 6px;margin:0;">No sites yet. Create a site first.</p>`;
+      return;
+    }
+    const f = (filter || '').trim().toLowerCase();
+    const matches = sites.filter(s => !f || s.name.toLowerCase().includes(f));
+    const allSelected = sites.length > 0 && gSelected.length === sites.length;
+
+    const rows = [`
+      <label style="display:flex;align-items:center;gap:9px;padding:8px 6px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;border-bottom:1px solid var(--border);margin-bottom:4px;">
+        <input type="checkbox" ${allSelected?'checked':''} onchange="gToggleAll(this.checked)"> Select all
+      </label>`];
+    rows.push(matches.length
+      ? matches.map(s => `
+        <label style="display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13px;color:var(--navy);cursor:pointer;">
+          <input type="checkbox" ${gSelected.includes(s.id)?'checked':''} onchange="gToggleSite(${s.id})"> ${s.name}
+        </label>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;padding:6px 2px;margin:0;">No matching sites.</p>`);
+    dd.innerHTML = rows.join('');
+  }
+
+  function gToggleSite(id){
+    const pos = gSelected.indexOf(id);
+    if (pos > -1) gSelected.splice(pos, 1); else gSelected.push(id);
+    gRenderDropdown(document.getElementById('gSiteSearch').value);
+    gRenderChips();
+  }
+  function gToggleAll(checked){
+    gSelected = checked ? sites.map(s => s.id) : [];
+    gRenderDropdown(document.getElementById('gSiteSearch').value);
+    gRenderChips();
+  }
+  function gFilterSites(){
+    gShowSiteDropdown();
+    gRenderDropdown(document.getElementById('gSiteSearch').value);
+  }
+  // Posiciona el dropdown con position:fixed según el input (no debe aportar
+  // altura al .form-scroll del modal ni quedar recortado por su overflow).
+  function gPositionDropdown(){
+    const input = document.getElementById('gSiteSearch');
+    const dd = document.getElementById('gSiteDropdown');
+    if (!input || !dd) return;
+    const r = input.getBoundingClientRect();
+    dd.style.left = r.left + 'px';
+    dd.style.top = (r.bottom + 5) + 'px';
+    dd.style.width = r.width + 'px';
+  }
+  function gShowSiteDropdown(){
+    const dd = document.getElementById('gSiteDropdown');
+    if (!dd) return;
+    gPositionDropdown();
+    dd.style.display = 'block';
+  }
+
+  // Cierra el dropdown de sites al clicar fuera de él
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('gSiteSearchWrap');
+    if (wrap && !wrap.contains(e.target)) document.getElementById('gSiteDropdown').style.display = 'none';
+  });
+  // Mantiene el dropdown alineado si el modal hace scroll o la ventana cambia de tamaño
+  window.addEventListener('resize', () => {
+    const dd = document.getElementById('gSiteDropdown');
+    if (dd && dd.style.display === 'block') gPositionDropdown();
+  });
+  document.addEventListener('scroll', () => {
+    const dd = document.getElementById('gSiteDropdown');
+    if (dd && dd.style.display === 'block') gPositionDropdown();
+  }, true);
+
+  // Abre el modal para crear un grupo de sites
+  function openGroupModal(){
+    document.getElementById('gName').value = '';
+    document.getElementById('gSiteSearch').value = '';
+    gSelected = [];
+    gRenderDropdown('');
+    gRenderChips();
+    document.getElementById('gSiteDropdown').style.display = 'none';
+    document.getElementById('groupModal').classList.remove('hidden');
+    document.getElementById('gName').focus();
+  }
+  function closeGroupModal(){ document.getElementById('groupModal').classList.add('hidden'); }
+
+  // Crea el grupo a partir del formulario y luego continúa (cierra el modal)
+  function submitGroupForm(){
+    const name = document.getElementById('gName').value.trim();
+    if (!name){ document.getElementById('gName').focus(); return; }
+
+    groups.push({ name, siteIds: gSelected.slice() });
+    persistGroups();
+    renderGroupsList();
+    closeGroupModal();
+    showSnack('Group created');
+  }
+
+  document.getElementById('groupModal').addEventListener('click', e => {
+    if (e.target.id === 'groupModal') closeGroupModal();
+  });
+
+  // Borrado de grupo con confirmación (no borra los sites, solo el grupo)
+  let groupToDelete = null;
+  function askDeleteGroup(i){
+    groupToDelete = i;
+    document.getElementById('delGroupName').textContent = groups[i] ? groups[i].name : 'this group';
+    document.getElementById('deleteGroupModal').classList.remove('hidden');
+  }
+  function closeDeleteGroup(){ groupToDelete = null; document.getElementById('deleteGroupModal').classList.add('hidden'); }
+  function confirmDeleteGroup(){
+    if (groupToDelete !== null && groups[groupToDelete]){
+      groups.splice(groupToDelete, 1);
+      persistGroups();
+      // Mantiene el filtro activo apuntando al mismo grupo tras el corrimiento de índices
+      if (activeGroupFilter === groupToDelete) activeGroupFilter = 'all';
+      else if (typeof activeGroupFilter === 'number' && activeGroupFilter > groupToDelete) activeGroupFilter--;
+    }
+    closeDeleteGroup();
+    render();
+    showSnack('Group deleted');
+  }
+  document.getElementById('deleteGroupModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteGroupModal') closeDeleteGroup();
   });
 
   /* ---------- Storage spaces ---------- */
@@ -1311,14 +2110,14 @@
       <div class="line l1"></div>
       <div class="line l2"></div>
       <div class="step active">
-        <div class="circle done clickable" onclick="showPage('sites')" title="Go to sites">${CHECK}</div>
+        <div class="circle ${hasSites?'done ':''}clickable" onclick="showPage('sites')" title="Go to sites">${hasSites?CHECK:'1'}</div>
         <div class="st-title clickable" onclick="showPage('sites')">Add sites</div>
-        <div class="st-sub">Ready</div>
+        <div class="st-sub">${hasSites?'Ready':'Add your first site'}</div>
       </div>
       <div class="step ${hasSites?'active':'locked'}">
-        <div class="circle ${hasSites?'done clickable':''}" ${hasSites?"onclick=\"showPage('users')\" title=\"Go to users\"":''}>${hasSites?CHECK:'2'+LOCK}</div>
+        <div class="circle ${hasUsers?'done ':''}${hasSites?'clickable':''}" ${hasSites?"onclick=\"showPage('users')\" title=\"Go to users\"":''}>${hasUsers?CHECK:(hasSites?'2':'2'+LOCK)}</div>
         <div class="st-title ${hasSites?'clickable':''}" ${hasSites?"onclick=\"showPage('users')\"":''}>Add users</div>
-        <div class="st-sub">${hasSites?'Ready to add users':'Available after your first site'}</div>
+        <div class="st-sub">${hasUsers?'Ready':(hasSites?'Ready to add users':'Available after your first site')}</div>
       </div>
       <div class="step ${lic?'active':'locked'}">
         <div class="circle ${lic?'done clickable':''}" ${lic?"onclick=\"showPage('licenses')\" title=\"Go to licenses\"":''}>${lic?CHECK:'3'+LOCK}</div>
@@ -1329,14 +2128,18 @@
 
   // Navegación entre páginas (Sites / Users / Licenses)
   function showPage(name){
-    const pages = { sites:'page-sites', users:'page-users', licenses:'page-licenses' };
+    const pages = { sites:'page-sites', users:'page-users', licenses:'page-licenses', map:'page-map' };
     Object.entries(pages).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) el.style.display = k===name ? 'block' : 'none'; });
-    const navIds = { sites:'navSites', users:'navUsers', licenses:'navLicenses' };
+    const navIds = { sites:'navSites', users:'navUsers', licenses:'navLicenses', map:'navMap' };
     document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
     const active = document.getElementById(navIds[name]);
     if (active) active.classList.add('active');
     if (name==='users') renderUsers();
     else if (name==='sites') render();
+    else if (name==='map'){
+      initMap();
+      requestAnimationFrame(() => { siteMap.invalidateSize(); refreshMapMarkers(); });
+    }
   }
 
   function openModal(){ document.getElementById('siteModal').classList.remove('hidden'); }
@@ -1362,7 +2165,9 @@
       e.preventDefault();
       const page = link.dataset.page;
       if (page === 'sites'){ showPage('sites'); return; }
-      // Sin ningún site, cualquier otra sección queda bloqueada
+      // El mapa también permite crear el primer site, así que no se bloquea con 0 sites
+      if (page === 'map'){ showPage('map'); return; }
+      // Sin ningún site, el resto de secciones quedan bloqueadas
       if (sites.length === 0){ openModal(); return; }
       if (page === 'users'){ showPage('users'); return; }
       if (page === 'licenses'){ showPage('licenses'); return; }
@@ -1375,6 +2180,22 @@
     'Thousand kernel weight (Barley)',
     'Varieties (Barley)',
     'Varieties (Wheat)',
+    'Thousand kernel weight (Wheat)',
+    'Thousand kernel weight (Corn)',
+    'Varieties (Corn)',
+    'Varieties (Soybean)',
+    'Protein content (Wheat)',
+    'Moisture content (Corn)',
+    'Test weight (Barley)',
+    'Broken kernels (Rice)',
+    'Foreign matter (Wheat)',
+    'Damaged kernels (Corn)',
+    'Sprout damage (Wheat)',
+    'Vitreousness (Durum wheat)',
+    'Impurities (Barley)',
+    'Grain size distribution (Rice)',
+    'Chalkiness (Rice)',
+    'Screenings (Barley)',
   ];
   const ROLES = ['Global Admin','Multisite Manager'];
   let users = [];       // saved site users: { name, site, actions:[], nomad, status }
@@ -1413,6 +2234,7 @@
 
   /* ---------- Página Users (solo lectura) ---------- */
   const U_GRID = 'grid-template-columns:1.6fr 1fr 0.9fr 1.1fr 70px 44px 44px;';
+  const toolIcoSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.5 4.7L3 17.2V21h3.8l6.2-6.2a4 4 0 0 0 4.7-5.5l-2.8 2.8-2.1-2.1z"/></svg>`;
   function renderUsers(){
     const card = document.getElementById('usersCard');
     if (!card) return;
@@ -1446,6 +2268,7 @@
 
     const showSite  = usersTab==='all' || usersTab==='site';
     const showAdmin = usersTab==='all' || usersTab==='admin';
+    const showTools = usersTab==='tools';
 
     const eyeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
     const trashSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>`;
@@ -1486,7 +2309,15 @@
       ${mRows}` : '';
 
     let body = uSection + mSection;
-    if(!body){
+    if(showTools){
+      body = `
+        <div class="tools-grid">
+          <button class="tool-card" onclick="openActionsTemplate()" title="Create action templates to assign to groups of users">
+            <span class="tool-card-ico">${toolIcoSvg}</span>
+            <span class="tool-card-label">Actions template</span>
+          </button>
+        </div>`;
+    } else if(!body){
       const what = usersTab==='admin' ? 'admin users' : usersTab==='site' ? 'site users' : 'users';
       body = `<div class="draft-empty" style="padding:44px;">No ${what} yet.</div>`;
     }
@@ -1496,7 +2327,9 @@
         <button class="u-tab ${usersTab==='all'?'active':''}" onclick="setUsersTab('all')">All users <span class="tcount">${users.length+managers.length}</span></button>
         <button class="u-tab ${usersTab==='site'?'active':''}" onclick="setUsersTab('site')">Site users <span class="tcount">${users.length}</span></button>
         <button class="u-tab ${usersTab==='admin'?'active':''}" onclick="setUsersTab('admin')">Admin users <span class="tcount">${managers.length}</span></button>
+        <button class="u-tab ${usersTab==='tools'?'active':''}" onclick="setUsersTab('tools')">${toolIcoSvg} Tools</button>
       </div>
+      ${showTools ? '' : `
       <div class="sites-toolbar">
         <div class="search"><input type="text" placeholder="Search by username or site..." oninput="filterUsers(this.value)"></div>
         <div class="spacer"></div>
@@ -1504,7 +2337,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg>
           Add users
         </button>
-      </div>
+      </div>`}
       ${body}
       <div class="table-footer">
         <span>${users.length} site user${users.length!==1?'s':''} · ${managers.length} admin user${managers.length!==1?'s':''}</span>
@@ -1512,6 +2345,192 @@
   }
 
   function setUsersTab(t){ usersTab=t; renderUsers(); }
+
+  /* ---------- Tool: Actions template ---------- */
+  let actionTemplates = [];  // { name, actions:[] }
+  let atSelected = [];       // acciones elegidas en curso dentro del modal (nombres de U_ACTIONS)
+
+  // Persistencia de actions templates
+  const ACTION_TEMPLATES_KEY = 'fleetview_action_templates_v1';
+  function persistActionTemplates(){
+    try{ localStorage.setItem(ACTION_TEMPLATES_KEY, JSON.stringify(actionTemplates)); }catch(e){}
+  }
+  function loadActionTemplates(){
+    try{
+      const raw = localStorage.getItem(ACTION_TEMPLATES_KEY);
+      if(raw){ const o = JSON.parse(raw); if(Array.isArray(o)) actionTemplates = o; }
+    }catch(e){}
+  }
+
+  function atRenderChips(){
+    const box = document.getElementById('atActionChips');
+    if (!box) return;
+    box.innerHTML = atSelected.length
+      ? atSelected.map(a => `
+        <span class="rev-chip" style="display:inline-flex;align-items:center;gap:7px;">
+          ${a}
+          <span style="cursor:pointer;font-weight:700;line-height:1;" onclick="atToggleAction('${a.replace(/'/g,"\\'")}')">&times;</span>
+        </span>`).join('')
+      : `<p style="color:var(--muted2);font-size:12.5px;margin:2px 0 0;">No actions selected yet.</p>`;
+  }
+
+  function atRenderDropdown(filter){
+    const dd = document.getElementById('atActionDropdown');
+    if (!dd) return;
+    const f = (filter || '').trim().toLowerCase();
+    const matches = U_ACTIONS.filter(a => !f || a.toLowerCase().includes(f));
+    const allSelected = atSelected.length === U_ACTIONS.length;
+
+    const rows = [`
+      <label style="display:flex;align-items:center;gap:9px;padding:8px 6px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;border-bottom:1px solid var(--border);margin-bottom:4px;">
+        <input type="checkbox" ${allSelected?'checked':''} onchange="atToggleAll(this.checked)"> Select all
+      </label>`];
+    rows.push(matches.length
+      ? matches.map(a => `
+        <label style="display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13px;color:var(--navy);cursor:pointer;">
+          <input type="checkbox" ${atSelected.includes(a)?'checked':''} onchange="atToggleAction('${a.replace(/'/g,"\\'")}')"> ${a}
+        </label>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;padding:6px 2px;margin:0;">No matching actions.</p>`);
+    dd.innerHTML = rows.join('');
+  }
+
+  function atToggleAction(name){
+    const pos = atSelected.indexOf(name);
+    if (pos > -1) atSelected.splice(pos, 1); else atSelected.push(name);
+    atRenderDropdown(document.getElementById('atActionSearch').value);
+    atRenderChips();
+  }
+  function atToggleAll(checked){
+    atSelected = checked ? [...U_ACTIONS] : [];
+    atRenderDropdown(document.getElementById('atActionSearch').value);
+    atRenderChips();
+  }
+  function atFilterActions(){
+    atShowDropdown();
+    atRenderDropdown(document.getElementById('atActionSearch').value);
+  }
+  function atPositionDropdown(){
+    const input = document.getElementById('atActionSearch');
+    const dd = document.getElementById('atActionDropdown');
+    if (!input || !dd) return;
+    const r = input.getBoundingClientRect();
+    dd.style.left = r.left + 'px';
+    dd.style.top = (r.bottom + 5) + 'px';
+    dd.style.width = r.width + 'px';
+  }
+  function atShowDropdown(){
+    const dd = document.getElementById('atActionDropdown');
+    if (!dd) return;
+    atPositionDropdown();
+    dd.style.display = 'block';
+  }
+
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('atActionSearchWrap');
+    if (wrap && !wrap.contains(e.target)) document.getElementById('atActionDropdown').style.display = 'none';
+  });
+  window.addEventListener('resize', () => {
+    const dd = document.getElementById('atActionDropdown');
+    if (dd && dd.style.display === 'block') atPositionDropdown();
+  });
+  document.addEventListener('scroll', () => {
+    const dd = document.getElementById('atActionDropdown');
+    if (dd && dd.style.display === 'block') atPositionDropdown();
+  }, true);
+
+  // Lista de templates existentes en el panel derecho del modal, con preview de acciones al hover
+  // y borrado por ícono de basura.
+  function renderAtTemplatesList(){
+    const list = document.getElementById('atTemplatesList');
+    if (!list) return;
+    list.innerHTML = actionTemplates.length
+      ? actionTemplates.map((t,i) => `
+        <div class="at-tpl-item" onmouseenter="atShowTplTip(event, ${i})" onmouseleave="atHideTplTip()">
+          <span class="lbl">${toolIcoSvg} ${t.name}</span>
+          <button class="icon-btn danger at-tpl-del" title="Delete template" onclick="askDeleteActionsTemplate(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>`).join('')
+      : `<p style="color:var(--muted2);font-size:12.5px;margin:2px 0 0;">No templates yet. Create your first one on the left.</p>`;
+  }
+
+  // Tooltip único (position:fixed) que muestra las acciones del template bajo el mouse
+  function atShowTplTip(ev, i){
+    const t = actionTemplates[i];
+    const tip = document.getElementById('atTplTip');
+    if (!t || !tip) return;
+    tip.innerHTML = `
+      <div class="rt-cap">ACTIONS TEMPLATE</div>
+      <div class="rt-title">${toolIcoSvg} ${t.name}</div>
+      <div class="rt-desc">${t.actions.length} action${t.actions.length!==1?'s':''}</div>
+      <div class="rt-checks">
+        ${t.actions.length ? t.actions.map(a => `<span class="rt-check">✔ ${a}</span>`).join('') : '<span class="rt-check">No actions</span>'}
+      </div>`;
+    const r = ev.currentTarget.getBoundingClientRect();
+    tip.style.left = (r.right + 10) + 'px';
+    tip.style.top = r.top + 'px';
+    tip.style.display = 'block';
+  }
+  function atHideTplTip(){
+    const tip = document.getElementById('atTplTip');
+    if (tip) tip.style.display = 'none';
+  }
+
+  // Borrado de un actions template con confirmación
+  let atTemplateToDelete = null;
+  function askDeleteActionsTemplate(i){
+    atHideTplTip();
+    atTemplateToDelete = i;
+    document.getElementById('delAtName').textContent = actionTemplates[i] ? actionTemplates[i].name : 'this template';
+    document.getElementById('deleteActionsTemplateModal').classList.remove('hidden');
+  }
+  function closeDeleteActionsTemplate(){ atTemplateToDelete = null; document.getElementById('deleteActionsTemplateModal').classList.add('hidden'); }
+  function confirmDeleteActionsTemplate(){
+    if (atTemplateToDelete !== null && actionTemplates[atTemplateToDelete]){
+      actionTemplates.splice(atTemplateToDelete, 1);
+      persistActionTemplates();
+      // Si el template borrado era el aplicado en el wizard de usuarios, se limpia esa referencia
+      if (typeof genSelectedTemplate === 'number'){
+        if (genSelectedTemplate === atTemplateToDelete) genSelectedTemplate = null;
+        else if (genSelectedTemplate > atTemplateToDelete) genSelectedTemplate--;
+        renderGenTemplates();
+      }
+    }
+    closeDeleteActionsTemplate();
+    renderAtTemplatesList();
+    showSnack('Template deleted');
+  }
+  document.getElementById('deleteActionsTemplateModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteActionsTemplateModal') closeDeleteActionsTemplate();
+  });
+
+  function openActionsTemplate(){
+    document.getElementById('atName').value = '';
+    document.getElementById('atActionSearch').value = '';
+    atSelected = [];
+    atRenderDropdown('');
+    atRenderChips();
+    document.getElementById('atActionDropdown').style.display = 'none';
+    renderAtTemplatesList();
+    atHideTplTip();
+    document.getElementById('actionsTemplateModal').classList.remove('hidden');
+    document.getElementById('atName').focus();
+  }
+  function closeActionsTemplate(){ atHideTplTip(); document.getElementById('actionsTemplateModal').classList.add('hidden'); }
+
+  function submitActionsTemplate(){
+    const name = document.getElementById('atName').value.trim();
+    if (!name){ document.getElementById('atName').focus(); return; }
+
+    actionTemplates.push({ name, actions: atSelected.slice() });
+    persistActionTemplates();
+    closeActionsTemplate();
+    showSnack('Actions template created');
+  }
+
+  document.getElementById('actionsTemplateModal').addEventListener('click', e => {
+    if (e.target.id === 'actionsTemplateModal') closeActionsTemplate();
+  });
   function filterUsers(q){
     q=(q||'').toLowerCase().trim();
     document.getElementById('usersCard').querySelectorAll('[data-search]').forEach(row=>{
@@ -1597,9 +2616,11 @@
   /* ---------- Generador por pasos ---------- */
   let genStep = 1;
   let genActs = new Set();
+  let genSelectedTemplate = null; // índice del template actualmente aplicado en actionTemplates, o null
   function genReset(){
     genStep = 1;
     genActs = new Set();
+    genSelectedTemplate = null;
     document.getElementById('genCount').value = 3;
     document.getElementById('genPrefix').value = 'PLU';
     document.getElementById('genSuffix').value = '';
@@ -1619,7 +2640,13 @@
     const next=document.getElementById('genNext');
     next.textContent = genStep===3 ? 'Generate' : 'Next';
     if(genStep===2) genSyncPreview();
-    if(genStep===3) renderGenActions();
+    if(genStep===3){
+      const s = document.getElementById('genActionSearch');
+      if(s) s.value = '';
+      const dd = document.getElementById('genActionDropdown');
+      if(dd) dd.style.display = 'none';
+      renderGenActions();
+    }
   }
   function genAdj(d){
     const inp=document.getElementById('genCount');
@@ -1641,11 +2668,125 @@
     if(p2) p2.textContent=nextUsername(p,s,off+2,code);
   }
   function renderGenActions(){
-    document.getElementById('genActions').innerHTML = U_ACTIONS.map(a=>`
-      <label class="wiz-check"><input type="checkbox" ${genActs.has(a)?'checked':''} onchange="genToggleAction('${a.replace(/'/g,"\\'")}')"><span>${a}</span></label>`).join('');
+    genRenderActionDropdown(document.getElementById('genActionSearch') ? document.getElementById('genActionSearch').value : '');
+    genRenderActionChips();
+    renderGenTemplates();
   }
-  function genToggleAction(a){ if(genActs.has(a)) genActs.delete(a); else genActs.add(a); }
-  function genActionsAll(on){ genActs = on ? new Set(U_ACTIONS) : new Set(); renderGenActions(); }
+  function genRenderActionChips(){
+    const box = document.getElementById('genActionChips');
+    if(!box) return;
+    const acts = [...genActs];
+    box.innerHTML = acts.length
+      ? acts.map(a=>`
+        <span class="rev-chip" style="display:inline-flex;align-items:center;gap:7px;">
+          ${a}
+          <span style="cursor:pointer;font-weight:700;line-height:1;" onclick="genToggleAction('${a.replace(/'/g,"\\'")}')">&times;</span>
+        </span>`).join('')
+      : `<p style="color:var(--muted2);font-size:12.5px;margin:2px 0 0;">No actions selected yet.</p>`;
+  }
+  function genRenderActionDropdown(filter){
+    const dd = document.getElementById('genActionDropdown');
+    if(!dd) return;
+    const f = (filter || '').trim().toLowerCase();
+    const matches = U_ACTIONS.filter(a => !f || a.toLowerCase().includes(f));
+    const allSelected = genActs.size === U_ACTIONS.length;
+
+    const rows = [`
+      <label style="display:flex;align-items:center;gap:9px;padding:8px 6px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;border-bottom:1px solid var(--border);margin-bottom:4px;">
+        <input type="checkbox" ${allSelected?'checked':''} onchange="genActionsAll(this.checked)"> Select all
+      </label>`];
+    rows.push(matches.length
+      ? matches.map(a=>`
+        <label style="display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13px;color:var(--navy);cursor:pointer;">
+          <input type="checkbox" ${genActs.has(a)?'checked':''} onchange="genToggleAction('${a.replace(/'/g,"\\'")}')"> ${a}
+        </label>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;padding:6px 2px;margin:0;">No matching actions.</p>`);
+    dd.innerHTML = rows.join('');
+  }
+  function genToggleAction(a){
+    if(genActs.has(a)) genActs.delete(a); else genActs.add(a);
+    genSelectedTemplate = null; // la selección manual ya no coincide necesariamente con el template aplicado
+    genRenderActionDropdown(document.getElementById('genActionSearch').value);
+    genRenderActionChips();
+    renderGenTemplates();
+  }
+  function genActionsAll(on){
+    genActs = on ? new Set(U_ACTIONS) : new Set();
+    genSelectedTemplate = null;
+    genRenderActionDropdown(document.getElementById('genActionSearch') ? document.getElementById('genActionSearch').value : '');
+    genRenderActionChips();
+    renderGenTemplates();
+  }
+  function genFilterActions(){
+    genShowActionDropdown();
+    genRenderActionDropdown(document.getElementById('genActionSearch').value);
+  }
+  function genPositionActionDropdown(){
+    const input = document.getElementById('genActionSearch');
+    const dd = document.getElementById('genActionDropdown');
+    if (!input || !dd) return;
+    const r = input.getBoundingClientRect();
+    dd.style.left = r.left + 'px';
+    dd.style.top = (r.bottom + 5) + 'px';
+    dd.style.width = r.width + 'px';
+  }
+  function genShowActionDropdown(){
+    const dd = document.getElementById('genActionDropdown');
+    if (!dd) return;
+    genPositionActionDropdown();
+    dd.style.display = 'block';
+  }
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('genActionSearchWrap');
+    if (wrap && !wrap.contains(e.target)) document.getElementById('genActionDropdown').style.display = 'none';
+  });
+  window.addEventListener('resize', () => {
+    const dd = document.getElementById('genActionDropdown');
+    if (dd && dd.style.display === 'block') genPositionActionDropdown();
+  });
+  document.addEventListener('scroll', () => {
+    const dd = document.getElementById('genActionDropdown');
+    if (dd && dd.style.display === 'block') genPositionActionDropdown();
+  }, true);
+
+  function renderGenTemplates(){
+    const box = document.getElementById('genTemplatesList');
+    if (!box) return;
+    if (!actionTemplates.length){
+      box.innerHTML = `<p style="color:var(--muted2);font-size:12.5px;margin:2px 0 0;">No templates yet. Create one from Tools &rsaquo; Actions template.</p>`;
+      return;
+    }
+    box.innerHTML = actionTemplates.map((t,i)=>`
+      <span class="role-chip2 ${genSelectedTemplate===i?'selected':''}" style="cursor:pointer;" onclick="genApplyTemplate(${i})">
+        <span class="rc-ico">${toolIcoSvg}</span>
+        ${t.name}
+        <div class="role-tip" style="max-height:220px;overflow-y:auto;">
+          <div class="rt-cap">ACTIONS TEMPLATE</div>
+          <div class="rt-title">${toolIcoSvg} ${t.name}</div>
+          <div class="rt-desc">${t.actions.length} action${t.actions.length!==1?'s':''}</div>
+          <div class="rt-checks">
+            ${t.actions.length ? t.actions.map(a=>`<span class="rt-check">✔ ${a}</span>`).join('') : '<span class="rt-check">No actions</span>'}
+          </div>
+        </div>
+      </span>`).join('');
+  }
+  // Un click aplica el template; si ya estaba aplicado, el siguiente click lo quita.
+  function genApplyTemplate(i){
+    const t = actionTemplates[i];
+    if (!t) return;
+    if (genSelectedTemplate === i){
+      genActs = new Set();
+      genSelectedTemplate = null;
+      showSnack(`Removed "${t.name}" template`);
+    } else {
+      genActs = new Set(t.actions);
+      genSelectedTemplate = i;
+      showSnack(`Applied "${t.name}" template`);
+    }
+    genRenderActionDropdown(document.getElementById('genActionSearch') ? document.getElementById('genActionSearch').value : '');
+    genRenderActionChips();
+    renderGenTemplates();
+  }
   function genNext(){
     if(genStep<3){ genStep++; genShowStep(); return; }
     genFinish();
@@ -1959,6 +3100,31 @@
 
 
 
+  // Colapsar / expandir el sidebar
+  const SIDEBAR_KEY = 'fleetview_sidebar_collapsed';
+  function applySidebarCollapsed(collapsed){
+    const sidebar = document.querySelector('.sidebar');
+    const btn = document.getElementById('sidebarToggleBtn');
+    if (sidebar) sidebar.classList.toggle('collapsed', collapsed);
+    if (btn){
+      btn.innerHTML = collapsed ? '&raquo;' : '&laquo;';
+      btn.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+    }
+    // Si el mapa ya está inicializado, recalcula su tamaño tras la transición de ancho
+    if (siteMap) setTimeout(() => siteMap.invalidateSize(), 200);
+  }
+  function toggleSidebar(){
+    const sidebar = document.querySelector('.sidebar');
+    const collapsed = !sidebar.classList.contains('collapsed');
+    try{ localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0'); }catch(e){}
+    applySidebarCollapsed(collapsed);
+  }
+  function loadSidebarState(){
+    let collapsed = false;
+    try{ collapsed = localStorage.getItem(SIDEBAR_KEY) === '1'; }catch(e){}
+    applySidebarCollapsed(collapsed);
+  }
+
   // Tema claro / oscuro
   const THEME_KEY = 'fleetview_theme';
   const sunIcon = '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
@@ -1970,6 +3136,7 @@
     const icon = document.getElementById('themeIcon');
     if(label) label.textContent = dark ? 'Light mode' : 'Dark mode';
     if(icon) icon.innerHTML = dark ? moonIcon : sunIcon;
+    if (typeof setMapThemeTiles === 'function') setMapThemeTiles(dark);
   }
   function toggleTheme(){
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -1983,8 +3150,11 @@
   }
 
   loadTheme();
+  loadSidebarState();
   loadSites();
   loadUsers();
+  loadGroups();
+  loadActionTemplates();
   render();
 </script>
 </body>
