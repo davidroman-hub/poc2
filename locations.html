@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sites</title>
+<style>
+  :root{
+    --navy:#1b2a4a;
+    --navy-dark:#141d33;
+    --blue:#2f6bff;
+    --blue-hover:#1f5aed;
+    --text:#1b2a4a;
+    --muted:#8a94a6;
+    --muted2:#6b7688;
+    --border:#e7eaf0;
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --yellow:#f6c445;
+    --sidebar-active-bg:#eef2ff;
+    --input-bg:#ffffff;
+    --panel:#f8f9fc;
+  }
+  :root[data-theme="dark"]{
+    --navy:#e7ebf3;
+    --navy-dark:#0b101b;
+    --blue:#4d8bff;
+    --blue-hover:#3f7bf0;
+    --text:#e7ebf3;
+    --muted:#7c8598;
+    --muted2:#a7b0c2;
+    --border:#2a3346;
+    --bg:#0e1320;
+    --card:#161d2b;
+    --sidebar-active-bg:#243046;
+    --input-bg:#1e2637;
+    --panel:#111826;
+  }
+  /* Overrides de superficies claras en modo oscuro */
+  [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background-color:var(--input-bg);color:var(--text);border-color:var(--border);}
+  [data-theme="dark"] input::placeholder,[data-theme="dark"] textarea::placeholder{color:var(--muted);}
+  [data-theme="dark"] .draft-row input.di,[data-theme="dark"] .draft-row select.di,
+  [data-theme="dark"] .u-actions-btn,[data-theme="dark"] .u-name-input,
+  [data-theme="dark"] .fld,[data-theme="dark"] .cap-wrap input{background-color:var(--input-bg);color:var(--text);border-color:var(--border);}
+  [data-theme="dark"] .u-actions-btn::after{border-color:var(--muted2);}
+  [data-theme="dark"] .naming-box,[data-theme="dark"] .draft-head,[data-theme="dark"] .gen-wiz,
+  [data-theme="dark"] .groups-note,[data-theme="dark"] .info-box,[data-theme="dark"] .mgr-lock,
+  [data-theme="dark"] .storage-left .sp-item,[data-theme="dark"] .cap-wrap .unit{background:var(--panel);}
+  [data-theme="dark"] .filters-btn,[data-theme="dark"] .btn-back,[data-theme="dark"] .btn-export,
+  [data-theme="dark"] .btn-outline,[data-theme="dark"] .stepper-num button{background:var(--card);color:var(--text);}
+  [data-theme="dark"] .filters-btn:hover,[data-theme="dark"] .btn-back:hover,[data-theme="dark"] .btn-export:hover,[data-theme="dark"] .btn-outline:hover{background:var(--panel);}
+  [data-theme="dark"] .adm-banner{background:#16233b;border-color:#2b3d5e;}
+  [data-theme="dark"] .role-chip2,[data-theme="dark"] .role-tip,[data-theme="dark"] .u-pop,[data-theme="dark"] .cap-wrap{background:var(--card);border-color:var(--border);}
+  [data-theme="dark"] .group-item.active,[data-theme="dark"] .sp-item.active{background:var(--sidebar-active-bg);}
+  /* Chips y badges legibles en oscuro */
+  [data-theme="dark"] .rev-chip,[data-theme="dark"] .ud-block .rev-chip,[data-theme="dark"] .u-tab .tcount{background:var(--panel);border:1px solid var(--border);color:var(--text);}
+  [data-theme="dark"] .role-badge,[data-theme="dark"] .sp-badge{background:#1f2b45;border-color:#33456a;color:#9db8ff;}
+  [data-theme="dark"] .badge-empty{background:#1c2330;border-color:#2a3346;color:var(--muted2);}
+  [data-theme="dark"] .badge-pending{background:#2a2113;border-color:#4a3a1c;color:#e6a83c;}
+  [data-theme="dark"] .badge-created,[data-theme="dark"] .nomad-badge,[data-theme="dark"] .rt-check{background:#122619;border-color:#1e3d29;color:#5cd08a;}
+  [data-theme="dark"] .badge-error{background:#2b1616;border-color:#5a2b2b;color:#ff8a80;}
+  [data-theme="dark"] .site-pill{background:#16233b;}
+  [data-theme="dark"] .info-box b,[data-theme="dark"] .preview-line b,[data-theme="dark"] .ud-v{color:var(--text);}
+  [data-theme="dark"] .modal-overlay{background:rgba(4,8,16,.55);}
+  [data-theme="dark"] .empty .pic svg circle[fill="#eef1f7"],[data-theme="dark"] .modal .pic svg circle[fill="#eef1f7"]{fill:#1e2637;}
+
+  /* Toggle claro/oscuro */
+  .theme-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border-radius:9px;color:#c9cfdb;cursor:pointer;font-size:15px;font-weight:500;user-select:none;}
+  .theme-toggle:hover{background:#1f2a44;}
+  .theme-toggle .tt-left{display:flex;align-items:center;gap:14px;}
+  .theme-toggle .tt-left svg{width:20px;height:20px;}
+  .theme-switch{width:40px;height:22px;border-radius:20px;background:#39435c;position:relative;flex-shrink:0;transition:background .2s;}
+  .theme-switch span{position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}
+  :root[data-theme="dark"] .theme-switch{background:var(--blue);}
+  :root[data-theme="dark"] .theme-switch span{left:21px;}
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  .app{display:flex;min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{width:230px;background:var(--navy-dark);color:#c9cfdb;display:flex;flex-direction:column;padding:18px 14px;flex-shrink:0;}
+  .sb-top{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 26px;}
+  .logo{display:flex;align-items:center;gap:6px;}
+  .logo svg{width:34px;height:34px;}
+  .collapse{color:#7d8698;font-size:20px;cursor:pointer;background:none;border:none;}
+  .nav{display:flex;flex-direction:column;gap:4px;flex:1;}
+  .nav a{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:9px;color:#c9cfdb;text-decoration:none;font-size:15px;font-weight:500;}
+  .nav a:hover{background:#1f2a44;}
+  .nav a.active{color:#4d8bff;font-weight:600;}
+  .nav a svg{width:20px;height:20px;stroke-width:1.8;flex-shrink:0;}
+  .nav-bottom{display:flex;flex-direction:column;gap:4px;padding-top:12px;}
+  .nav-bottom a{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:9px;color:#c9cfdb;text-decoration:none;font-size:15px;font-weight:500;}
+  .nav-bottom a:hover{background:#1f2a44;}
+  .nav-bottom a svg{width:20px;height:20px;stroke-width:1.8;flex-shrink:0;}
+
+  /* Main */
+  .main{flex:1;padding:26px 34px;overflow:auto;}
+  .page-title{font-size:44px;font-weight:800;color:var(--navy);letter-spacing:-1px;}
+  .page-sub{color:var(--muted2);font-size:16px;margin-top:4px;}
+  .header-row{display:flex;justify-content:space-between;align-items:flex-start;}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(47,107,255,.35);}
+  .btn:hover{background:var(--blue-hover);}
+  .btn svg{width:16px;height:16px;}
+  .btn-lg{padding:14px 22px;font-size:15px;}
+  .btn-export{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;}
+  .btn-export:hover{background:#f6f7fb;}
+  .btn-export svg{width:16px;height:16px;}
+
+  .layout{display:flex;gap:22px;margin-top:22px;}
+
+  /* Left card - groups */
+  .groups{width:300px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;}
+  .groups h2{font-size:20px;font-weight:700;color:var(--navy);}
+  .groups .desc{color:var(--muted2);font-size:14px;margin:10px 0 18px;line-height:1.5;}
+  .new-group{width:100%;justify-content:center;margin-bottom:20px;}
+  .group-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:9px;font-size:15px;color:var(--navy);}
+  .group-item.active{background:var(--sidebar-active-bg);font-weight:600;}
+  .group-item .cnt{color:var(--muted);font-weight:500;}
+  .group-item .lbl{display:flex;align-items:center;gap:9px;}
+  .group-item .lbl svg{width:16px;height:16px;color:var(--muted);}
+  .groups-note{margin-top:auto;border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--muted2);font-size:13px;line-height:1.5;}
+
+  /* Right column */
+  .content{flex:1;display:flex;flex-direction:column;gap:20px;}
+
+  /* Stepper */
+  .stepper-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 40px;}
+  .stepper{display:flex;align-items:flex-start;justify-content:space-between;position:relative;}
+  .step{display:flex;flex-direction:column;align-items:center;text-align:center;flex:1;position:relative;z-index:2;}
+  .step .circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;margin-bottom:12px;}
+  .step.active .circle{background:var(--blue);color:#fff;}
+  .step .circle.clickable{cursor:pointer;transition:transform .12s,box-shadow .12s;}
+  .step .circle.clickable:hover{transform:scale(1.12);box-shadow:0 0 0 4px rgba(47,107,255,.18);}
+  .step .circle.done{background:#1c8a4b;color:#fff;}
+  .step .circle.done svg{width:16px;height:16px;}
+  .step .circle.done.clickable:hover{box-shadow:0 0 0 4px rgba(28,138,75,.2);}
+  .st-title.clickable{cursor:pointer;}
+  .st-title.clickable:hover{color:var(--blue);text-decoration:underline;}
+  .step.active .lock{display:none;}
+  .step.locked .circle{background:#eef0f5;color:#aeb6c4;border:1px solid #e0e4ec;position:relative;}
+  .step .lock{position:absolute;top:-6px;right:-6px;width:16px;height:16px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .step .lock svg{width:11px;height:11px;color:#aeb6c4;}
+  .step .st-title{font-weight:700;font-size:15px;color:var(--navy);}
+  .step.locked .st-title{color:#aeb6c4;}
+  .step .st-sub{font-size:12.5px;color:var(--muted);margin-top:3px;}
+  .step .badge{margin-top:8px;background:#fdf3d6;color:#b58a00;font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:6px;}
+  .line{position:absolute;top:17px;height:2px;background:#e5e8ef;z-index:1;}
+  .line.l1{left:20%;right:50%;}
+  .line.l2{left:50%;right:20%;}
+
+  /* Sites card */
+  .sites-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;flex:1;display:flex;flex-direction:column;min-height:560px;}
+  .sites-toolbar{display:flex;align-items:center;gap:14px;}
+  .sites-toolbar .all{font-size:16px;font-weight:700;color:var(--navy);}
+  .search{flex:1;max-width:420px;}
+  .search input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:#fbfcfe;}
+  .search input::placeholder{color:var(--muted);}
+  .filters-btn{padding:11px 18px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;}
+  .spacer{flex:1;}
+
+  .table-head{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:20px 6px 16px;border-bottom:1px solid var(--border);color:var(--navy);font-weight:700;font-size:14px;}
+  .table-head .r{text-align:center;}
+
+  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px;}
+  .empty .pic{display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+  .empty .pic svg{width:230px;height:auto;}
+  .empty h3{font-size:28px;font-weight:800;color:var(--navy);max-width:440px;line-height:1.25;}
+  .empty p{color:var(--muted2);font-size:16px;margin:16px 0 28px;max-width:470px;line-height:1.5;}
+
+  .table-footer{display:flex;justify-content:flex-end;align-items:center;gap:24px;color:var(--muted2);font-size:13px;padding-top:14px;margin-top:auto;}
+
+  .site-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:16px 6px;border-bottom:1px solid var(--border);font-size:14px;align-items:center;}
+  .icon-btn.danger:hover{background:#fdecec;color:#e2453b;}
+  .site-row .name{font-weight:600;color:var(--navy);}
+  .site-row .r{text-align:center;color:var(--muted2);}
+  .cap-cell{display:flex;align-items:center;justify-content:center;gap:8px;}
+  .icon-btn{background:none;border:none;cursor:pointer;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;padding:5px;border-radius:7px;}
+  .icon-btn:hover{background:#f1f3f8;color:var(--navy);}
+  .icon-btn svg{width:17px;height:17px;}
+
+  /* Users table */
+  .u-row{display:grid;grid-template-columns:1.7fr 1.1fr 1.3fr 90px 110px 44px;padding:14px 6px;border-bottom:1px solid var(--border);font-size:14px;align-items:center;gap:8px;}
+  .u-name-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;color:var(--navy);font-weight:600;outline:none;}
+  .u-name-input:focus{border-color:var(--blue);}
+  .u-site{color:var(--muted2);font-size:13px;}
+  .nomad-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#eefaf1;color:#1c8a4b;border:1px solid #c4ecd1;}
+  .u-actions-btn{width:100%;text-align:left;border:1px solid var(--border);border-radius:8px;padding:9px 30px 9px 11px;font-size:13px;background:#fff;cursor:pointer;font-family:inherit;color:var(--muted2);position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .u-actions-btn::after{content:"";position:absolute;right:11px;top:50%;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-70%) rotate(45deg);}
+  .u-actions-btn.has{color:var(--navy);font-weight:600;}
+  .u-pop{position:absolute;z-index:60;top:calc(100% + 5px);left:0;min-width:250px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 30px rgba(20,29,51,.16);padding:10px 12px;}
+  .u-pop-head{display:flex;gap:6px;padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid var(--border);}
+  .u-pop-head .mini-link{margin-left:0;}
+  .u-pop label{display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13px;color:var(--navy);cursor:pointer;}
+  .u-pop input{accent-color:var(--blue);width:15px;height:15px;}
+  .sw{position:relative;display:inline-block;width:40px;height:22px;cursor:pointer;}
+  .sw span{position:absolute;inset:0;background:#dfe3ea;border-radius:20px;transition:.2s;}
+  .sw span::before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+  .sw.on span{background:var(--blue);}
+  .sw.on span::before{transform:translateX(18px);}
+  .badge-pending{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#fff5e9;color:#c2740c;border:1px solid #f6dcb6;}
+  .badge-created{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#eefaf1;color:#1c8a4b;border:1px solid #c4ecd1;}
+  .u-del{background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:7px;display:flex;}
+  .u-del:hover{background:#fdecec;color:#e2453b;}
+  .u-del svg{width:16px;height:16px;}
+  .u-add-single{display:inline-flex;align-items:center;gap:8px;border:1.5px dashed #c3d3f6;color:var(--blue);background:#fff;padding:10px 16px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;margin-top:14px;}
+  .u-add-single:hover{background:#f4f8ff;}
+  .u-add-single svg{width:16px;height:16px;flex-shrink:0;}
+
+  /* Users sections + managers */
+  .u-tabs{display:flex;gap:20px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+  .u-tab{padding:11px 2px;margin-bottom:-1px;background:none;border:none;border-bottom:2.5px solid transparent;font-size:15px;font-weight:600;color:var(--muted2);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;}
+  .u-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+  .u-tab .tcount{font-size:12px;font-weight:700;background:#eef1f6;color:var(--muted2);padding:1px 8px;border-radius:20px;}
+  .u-tab.active .tcount{background:#eaf1ff;color:var(--blue);}
+  .u-sec-head{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--navy);margin:26px 0 6px;}
+  .u-sec-head:first-child{margin-top:0;}
+  .u-sec-head .cnt{font-size:13px;font-weight:600;color:var(--muted);}
+  .m-row{display:grid;grid-template-columns:1.8fr 1.1fr 1fr 110px 44px;padding:14px 6px;border-bottom:1px solid var(--border);font-size:14px;align-items:center;gap:8px;}
+  .m-email{font-weight:600;color:var(--navy);}
+  .role-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#eef2ff;color:#3b53a0;border:1px solid #cdd8fb;}
+
+  /* Wizard tabs + managers editor */
+  .wiz-tabs{display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  .wiz-tab{padding:10px 4px;margin-bottom:-1px;background:none;border:none;border-bottom:2.5px solid transparent;font-size:14px;font-weight:600;color:var(--muted2);cursor:pointer;font-family:inherit;}
+  .wiz-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+  .mgr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-weight:700;color:var(--navy);font-size:15px;}
+  .req-note{color:#e2453b;font-weight:500;font-size:12px;margin-left:6px;}
+
+  /* Banner administradores */
+  .adm-banner{background:#eef4ff;border:1px solid #d3e0fb;border-radius:12px;padding:16px 18px;margin-bottom:18px;}
+  .adm-banner-head{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--navy);font-size:15px;}
+  .adm-banner-head svg{width:18px;height:18px;color:#4b6cb7;}
+  .adm-banner-sub{color:#41527e;font-size:13px;margin:6px 0 12px;}
+  .adm-banner-sub .req{color:#e2453b;}
+  .adm-roles{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+  .adm-roles-lbl{font-size:11px;font-weight:700;color:#7d8bab;letter-spacing:.4px;}
+  .role-chip2{position:relative;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--navy);background:#fff;border:1px solid #c7d4f0;border-radius:20px;padding:6px 13px;cursor:default;}
+  .role-chip2 svg{width:15px;height:15px;color:#4b6cb7;}
+  .role-tip{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:70;width:260px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 34px rgba(20,29,51,.18);padding:14px 16px;cursor:default;}
+  .role-chip2:hover .role-tip{display:block;}
+  .rt-cap{font-size:11px;font-weight:700;color:#9aa3b4;letter-spacing:.5px;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+  .rt-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--navy);}
+  .rt-title svg{width:16px;height:16px;}
+  .rt-desc{font-size:13px;color:var(--muted2);line-height:1.5;margin:8px 0 0;}
+  .rt-checks{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .rt-check{font-size:12px;font-weight:600;color:#1c8a4b;background:#eefaf1;border:1px solid #c4ecd1;border-radius:16px;padding:4px 10px;}
+
+  /* Celdas de manager bloqueadas + badges */
+  .mgr-lock{border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-size:12px;color:#c0c8d8;background:#f6f7fb;}
+  .mgr-lock-hint{font-size:10px;color:#c0c8d8;display:flex;align-items:center;gap:4px;margin-top:3px;}
+  .mgr-lock-hint svg{width:10px;height:10px;}
+  .di.err{border-color:#e2453b;background:#fff6f6;}
+  .mgr-hint{font-size:10px;color:#e2453b;display:flex;align-items:center;gap:4px;margin-top:3px;min-height:12px;}
+  .badge-empty{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#f2f4f8;color:#8a94a6;border:1px solid #e3e7ee;}
+  .badge-error{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#fdecec;color:#c0392b;border:1px solid #f6c9c4;}
+  .mgr-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 32px;gap:10px;align-items:center;margin-bottom:10px;}
+  .mgr-row input,.mgr-row select{border:1px solid var(--border);border-radius:8px;padding:10px 11px;font-size:13px;font-family:inherit;outline:none;width:100%;color:var(--navy);background:#fff;}
+  .mgr-row input:focus,.mgr-row select:focus{border-color:var(--blue);}
+  .mgr-row .u-del{justify-self:center;}
+  .mgr-empty{color:var(--muted2);font-size:13px;padding:10px 2px;}
+
+  /* Wizard (wide) + draft tables */
+  #userWizard .form-modal{max-width:960px;}
+  .wiz-gen{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .wiz-gen .nl{font-size:14px;font-weight:700;color:var(--navy);}
+
+  /* Generador por pasos */
+  .gen-wiz{border:1px solid var(--border);border-radius:12px;padding:22px 24px;background:#fbfcfe;margin-bottom:8px;}
+  .gen-progress{display:flex;align-items:center;gap:0;margin-bottom:20px;}
+  .gp-dot{width:26px;height:26px;border-radius:50%;background:#e6e9f0;color:#9aa3b4;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .gp-dot.active{background:var(--blue);color:#fff;}
+  .gp-dot.done{background:#cfe0ff;color:var(--blue);}
+  .gp-line{width:40px;height:2px;background:#e6e9f0;}
+  .gp-line.done{background:var(--blue);}
+  .gp-label{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted2);}
+  .gen-q{font-size:17px;font-weight:700;color:var(--navy);}
+  .gen-step{min-height:88px;}
+  .gen-nav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;}
+  .mini-link{font-size:12px;font-weight:600;color:var(--blue);background:#eff5ff;border:1px solid #cfe0ff;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit;margin-left:6px;}
+  .mini-link:hover{background:#e3eeff;}
+  .naming-box.compact{padding:12px 14px;margin-bottom:16px;}
+  .draft-wrap{border:1px solid var(--border);border-radius:10px;overflow:visible;margin-top:6px;}
+  .draft-head{display:grid;padding:10px 12px;background:#f8f9fc;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;gap:6px;border-radius:10px 10px 0 0;}
+  .draft-row{display:grid;padding:10px 12px;border-bottom:1px solid #f0f2f8;align-items:center;gap:6px;font-size:13px;}
+  .draft-row:last-child{border-bottom:none;}
+  .draft-row input.di{border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-size:13px;font-family:inherit;width:100%;outline:none;color:var(--navy);}
+  .draft-row input.di:focus,.draft-row select.di:focus{border-color:var(--blue);}
+  .draft-row select.di{border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-size:13px;font-family:inherit;width:100%;outline:none;color:var(--navy);background:#fff;}
+  .draft-empty{padding:22px 12px;text-align:center;color:var(--muted2);font-size:13px;}
+  .di-act{position:relative;}
+  .di-act .u-actions-btn{padding:8px 26px 8px 10px;font-size:12px;}
+  .draft-row input.di.dup{border-color:#e2453b;background:#fff6f6;}
+  .draft-cb{accent-color:var(--blue);width:15px;height:15px;cursor:pointer;}
+  .dup-warn{display:flex;align-items:center;gap:8px;background:#fdecec;color:#c0392b;border:1px solid #f6c9c4;border-radius:9px;padding:10px 14px;font-size:13px;margin:14px 0 0;}
+  .dup-warn svg{width:16px;height:16px;flex-shrink:0;}
+  .bulk-bar{display:flex;align-items:center;gap:12px;background:#1b2a4a;border-radius:10px;padding:10px 14px;margin-top:14px;flex-wrap:wrap;}
+  .bulk-bar .bc{color:#fff;font-weight:600;font-size:13px;}
+  .bulk-bar select{border:none;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;background:#fff;color:var(--navy);}
+  .bulk-bar .bbtn{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+  .bulk-bar .bbtn:hover{background:rgba(255,255,255,.24);}
+  .bulk-bar input{border:none;border-radius:7px;padding:7px 9px;font-size:12px;font-family:inherit;width:78px;color:var(--navy);}
+  .bulk-bar .bsep{width:1px;height:20px;background:rgba(255,255,255,.18);}
+  .bulk-bar .bclear{margin-left:auto;background:transparent;color:#aeb8cc;}
+
+  /* Review modal */
+  .rev-modal{background:var(--card);border-radius:16px;box-shadow:0 24px 60px rgba(20,29,51,.28);width:92%;max-width:640px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
+  .rev-scroll{overflow-y:auto;padding:26px 30px;}
+  .rev-h{font-size:22px;font-weight:800;color:var(--navy);}
+  .rev-sub{color:var(--muted2);font-size:14px;margin:5px 0 20px;}
+  .rev-block{border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+  .rev-block h5{font-size:14px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .rev-block h5 .pill{margin-left:auto;background:#eaf1ff;color:var(--blue);font-weight:700;font-size:12px;padding:3px 11px;border-radius:20px;}
+  .rev-site{font-size:13px;font-weight:700;color:var(--navy);margin:10px 0 6px;display:flex;align-items:center;gap:7px;}
+  .rev-site svg{width:14px;height:14px;color:var(--blue);}
+  .rev-chip{display:inline-block;background:#f4f6fa;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:12px;color:var(--navy);margin:0 6px 6px 0;}
+  .rev-mrow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--navy);padding:6px 0;border-bottom:1px solid #f0f2f8;}
+  .rev-mrow:last-child{border-bottom:none;}
+  .rev-empty{color:var(--muted2);font-size:13px;}
+
+  /* Detalles de usuario */
+  .ud-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:11px 0;border-bottom:1px solid #f0f2f8;}
+  .ud-k{font-size:13px;font-weight:600;color:var(--muted2);}
+  .ud-v{font-size:14px;color:var(--navy);font-weight:600;text-align:right;}
+  .ud-block{padding-top:14px;}
+  .ud-block .rev-chip{display:inline-block;background:#f4f6fa;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:12px;color:var(--navy);margin:0 6px 6px 0;}
+
+  /* Add-users wizard */
+  .wiz-top{text-align:center;color:var(--muted2);font-size:14px;margin-bottom:20px;}
+  .site-pill{display:flex;align-items:center;gap:11px;background:#f2f6ff;border-radius:10px;padding:12px 15px;margin-bottom:22px;}
+  .site-pill svg{width:20px;height:20px;color:var(--blue);}
+  .site-pill .sp-t{font-weight:700;color:var(--navy);font-size:14px;}
+  .site-pill .sp-s{font-size:12px;color:var(--muted2);}
+  .site-pill .sp-badge{margin-left:auto;background:#dbe6ff;color:var(--blue);font-weight:700;font-size:12px;padding:4px 12px;border-radius:20px;}
+  .num-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .num-row .nl{font-size:14px;font-weight:700;color:var(--navy);}
+  .stepper-num{display:flex;align-items:center;border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+  .stepper-num button{width:38px;height:40px;border:none;background:#fff;font-size:18px;color:var(--muted2);cursor:pointer;}
+  .stepper-num button:hover{background:#f4f6fa;}
+  .stepper-num input{width:56px;height:40px;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);text-align:center;font-size:15px;font-family:inherit;color:var(--navy);outline:none;}
+  .naming-box{background:#f8f9fc;border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:20px;}
+  .naming-box .nrow{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .naming-box .nrow:last-child{margin-bottom:0;}
+  .naming-box label{width:90px;font-size:13px;font-weight:600;color:var(--navy);}
+  .naming-box input{flex:1;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;outline:none;color:var(--navy);}
+  .naming-box input:disabled{background:#eef0f5;color:var(--muted2);}
+  .naming-box input:focus{border-color:var(--blue);}
+  .preview-line{font-size:13px;color:var(--muted2);margin-top:6px;}
+  .preview-line b{color:var(--navy);}
+  .wiz-actions-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .wiz-actions-title button{font-size:12px;font-weight:600;color:var(--blue);background:#eff5ff;border:1px solid #cfe0ff;padding:4px 11px;border-radius:6px;cursor:pointer;font-family:inherit;}
+  .wiz-check{display:flex;align-items:center;gap:10px;padding:8px 2px;font-size:14px;color:var(--navy);cursor:pointer;}
+  .wiz-check input{accent-color:var(--blue);width:16px;height:16px;}
+  .hidden{display:none !important;}
+
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+    background:rgba(27,42,74,.25);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}
+  .modal-overlay.hidden{display:none;}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;
+    box-shadow:0 24px 60px rgba(20,29,51,.28);padding:56px 48px;max-width:560px;width:90%;
+    text-align:center;display:flex;flex-direction:column;align-items:center;}
+  .modal .pic{display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+  .modal .pic svg{width:230px;height:auto;}
+  .modal h3{font-size:28px;font-weight:800;color:var(--navy);max-width:440px;line-height:1.25;}
+  .del-ic{width:64px;height:64px;border-radius:50%;background:#fdecec;display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+  .del-ic svg{width:28px;height:28px;color:#e2453b;}
+  .btn-danger{background:#e2453b;color:#fff;border:none;padding:13px 26px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .btn-danger:hover{background:#c93a31;}
+
+  /* Snackbar */
+  #snackbar{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:300;
+    background:var(--navy-dark);color:#fff;padding:13px 20px;border-radius:10px;font-size:14px;font-weight:600;
+    display:flex;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(20,29,51,.3);opacity:0;pointer-events:none;
+    transition:opacity .25s,transform .25s;}
+  #snackbar.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  #snackbar svg{width:18px;height:18px;color:#5cd08a;}
+  .modal p{color:var(--muted2);font-size:16px;margin:16px 0 28px;max-width:470px;line-height:1.5;}
+
+  /* Form modal */
+  .form-modal{background:var(--card);border-radius:16px;box-shadow:0 24px 60px rgba(20,29,51,.28);
+    width:92%;max-width:680px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
+  .form-scroll{overflow-y:auto;padding:26px 30px 10px;}
+  .form-top{text-align:center;color:var(--muted2);font-size:15px;margin-bottom:22px;}
+  .form-card{border:1px solid var(--border);border-radius:14px;padding:24px 26px;margin-bottom:20px;}
+  .form-card h4{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:20px;}
+  .fld-label{display:block;font-size:14px;font-weight:700;color:var(--navy);margin:0 0 9px;}
+  .fld-label .req{color:#e2453b;}
+  .fld{width:100%;padding:13px 15px;border:1px solid var(--border);border-radius:9px;font-size:14px;
+    color:var(--text);background:#fff;font-family:inherit;margin-bottom:20px;}
+  .fld::placeholder{color:var(--muted);}
+  .fld:focus{outline:none;border-color:var(--blue);}
+  .fld-search{position:relative;margin-bottom:20px;}
+  .fld-search .fld{margin-bottom:0;padding-right:44px;}
+  .fld-search svg{position:absolute;right:15px;top:50%;transform:translateY(-50%);width:19px;height:19px;color:var(--muted);}
+  .divider-text{display:flex;align-items:center;gap:14px;color:var(--muted2);font-size:14px;margin:6px 0 22px;}
+  .divider-text::before,.divider-text::after{content:"";flex:1;height:1px;background:var(--border);}
+  .two-col{display:flex;gap:20px;}
+  .two-col > div{flex:1;}
+  .toggle-row{display:flex;align-items:flex-start;gap:18px;}
+  .toggle-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:5px;}
+  .toggle-sub{font-size:14px;color:var(--muted2);line-height:1.45;}
+  .switch{position:relative;display:inline-block;width:52px;height:28px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;inset:0;background:#dfe3ea;border-radius:20px;transition:.2s;cursor:pointer;}
+  .slider::before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+  .switch input:checked + .slider{background:var(--blue);}
+  .switch input:checked + .slider::before{transform:translateX(24px);}
+  .form-footer{display:flex;justify-content:space-between;align-items:center;padding:18px 30px;border-top:1px solid var(--border);}
+  .btn-back{padding:13px 30px;border:1px solid var(--border);border-radius:10px;background:#fff;
+    font-size:15px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;}
+  .btn-back:hover{background:#f6f7fb;}
+  .form-footer .btn{padding:14px 30px;font-size:15px;}
+
+  /* Storage modal */
+  .storage-modal{background:var(--card);border-radius:16px;box-shadow:0 24px 60px rgba(20,29,51,.28);
+    width:94%;max-width:1000px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
+  .storage-scroll{overflow-y:auto;padding:28px 32px 14px;}
+  .storage-title{font-size:24px;font-weight:800;color:var(--navy);}
+  .storage-sub{color:var(--muted2);font-size:14px;margin:6px 0 22px;}
+  .storage-body{display:flex;border:1px solid var(--border);border-radius:14px;overflow:hidden;min-height:440px;}
+  .storage-left{width:330px;flex-shrink:0;padding:22px;border-right:1px solid var(--border);}
+  .storage-right{flex:1;padding:28px 32px;display:flex;flex-direction:column;}
+  .sp-head{font-weight:700;font-size:16px;color:var(--navy);margin-bottom:16px;}
+  .btn-outline{display:inline-flex;align-items:center;gap:8px;border:1px solid #c3d3f6;color:var(--blue);
+    background:#fff;padding:11px 16px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  .btn-outline:hover{background:#f4f8ff;}
+  .btn-outline.sm{padding:8px 12px;font-size:13px;}
+  .btn-outline.sm svg{width:15px;height:15px;}
+
+  .sp-empty{text-align:center;color:var(--muted);margin-top:60px;}
+  .sp-empty svg{width:44px;height:44px;color:#cdd4e0;}
+  .sp-empty-t{margin-top:14px;color:#8a94a6;font-weight:600;font-size:15px;}
+  .sp-empty-s{margin-top:5px;color:#aab2c0;font-size:13px;}
+
+  .sp-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-radius:10px;
+    margin-top:14px;cursor:pointer;border:1px solid transparent;}
+  .sp-item:hover{background:#f6f8fc;}
+  .sp-item.active{background:#eaf1ff;}
+  .sp-item-l{display:flex;align-items:center;gap:11px;font-weight:600;color:var(--navy);font-size:15px;}
+  .sp-item-l svg{width:20px;height:20px;color:var(--navy);}
+  .sp-check{width:20px;height:20px;color:var(--blue);flex-shrink:0;}
+
+  /* Right empty state */
+  .sp-r-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .sp-illus{width:180px;height:150px;margin-bottom:20px;}
+  .sp-r-empty h3{font-size:22px;font-weight:800;color:var(--navy);}
+  .sp-r-empty p{color:var(--muted2);font-size:15px;margin:12px 0 24px;max-width:340px;line-height:1.5;}
+  .sp-skip{margin-top:16px;background:none;border:none;color:var(--blue);font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;}
+
+  /* Details form */
+  .storage-right h4{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:20px;}
+  .st-label{display:block;font-size:14px;font-weight:700;color:var(--navy);margin:0 0 8px;}
+  select.fld{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a94a6' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;}
+  .st-icon-select{position:relative;}
+  .cap-wrap{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:14px;}
+  .cap-wrap input{flex:1;border:none;padding:13px 15px;font-size:14px;outline:none;font-family:inherit;color:var(--text);}
+  .cap-wrap .unit{padding:0 20px;display:flex;align-items:center;border-left:1px solid var(--border);background:#fbfcfe;color:var(--muted2);font-size:14px;}
+  .info-box{background:#f2f6ff;border-radius:9px;padding:13px 15px;font-size:14px;color:#51607a;display:flex;gap:9px;align-items:center;margin-bottom:22px;}
+  .info-box b{color:var(--navy);}
+  .info-box svg{width:17px;height:17px;color:var(--blue);flex-shrink:0;}
+  .alloc-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-top:6px;}
+  .alloc-title{font-weight:700;font-size:14px;color:var(--navy);}
+  .alloc-title span{color:var(--muted);font-weight:500;}
+  .alloc-sub{color:var(--muted2);font-size:13px;margin-top:5px;max-width:360px;line-height:1.45;}
+  .st-actions{display:flex;align-items:center;gap:14px;margin-top:26px;padding-top:20px;border-top:1px solid var(--border);}
+  .st-actions .btn{padding:12px 22px;}
+  .link-danger{margin-left:auto;background:none;border:none;color:#e2453b;font-weight:600;font-size:14px;
+    cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:inherit;}
+  .link-danger svg{width:16px;height:16px;}
+
+  .storage-footer{display:flex;justify-content:flex-end;gap:14px;padding:18px 32px;border-top:1px solid var(--border);}
+  .storage-footer .btn{padding:14px 28px;font-size:15px;}
+  .storage-footer .btn-back{padding:13px 26px;}
+
+  /* Formulario de storage compacto (evita scroll) */
+  .storage-scroll{padding:20px 24px 10px;}
+  .storage-body{min-height:0;}
+  .storage-left{padding:16px;}
+  .storage-right{padding:18px 22px;}
+  .storage-right h4{font-size:16px;margin-bottom:12px;}
+  .storage-right .st-label{font-size:12.5px;margin:0 0 5px;}
+  .storage-right .fld{padding:8px 11px;margin-bottom:10px;font-size:13px;}
+  .storage-right .cap-wrap{margin-bottom:8px;}
+  .storage-right .cap-wrap input{padding:8px 11px;font-size:13px;}
+  .storage-right .cap-wrap .unit{font-size:13px;}
+  .storage-right .info-box{padding:9px 12px;margin-bottom:12px;font-size:12.5px;}
+  .storage-right .alloc-row{padding-top:2px;gap:12px;}
+  .storage-right .alloc-sub{font-size:12px;margin-top:3px;}
+  .storage-right .st-actions{margin-top:14px;padding-top:12px;}
+  .storage-right .st-actions .btn,.storage-right .st-actions .btn-back{padding:9px 16px;font-size:13px;}
+  .storage-right .link-danger{font-size:13px;}
+  .sp-r-empty h3{font-size:19px;}
+  .sp-r-empty p{font-size:13px;margin:10px 0 18px;}
+  .sp-illus{width:150px;height:120px;margin-bottom:14px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-top">
+      <div class="logo">
+        <svg viewBox="0 0 40 40" fill="none">
+          <path d="M6 12h20l-6 8H8z" fill="#f6c445"/>
+          <path d="M4 20h20l-6 8H6z" fill="#2f6bff"/>
+        </svg>
+      </div>
+      <button class="collapse">&laquo;</button>
+    </div>
+    <nav class="nav">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3Z"/><path d="M9 3v15M15 6v15"/></svg>Map</a>
+      <a href="#" class="active" id="navSites" data-page="sites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>Sites</a>
+      <a href="#" id="navUsers" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.5-1-4-3-4.6"/></svg>Users</a>
+      <a href="#" id="navLicenses" data-page="licenses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg>Licenses</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg>Dashboard</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg>Devices</a>
+    </nav>
+    <div class="nav-bottom">
+      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark">
+        <span class="tt-left">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <span id="themeLabel">Dark mode</span>
+        </span>
+        <span class="theme-switch"><span></span></span>
+      </div>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 9v11M15 9v11"/></svg>Data</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.6 2.6c-.7.3-1.3.9-1.3 1.8v.4"/><circle cx="11.9" cy="17" r="0.4" fill="currentColor" stroke="none"/></svg>Help center</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+   <div id="page-sites">
+    <div class="header-row">
+      <div>
+        <h1 class="page-title">Sites</h1>
+        <p class="page-sub">Manage organization sites and groups.</p>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- Groups -->
+      <section class="groups" id="siteGroups">
+        <h2>Site groups</h2>
+        <p class="desc">Organize your sites into groups so you can more easily assign them to your users</p>
+        <button class="btn new-group">New group</button>
+        <div class="group-item active">
+          <span class="lbl">All sites</span>
+          <span class="cnt">0</span>
+        </div>
+        <div class="group-item">
+          <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8 15.8 6.2M8.2 13.2l7.6 4.6"/></svg>Sites shared by me</span>
+          <span class="cnt">0</span>
+        </div>
+        <div class="groups-note">This looks like a new organization. There are currently 0 groups and 0 sites.</div>
+      </section>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Stepper -->
+        <div class="stepper-card">
+          <div class="stepper" id="stepperSites"></div>
+        </div>
+
+        <!-- Sites -->
+        <div class="sites-card">
+          <div class="sites-toolbar">
+            <span class="all">All sites</span>
+            <div class="search"><input type="text" placeholder="Search sites..."></div>
+            <button class="filters-btn">Filters</button>
+            <div class="spacer"></div>
+            <button class="btn" id="btnToolbar" onclick="openForm()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+              Add new site
+            </button>
+          </div>
+
+          <div class="table-head">
+            <div>Site name</div>
+            <div class="r">Localisation</div>
+            <div class="r">Group(s)</div>
+            <div class="r">Capacity</div>
+            <div class="r"></div>
+            <div class="r"></div>
+          </div>
+
+          <div id="rows"></div>
+
+          <div class="empty" id="emptyState">
+            <div class="pic">
+              <svg viewBox="0 0 260 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="130" cy="88" r="62" fill="#eef1f7"/>
+                <g stroke="#c3cad8"><circle cx="60" cy="112" r="1.6" fill="#c3cad8" stroke="none"/><circle cx="68" cy="112" r="1.6" fill="#c3cad8" stroke="none"/><circle cx="76" cy="112" r="1.6" fill="#c3cad8" stroke="none"/><circle cx="60" cy="120" r="1.6" fill="#c3cad8" stroke="none"/><circle cx="68" cy="120" r="1.6" fill="#c3cad8" stroke="none"/><circle cx="76" cy="120" r="1.6" fill="#c3cad8" stroke="none"/><circle cx="60" cy="128" r="1.6" fill="#c3cad8" stroke="none"/><circle cx="68" cy="128" r="1.6" fill="#c3cad8" stroke="none"/><circle cx="76" cy="128" r="1.6" fill="#c3cad8" stroke="none"/></g>
+                <g><circle cx="196" cy="150" r="1.6" fill="#c3cad8"/><circle cx="204" cy="150" r="1.6" fill="#c3cad8"/><circle cx="212" cy="150" r="1.6" fill="#c3cad8"/><circle cx="196" cy="158" r="1.6" fill="#c3cad8"/><circle cx="204" cy="158" r="1.6" fill="#c3cad8"/><circle cx="212" cy="158" r="1.6" fill="#c3cad8"/><circle cx="196" cy="166" r="1.6" fill="#c3cad8"/><circle cx="204" cy="166" r="1.6" fill="#c3cad8"/><circle cx="212" cy="166" r="1.6" fill="#c3cad8"/></g>
+                <path d="M55,150 L105,135 L155,150 L205,135 L205,178 L155,193 L105,178 L55,193 Z" fill="#f8fafc" stroke="#aab4c6" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M105,135 L105,178" stroke="#aab4c6" stroke-width="1.4"/>
+                <path d="M155,150 L155,193" stroke="#aab4c6" stroke-width="1.4"/>
+                <path d="M72,178 Q108,150 132,168 T196,152" stroke="#8b97ab" stroke-width="1.8" stroke-dasharray="1.5 6" stroke-linecap="round" fill="none"/>
+                <g transform="translate(96,104) scale(0.82)">
+                  <path d="M23,0 C10.3,0 0,10.3 0,23 C0,40 23,60 23,60 C23,60 46,40 46,23 C46,10.3 35.7,0 23,0 Z" fill="#6b7789"/>
+                  <path d="M15,26 L15,17 a8,8 0 0 1 16,0 L31,26 Z" fill="#3f4a5a"/>
+                </g>
+                <g transform="translate(156,88) scale(0.98)">
+                  <path d="M23,0 C10.3,0 0,10.3 0,23 C0,40 23,60 23,60 C23,60 46,40 46,23 C46,10.3 35.7,0 23,0 Z" fill="#f2b21e"/>
+                  <path d="M15,26 L15,17 a8,8 0 0 1 16,0 L31,26 Z" fill="#d99a10"/>
+                </g>
+              </svg>
+            </div>
+            <h3>Create your first site to continue the setup</h3>
+            <p>A brand-new organization should start with 0 groups and no sites yet. Create the first site to unlock user onboarding and license assignment.</p>
+            <button class="btn btn-lg" onclick="openForm()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+              Add new site
+            </button>
+          </div>
+
+          <div class="table-footer">
+            <span>Rows per page: 25</span>
+            <span id="pageCount">0—0 of 0</span>
+          </div>
+        </div>
+
+        <div id="continueUsersBar" style="display:none;justify-content:flex-end;margin-top:16px;">
+          <button class="btn" onclick="showPage('users')">
+            Continue adding users
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+   </div><!-- /page-sites -->
+
+   <!-- ================= USERS PAGE ================= -->
+   <div id="page-users" style="display:none;">
+    <div class="header-row">
+      <div>
+        <h1 class="page-title">Users</h1>
+        <p class="page-sub">Add and manage users for your organization.</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <button class="btn-export">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          Export
+        </button>
+        <button class="btn" onclick="openUserWizard()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg>
+          Add users
+        </button>
+      </div>
+    </div>
+
+    <div class="content" style="margin-top:22px;">
+      <div class="stepper-card">
+        <div class="stepper" id="stepperUsers"></div>
+      </div>
+
+      <div class="sites-card" id="usersCard"></div>
+    </div>
+   </div><!-- /page-users -->
+
+   <!-- ================= LICENSES PAGE ================= -->
+   <div id="page-licenses" style="display:none;">
+    <div class="header-row">
+      <div>
+        <h1 class="page-title">Licenses</h1>
+        <p class="page-sub">Assign licenses to your users.</p>
+      </div>
+    </div>
+    <div class="sites-card" style="margin-top:22px;align-items:center;justify-content:center;text-align:center;">
+      <div class="empty">
+        <h3>I'm licenses</h3>
+      </div>
+    </div>
+   </div><!-- /page-licenses -->
+  </main>
+</div>
+
+<!-- Modal: bloqueo hasta crear el primer site -->
+<div class="modal-overlay hidden" id="siteModal">
+  <div class="modal">
+    <div class="pic">
+      <svg viewBox="0 0 260 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="130" cy="88" r="62" fill="#eef1f7"/>
+        <g><circle cx="60" cy="112" r="1.6" fill="#c3cad8"/><circle cx="68" cy="112" r="1.6" fill="#c3cad8"/><circle cx="76" cy="112" r="1.6" fill="#c3cad8"/><circle cx="60" cy="120" r="1.6" fill="#c3cad8"/><circle cx="68" cy="120" r="1.6" fill="#c3cad8"/><circle cx="76" cy="120" r="1.6" fill="#c3cad8"/><circle cx="60" cy="128" r="1.6" fill="#c3cad8"/><circle cx="68" cy="128" r="1.6" fill="#c3cad8"/><circle cx="76" cy="128" r="1.6" fill="#c3cad8"/></g>
+        <g><circle cx="196" cy="150" r="1.6" fill="#c3cad8"/><circle cx="204" cy="150" r="1.6" fill="#c3cad8"/><circle cx="212" cy="150" r="1.6" fill="#c3cad8"/><circle cx="196" cy="158" r="1.6" fill="#c3cad8"/><circle cx="204" cy="158" r="1.6" fill="#c3cad8"/><circle cx="212" cy="158" r="1.6" fill="#c3cad8"/><circle cx="196" cy="166" r="1.6" fill="#c3cad8"/><circle cx="204" cy="166" r="1.6" fill="#c3cad8"/><circle cx="212" cy="166" r="1.6" fill="#c3cad8"/></g>
+        <path d="M55,150 L105,135 L155,150 L205,135 L205,178 L155,193 L105,178 L55,193 Z" fill="#f8fafc" stroke="#aab4c6" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M105,135 L105,178" stroke="#aab4c6" stroke-width="1.4"/>
+        <path d="M155,150 L155,193" stroke="#aab4c6" stroke-width="1.4"/>
+        <path d="M72,178 Q108,150 132,168 T196,152" stroke="#8b97ab" stroke-width="1.8" stroke-dasharray="1.5 6" stroke-linecap="round" fill="none"/>
+        <g transform="translate(96,104) scale(0.82)">
+          <path d="M23,0 C10.3,0 0,10.3 0,23 C0,40 23,60 23,60 C23,60 46,40 46,23 C46,10.3 35.7,0 23,0 Z" fill="#6b7789"/>
+          <path d="M15,26 L15,17 a8,8 0 0 1 16,0 L31,26 Z" fill="#3f4a5a"/>
+        </g>
+        <g transform="translate(156,88) scale(0.98)">
+          <path d="M23,0 C10.3,0 0,10.3 0,23 C0,40 23,60 23,60 C23,60 46,40 46,23 C46,10.3 35.7,0 23,0 Z" fill="#f2b21e"/>
+          <path d="M15,26 L15,17 a8,8 0 0 1 16,0 L31,26 Z" fill="#d99a10"/>
+        </g>
+      </svg>
+    </div>
+    <h3>Create your first site to continue the setup</h3>
+    <p>A brand-new organization should start with 0 groups and no sites yet. Create the first site to unlock user onboarding and license assignment.</p>
+    <button class="btn btn-lg" onclick="closeModal(); openForm();">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      Add new site
+    </button>
+  </div>
+</div>
+
+<!-- Modal: formulario para crear un site -->
+<div class="modal-overlay hidden" id="formModal">
+  <div class="form-modal">
+    <div class="form-scroll">
+      <p class="form-top">Enter the basic details for this site.</p>
+
+      <div class="form-card">
+        <h4>Site details</h4>
+
+        <label class="fld-label">Site name <span class="req">*</span></label>
+        <input class="fld" id="fName" placeholder="Enter site name">
+
+        <label class="fld-label">Search address <span class="req">*</span></label>
+        <div class="fld-search">
+          <input class="fld" id="fAddress" placeholder="Search for an address">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+
+        <div class="divider-text">Or enter coordinates manually</div>
+
+        <div class="two-col">
+          <div>
+            <label class="fld-label">Latitude</label>
+            <input class="fld" id="fLat" placeholder="Enter latitude (e.g., 40.7128)">
+          </div>
+          <div>
+            <label class="fld-label">Longitude</label>
+            <input class="fld" id="fLng" placeholder="Enter longitude (e.g., -74.0060)">
+          </div>
+        </div>
+
+        <label class="fld-label">Identifier (optional)</label>
+        <input class="fld" id="fId" placeholder="Enter identifier" style="margin-bottom:4px;">
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn-back" onclick="closeForm()">Back</button>
+      <button class="btn" onclick="submitForm()">Create site</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: wizard para añadir usuarios -->
+<div class="modal-overlay hidden" id="userWizard">
+  <div class="form-modal">
+    <div class="form-scroll">
+      <h3 class="storage-title" style="text-align:center;">Add users</h3>
+      <p class="wiz-top">Generate and configure users before adding them to the table.</p>
+
+      <div class="wiz-tabs">
+        <button class="wiz-tab active" id="wtab-users" onclick="wizTab('users')">Site users</button>
+        <button class="wiz-tab" id="wtab-mgr" onclick="wizTab('mgr')">Managers</button>
+      </div>
+
+      <!-- ===== Site users ===== -->
+      <div id="wpane-users">
+        <!-- Generador por pasos -->
+        <div class="gen-wiz" id="genWiz">
+          <div class="gen-progress">
+            <span class="gp-dot" id="gp-1">1</span><span class="gp-line" id="gl-1"></span>
+            <span class="gp-dot" id="gp-2">2</span><span class="gp-line" id="gl-2"></span>
+            <span class="gp-dot" id="gp-3">3</span>
+            <span class="gp-label" id="gpLabel">Step 1 of 3</span>
+          </div>
+
+          <!-- Paso 1: cuántos + formato del nombre -->
+          <div class="gen-step" id="gstep-1">
+            <div class="gen-q">How many users do you want to create?</div>
+            <div class="stepper-num" style="margin-top:14px;">
+              <button type="button" onclick="genAdj(-1)">−</button>
+              <input id="genCount" type="number" min="1" max="50" value="3" oninput="genSyncPreview()">
+              <button type="button" onclick="genAdj(1)">+</button>
+            </div>
+            <div class="naming-box compact" style="margin-top:18px;margin-bottom:0;">
+              <div class="nrow"><label>Prefix</label><input id="genPrefix" value="PLU" oninput="genSyncPreview()"></div>
+              <div class="nrow"><label>Suffix</label><input id="genSuffix" placeholder="optional" oninput="genSyncPreview()"></div>
+              <div class="preview-line">Username format: <b id="genFmt">PLU_&lt;SITE&gt;_001</b></div>
+            </div>
+          </div>
+
+          <!-- Paso 2: a qué site -->
+          <div class="gen-step" id="gstep-2" style="display:none;">
+            <div class="gen-q">Those users will be assigned to</div>
+            <select class="fld" id="genSite" style="margin-top:14px;margin-bottom:0;"></select>
+            <div class="preview-line" style="margin-top:12px;">Preview: <b id="genPrev1">PLU_SITE_001</b>, <b id="genPrev2">PLU_SITE_002</b>, …</div>
+          </div>
+
+          <!-- Paso 3: acciones -->
+          <div class="gen-step" id="gstep-3" style="display:none;">
+            <div class="gen-q" style="display:flex;justify-content:space-between;align-items:center;">
+              <span>Assign actions to those users</span>
+              <span>
+                <button type="button" class="mini-link" onclick="genActionsAll(true)">Add all</button>
+                <button type="button" class="mini-link" onclick="genActionsAll(false)">Remove all</button>
+              </span>
+            </div>
+            <div id="genActions" style="margin-top:8px;"></div>
+          </div>
+
+          <div class="gen-nav">
+            <button type="button" class="btn-back" id="genBack" onclick="genPrev()" style="visibility:hidden;">Back</button>
+            <button type="button" class="btn" id="genNext" onclick="genNext()">Next</button>
+          </div>
+        </div>
+
+        <div class="dup-warn" id="dupWarn" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+          <span id="dupWarnText">Some usernames already exist or are duplicated. Make them unique before reviewing.</span>
+        </div>
+
+        <div class="bulk-bar" id="bulkBar" style="display:none;">
+          <span class="bc" id="bulkCount">0 selected</span>
+          <select id="bulkSite"></select>
+          <button class="bbtn" onclick="bulkAssignSite()">Assign to site</button>
+          <span class="bsep"></span>
+          <input id="bulkPrefix" placeholder="Prefix" value="PLU">
+          <input id="bulkSuffix" placeholder="Suffix">
+          <button class="bbtn" onclick="bulkRename()">Apply names</button>
+          <span class="bsep"></span>
+          <button class="bbtn" onclick="bulkNomad(true)">Nomad on</button>
+          <button class="bbtn" onclick="bulkNomad(false)">Nomad off</button>
+          <button class="bbtn" onclick="bulkDelete()">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+            Delete
+          </button>
+          <button class="bbtn bclear" onclick="clearSel()">Clear</button>
+        </div>
+
+        <div class="draft-wrap" style="margin-top:14px;">
+          <div class="draft-head" style="grid-template-columns:30px 1.4fr 1fr 1.05fr 60px 90px 32px;">
+            <div><input type="checkbox" class="draft-cb" id="draftSelAll" onchange="toggleSelAll(this)"></div>
+            <div>Username</div><div>Site</div><div>Actions</div><div>Nomad</div><div>Status</div><div></div>
+          </div>
+          <div id="draftUsersRows"></div>
+          <div class="draft-empty" id="draftUsersEmpty">No users yet. Set a number and click <b>Generate</b>, or add one below.</div>
+        </div>
+        <button class="u-add-single" onclick="addDraftUser()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Add user
+        </button>
+      </div>
+
+      <!-- ===== Managers ===== -->
+      <div id="wpane-mgr" style="display:none;">
+        <div class="adm-banner">
+          <div class="adm-banner-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>
+            Create administrators
+          </div>
+          <div class="adm-banner-sub">Fill in each administrator in the indicated order. Fields marked <span class="req">*</span> are required.</div>
+          <div class="adm-roles">
+            <span class="adm-roles-lbl">AVAILABLE ROLES :</span>
+            <span class="role-chip2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg>
+              Global Admin
+              <div class="role-tip">
+                <div class="rt-cap">AVAILABLE ROLES</div>
+                <div class="rt-title"><svg viewBox="0 0 24 24" fill="none" stroke="#4b6cb7" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg> Global Admin</div>
+                <div class="rt-desc">For: IT manager, technical director — manages <b>all</b> sites.</div>
+                <div class="rt-checks">
+                  <span class="rt-check">✔ All sites</span>
+                  <span class="rt-check">✔ All groups</span>
+                  <span class="rt-check">✔ Global config</span>
+                </div>
+              </div>
+            </span>
+            <span class="role-chip2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3 2.5-5 7-5s7 2 7 5"/><path d="M17 6a3 3 0 0 1 0 5.5M22 20c0-2.3-1-3.8-3-4.5"/></svg>
+              Multisite Manager
+              <div class="role-tip">
+                <div class="rt-cap">AVAILABLE ROLES</div>
+                <div class="rt-title"><svg viewBox="0 0 24 24" fill="none" stroke="#4b6cb7" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3 2.5-5 7-5s7 2 7 5"/><path d="M17 6a3 3 0 0 1 0 5.5M22 20c0-2.3-1-3.8-3-4.5"/></svg> Multisite Manager</div>
+                <div class="rt-desc">For: local team lead — manages <b>only their groups</b>.</div>
+              </div>
+            </span>
+          </div>
+        </div>
+
+        <div class="mgr-head">
+          <span><b id="mgrCountLbl">0 administrators</b> <span class="req-note">* required fields</span></span>
+          <button type="button" class="btn-outline sm" onclick="addDraftMgr()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Add
+          </button>
+        </div>
+        <div class="draft-wrap">
+          <div class="draft-head" style="grid-template-columns:1.5fr 1fr 1fr 1fr 90px 32px;">
+            <div>E-mail *</div><div>Role *</div><div>Group of sites</div><div>Site</div><div>Status</div><div></div>
+          </div>
+          <div id="draftMgrRows"></div>
+          <div class="draft-empty" id="draftMgrEmpty">No administrators yet. Click <b>Add</b> to add one.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn-back" onclick="closeUserWizard()">Cancel</button>
+      <button class="btn" id="wizReviewBtn" onclick="wizReview()">Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: review antes de crear -->
+<div class="modal-overlay hidden" id="reviewModal">
+  <div class="rev-modal">
+    <div class="rev-scroll">
+      <div class="rev-h">Review &amp; confirm</div>
+      <div class="rev-sub">The following will be created in your organization.</div>
+      <div id="reviewBody"></div>
+    </div>
+    <div class="form-footer">
+      <button class="btn-back" onclick="closeReview()">Back</button>
+      <button class="btn" onclick="reviewConfirm()"><span id="revSaveLbl">Save</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: detalles de usuario -->
+<div class="modal-overlay hidden" id="userDetailsModal">
+  <div class="form-modal" style="max-width:480px;">
+    <div class="form-scroll" style="padding:24px 26px;">
+      <h3 class="storage-title" id="userDetailsTitle" style="font-size:20px;margin-bottom:16px;">User details</h3>
+      <div id="userDetailsBody"></div>
+    </div>
+    <div class="form-footer">
+      <button class="btn" onclick="closeUserDetails()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: confirmar borrado de usuario -->
+<div class="modal-overlay hidden" id="deleteUserModal">
+  <div class="modal" style="max-width:420px;padding:32px 30px;">
+    <div class="del-ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+    </div>
+    <h3 style="font-size:21px;">Delete this user?</h3>
+    <p style="font-size:14px;">You're about to delete <b id="delUserName">this user</b>. This action can't be undone.</p>
+    <div style="display:flex;gap:12px;width:100%;justify-content:center;">
+      <button class="btn-back" onclick="closeDeleteUser()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeleteUser()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: confirmar borrado de site -->
+<div class="modal-overlay hidden" id="deleteSiteModal">
+  <div class="modal" style="max-width:440px;padding:36px 34px;">
+    <div class="del-ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+    </div>
+    <h3 style="font-size:22px;">Delete this site?</h3>
+    <p style="font-size:15px;">You're about to delete <b id="delSiteName">this site</b>. This action can't be undone and will remove its storage spaces too.</p>
+    <div style="display:flex;gap:12px;width:100%;justify-content:center;">
+      <button class="btn-back" onclick="closeDeleteSite()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeleteSite()">Delete site</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: storage spaces (capacity de cada site) -->
+<div class="modal-overlay hidden" id="storageModal">
+  <div class="storage-modal">
+    <div class="storage-scroll">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <h3 class="storage-title">Set up storage spaces</h3>
+        <button class="btn-outline sm" id="storageTopAdd" onclick="addStorage()" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Add storage space
+        </button>
+      </div>
+      <div class="storage-body" style="margin-top:22px;">
+        <div class="storage-left">
+          <div class="sp-head">Storage spaces</div>
+          <div id="storageList"></div>
+        </div>
+        <div class="storage-right" id="storageRight"></div>
+      </div>
+    </div>
+    <div class="storage-footer">
+      <button class="btn" onclick="closeStorage()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmación de borrado de storage (encima del modal de storage) -->
+<div class="modal-overlay hidden" id="deleteStorageModal" style="z-index:200;">
+  <div class="modal" style="max-width:420px;padding:32px 30px;">
+    <div class="del-ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+    </div>
+    <h3 style="font-size:21px;">Delete this storage space?</h3>
+    <p style="font-size:14px;">You're about to delete <b id="delStorageName">this storage</b>. This action can't be undone.</p>
+    <div style="display:flex;gap:12px;width:100%;justify-content:center;">
+      <button class="btn-back" onclick="closeDeleteStorage()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeleteStorage()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Snackbar -->
+<div id="snackbar"></div>
+
+<script>
+  // Lista de sitios. Vacía = estado inicial (sin sitios).
+  let sites = [];
+
+  // Persistencia solo de sites en localStorage
+  const SITES_KEY = 'fleetview_sites_v1';
+  function persistSites(){
+    try{ localStorage.setItem(SITES_KEY, JSON.stringify(sites)); }catch(e){}
+  }
+  function loadSites(){
+    try{
+      const raw = localStorage.getItem(SITES_KEY);
+      if(raw){ const arr = JSON.parse(raw); if(Array.isArray(arr)) sites = arr; }
+    }catch(e){}
+  }
+
+  function render(){
+    const hasSites = sites.length > 0;
+    const rows = document.getElementById('rows');
+    const empty = document.getElementById('emptyState');
+    const btnToolbar = document.getElementById('btnToolbar');
+
+    // Sin sitios -> solo el botón dentro de la tabla (estado vacío)
+    // Con sitios -> solo el botón del header de la tabla (toolbar)
+    empty.classList.toggle('hidden', hasSites);
+    btnToolbar.classList.toggle('hidden', !hasSites);
+
+    // Ocultar el panel "Site groups" mientras no haya ningún site
+    const groupsPanel = document.getElementById('siteGroups');
+    if (groupsPanel) groupsPanel.style.display = hasSites ? '' : 'none';
+
+    // Botón "Continue adding users": solo si hay sites y aún no hay usuarios
+    const contBar = document.getElementById('continueUsersBar');
+    if (contBar) contBar.style.display = (hasSites && (typeof users==='undefined' || users.length===0)) ? 'flex' : 'none';
+
+    // Timeline compartido (Sites + Users). El paso 2 se habilita con al menos un site
+    const hasUsers = (typeof users!=='undefined') && users.length>0;
+    const sh = stepperHTML(hasSites, hasUsers);
+    document.getElementById('stepperSites').innerHTML = sh;
+    document.getElementById('stepperUsers').innerHTML = sh;
+
+    rows.innerHTML = sites.map((s, idx) => `
+      <div class="site-row">
+        <span class="name">${s.name}</span>
+        <span class="r">${s.localisation}</span>
+        <span class="r">${s.group}</span>
+        <span class="r cap-cell">${capacityLabel(s)}
+          <button class="icon-btn" title="Edit capacity" onclick="openStorage(${idx})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </button>
+        </span>
+        <span class="r">
+          <button class="icon-btn" title="View details">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </span>
+        <span class="r">
+          <button class="icon-btn danger" title="Delete site" onclick="askDeleteSite(${idx})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+          </button>
+        </span>
+      </div>`).join('');
+
+    const n = sites.length;
+    document.getElementById('pageCount').textContent =
+      n === 0 ? '0—0 of 0' : `1—${n} of ${n}`;
+    document.querySelectorAll('.group-item .cnt')[0].textContent = n;
+  }
+
+  // Abre el formulario de creación de site
+  function openForm(){
+    document.getElementById('formModal').classList.remove('hidden');
+    ['fName','fAddress','fLat','fLng','fId'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fName').focus();
+  }
+  function closeForm(){ document.getElementById('formModal').classList.add('hidden'); }
+
+  // Borrado de site con confirmación
+  let siteToDelete = null;
+  function askDeleteSite(i){
+    siteToDelete = i;
+    document.getElementById('delSiteName').textContent = sites[i] ? sites[i].name : 'this site';
+    document.getElementById('deleteSiteModal').classList.remove('hidden');
+  }
+  function closeDeleteSite(){ siteToDelete = null; document.getElementById('deleteSiteModal').classList.add('hidden'); }
+  function confirmDeleteSite(){
+    if(siteToDelete!==null && sites[siteToDelete]){ sites.splice(siteToDelete,1); persistSites(); }
+    closeDeleteSite();
+    render();
+  }
+
+  // Crea el site a partir del formulario
+  function submitForm(){
+    const name = document.getElementById('fName').value.trim();
+    const address = document.getElementById('fAddress').value.trim();
+    const lat = document.getElementById('fLat').value.trim();
+    const lng = document.getElementById('fLng').value.trim();
+    if (!name){ document.getElementById('fName').focus(); return; }
+
+    let loc = address;
+    if (!loc && lat && lng) loc = lat + ', ' + lng;
+    if (!loc) loc = '—';
+
+    sites.push({ name, localisation: loc, group: '—', storages: [] });
+    persistSites();
+    render();
+    closeForm();
+  }
+
+  // Cerrar el formulario al hacer click fuera
+  document.getElementById('formModal').addEventListener('click', e => {
+    if (e.target.id === 'formModal') closeForm();
+  });
+
+  /* ---------- Storage spaces ---------- */
+  const TYPES = ['Bunker','Silo','Warehouse','Barn','Tank'];
+  const CROPS = ['Barley','Wheat','Corn','Rice','Soybean','Oats'];
+  let currentSite = null;      // índice del site en edición
+  let selectedStorage = null;  // índice del storage seleccionado
+
+  function siteTons(s){ return (s.storages||[]).reduce((t,x)=> t + (parseFloat(x.capacity)||0), 0); }
+  function capacityLabel(s){ const t = siteTons(s); return t > 0 ? t + ' tons' : '0'; }
+
+  function openStorage(i){
+    currentSite = i;
+    selectedStorage = sites[i].storages.length ? 0 : null;
+    document.getElementById('storageModal').classList.remove('hidden');
+    renderStorage();
+  }
+  function closeStorage(){
+    document.getElementById('storageModal').classList.add('hidden');
+    currentSite = null; selectedStorage = null;
+    render();
+  }
+  function addStorage(){
+    const st = sites[currentSite].storages;
+    st.push({ type:'Bunker', name:'', crop:'Barley', capacity:'' });
+    selectedStorage = st.length - 1;
+    renderStorage();
+  }
+  function selectStorage(i){ selectedStorage = i; renderStorage(); }
+  function saveStorage(){
+    const s = sites[currentSite].storages[selectedStorage];
+    s.type = document.getElementById('stType').value;
+    s.name = document.getElementById('stName').value.trim() || 'Untitled storage';
+    s.crop = document.getElementById('stCrop').value;
+    s.capacity = parseFloat(document.getElementById('stCap').value) || 0;
+    persistSites();
+    renderStorage();
+    showSnack('Storage saved');
+  }
+  function cancelStorage(){ renderStorage(); }
+  function deleteStorage(){
+    const s = sites[currentSite].storages[selectedStorage];
+    document.getElementById('delStorageName').textContent = (s && s.name) ? s.name : 'this storage';
+    document.getElementById('deleteStorageModal').classList.remove('hidden');
+  }
+  function closeDeleteStorage(){ document.getElementById('deleteStorageModal').classList.add('hidden'); }
+  function confirmDeleteStorage(){
+    sites[currentSite].storages.splice(selectedStorage, 1);
+    selectedStorage = sites[currentSite].storages.length ? 0 : null;
+    persistSites();
+    closeDeleteStorage();
+    renderStorage();
+    showSnack('Storage deleted');
+  }
+
+  // Snackbar
+  let snackTimer = null;
+  function showSnack(msg){
+    const el = document.getElementById('snackbar');
+    el.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg> ${msg}`;
+    el.classList.add('show');
+    clearTimeout(snackTimer);
+    snackTimer = setTimeout(()=> el.classList.remove('show'), 2200);
+  }
+  function updateEquivalent(){
+    const cap = parseFloat(document.getElementById('stCap').value) || 0;
+    document.getElementById('stEquiv').textContent = (cap * 0.868).toFixed(2) + ' tons';
+  }
+
+  function renderStorage(){
+    const site = sites[currentSite];
+    const list = document.getElementById('storageList');
+    const right = document.getElementById('storageRight');
+
+    // Botón "Add storage space" arriba a la derecha: solo si ya hay storages
+    document.getElementById('storageTopAdd').style.display = site.storages.length ? 'inline-flex' : 'none';
+
+    // Lista izquierda
+    if (site.storages.length === 0){
+      list.innerHTML = `
+        <div class="sp-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.4 6.5 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.4-5.5A2 2 0 0 0 16.9 5.5H7.1a2 2 0 0 0-1.7 1Z"/></svg>
+          <div class="sp-empty-t">No storage spaces yet</div>
+          <div class="sp-empty-s">Add a storage space to get started.</div>
+        </div>`;
+    } else {
+      list.innerHTML = site.storages.map((s,i)=>`
+        <div class="sp-item ${i===selectedStorage?'active':''}" onclick="selectStorage(${i})">
+          <span class="sp-item-l">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/></svg>
+            ${s.name || 'Untitled storage'}
+          </span>
+          ${i===selectedStorage ? `<svg class="sp-check" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 14.2-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4Z"/></svg>` : ''}
+        </div>`).join('');
+    }
+
+    // Panel derecho
+    if (selectedStorage === null){
+      right.innerHTML = `
+        <div class="sp-r-empty">
+          <svg class="sp-illus" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="62" r="52" fill="#eef1f7"/>
+            <path d="M40 118h120" stroke="#c7ceda" stroke-width="2" stroke-linecap="round"/>
+            <path d="M60 118V70l40-26 40 26v48" stroke="#3f68d6" stroke-width="2.4" stroke-linejoin="round"/>
+            <path d="M60 70l40-26 40 26" stroke="#3f68d6" stroke-width="2.4" stroke-linejoin="round"/>
+            <path d="M72 118V84h56v34" stroke="#3f68d6" stroke-width="2"/>
+            <path d="M72 84h56" stroke="#3f68d6" stroke-width="2"/>
+            <rect x="90" y="98" width="20" height="20" fill="#eaf0fb" stroke="#3f68d6" stroke-width="1.8"/>
+            <path d="M100 98v20" stroke="#3f68d6" stroke-width="1.4"/>
+            <path d="M60 118l0 0" stroke="#e6a23c" stroke-width="3" stroke-linecap="round"/>
+            <path d="M58 118h20" stroke="#e6a23c" stroke-width="2.6" stroke-linecap="round"/>
+            <circle cx="150" cy="48" r="8" fill="none" stroke="#cdd6e6" stroke-width="2"/>
+            <path d="M40 52c4-4 10-4 14 0" stroke="#cdd6e6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h3>Create your first storage space</h3>
+          <p>Storage spaces help you organize inventory by location or area. You can add as many as you need and manage them later.</p>
+          <button class="btn btn-lg" onclick="addStorage()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Add storage space
+          </button>
+          <button class="sp-skip" onclick="closeStorage()">Skip for now</button>
+        </div>`;
+      return;
+    }
+
+    const s = site.storages[selectedStorage];
+    const typeOpts = TYPES.map(t=>`<option ${t===s.type?'selected':''}>${t}</option>`).join('');
+    const cropOpts = CROPS.map(c=>`<option ${c===s.crop?'selected':''}>${c}</option>`).join('');
+    const equiv = ((parseFloat(s.capacity)||0)*0.868).toFixed(2);
+    right.innerHTML = `
+      <h4>Storage details</h4>
+
+      <label class="st-label">Type</label>
+      <select class="fld" id="stType">${typeOpts}</select>
+
+      <label class="st-label">Name</label>
+      <input class="fld" id="stName" placeholder="Enter a name" value="${s.name.replace(/"/g,'&quot;')}">
+
+      <label class="st-label">Stored crop</label>
+      <select class="fld" id="stCrop">${cropOpts}</select>
+
+      <label class="st-label">Capacity</label>
+      <div class="cap-wrap">
+        <input type="number" id="stCap" min="0" placeholder="0" value="${s.capacity}" oninput="updateEquivalent()">
+        <span class="unit">tons</span>
+      </div>
+      <div class="info-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        Equivalent barley: <b id="stEquiv">${equiv} tons</b>
+      </div>
+
+      <div class="alloc-row">
+        <div>
+          <div class="alloc-title">Allocation rules <span>(optional)</span></div>
+          <div class="alloc-sub">Define rules to control how inventory is allocated to this storage space.</div>
+        </div>
+        <button class="btn-outline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Add rule
+        </button>
+      </div>
+
+      <div class="st-actions">
+        <button class="btn" onclick="saveStorage()">Save storage</button>
+        <button class="btn-back" onclick="cancelStorage()">Cancel changes</button>
+        <button class="link-danger" onclick="deleteStorage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Delete storage
+        </button>
+      </div>`;
+  }
+
+  document.getElementById('storageModal').addEventListener('click', e => {
+    if (e.target.id === 'storageModal') closeStorage();
+  });
+  document.getElementById('deleteStorageModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteStorageModal') closeDeleteStorage();
+  });
+
+  const LOCK = `<span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>`;
+  const CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg>`;
+  function stepperHTML(hasSites, hasUsers){
+    const lic = hasSites && hasUsers;
+    return `
+      <div class="line l1"></div>
+      <div class="line l2"></div>
+      <div class="step active">
+        <div class="circle done clickable" onclick="showPage('sites')" title="Go to sites">${CHECK}</div>
+        <div class="st-title clickable" onclick="showPage('sites')">Add sites</div>
+        <div class="st-sub">Ready</div>
+      </div>
+      <div class="step ${hasSites?'active':'locked'}">
+        <div class="circle ${hasSites?'done clickable':''}" ${hasSites?"onclick=\"showPage('users')\" title=\"Go to users\"":''}>${hasSites?CHECK:'2'+LOCK}</div>
+        <div class="st-title ${hasSites?'clickable':''}" ${hasSites?"onclick=\"showPage('users')\"":''}>Add users</div>
+        <div class="st-sub">${hasSites?'Ready to add users':'Available after your first site'}</div>
+      </div>
+      <div class="step ${lic?'active':'locked'}">
+        <div class="circle ${lic?'done clickable':''}" ${lic?"onclick=\"showPage('licenses')\" title=\"Go to licenses\"":''}>${lic?CHECK:'3'+LOCK}</div>
+        <div class="st-title ${lic?'clickable':''}" ${lic?"onclick=\"showPage('licenses')\"":''}>Assign licenses</div>
+        <div class="st-sub">${lic?'Ready to assign licenses':'Unlocked once users are added'}</div>
+      </div>`;
+  }
+
+  // Navegación entre páginas (Sites / Users / Licenses)
+  function showPage(name){
+    const pages = { sites:'page-sites', users:'page-users', licenses:'page-licenses' };
+    Object.entries(pages).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) el.style.display = k===name ? 'block' : 'none'; });
+    const navIds = { sites:'navSites', users:'navUsers', licenses:'navLicenses' };
+    document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+    const active = document.getElementById(navIds[name]);
+    if (active) active.classList.add('active');
+    if (name==='users') renderUsers();
+    else if (name==='sites') render();
+  }
+
+  function openModal(){ document.getElementById('siteModal').classList.remove('hidden'); }
+  function closeModal(){ document.getElementById('siteModal').classList.add('hidden'); }
+
+  // Cerrar al hacer click fuera del modal
+  document.getElementById('siteModal').addEventListener('click', e => {
+    if (e.target.id === 'siteModal') closeModal();
+  });
+  document.getElementById('deleteSiteModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteSiteModal') closeDeleteSite();
+  });
+  document.getElementById('deleteUserModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteUserModal') closeDeleteUser();
+  });
+  document.getElementById('userDetailsModal').addEventListener('click', e => {
+    if (e.target.id === 'userDetailsModal') closeUserDetails();
+  });
+
+  // Navegación del menú
+  document.querySelectorAll('.nav a, .nav-bottom a').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const page = link.dataset.page;
+      if (page === 'sites'){ showPage('sites'); return; }
+      // Sin ningún site, cualquier otra sección queda bloqueada
+      if (sites.length === 0){ openModal(); return; }
+      if (page === 'users'){ showPage('users'); return; }
+      if (page === 'licenses'){ showPage('licenses'); return; }
+      // Otras secciones no tienen página en este prototipo
+    });
+  });
+
+  /* ================= USERS ================= */
+  const U_ACTIONS = [
+    'Thousand kernel weight (Barley)',
+    'Varieties (Barley)',
+    'Varieties (Wheat)',
+  ];
+  const ROLES = ['Global Admin','Multisite Manager'];
+  let users = [];       // saved site users: { name, site, actions:[], nomad, status }
+  let managers = [];    // saved managers: { email, role, site, status }
+  let usersTab = 'all'; // pestaña activa en la tabla de usuarios
+
+  // Persistencia de usuarios y managers
+  const USERS_KEY = 'fleetview_users_v1';
+  function persistUsers(){
+    try{ localStorage.setItem(USERS_KEY, JSON.stringify({ users, managers })); }catch(e){}
+  }
+  function loadUsers(){
+    try{
+      const raw = localStorage.getItem(USERS_KEY);
+      if(raw){ const o = JSON.parse(raw); if(o){ users = o.users||[]; managers = o.managers||[]; } }
+    }catch(e){}
+  }
+
+  // Draft (edición dentro del modal)
+  let dUsers = [];
+  let dMgrs = [];
+
+  function siteList(){ return sites.length ? sites.map(s=>s.name) : ['Your site']; }
+  function siteName(){ return sites.length ? sites[0].name : 'Your site'; }
+  function codeOf(name){ return ((name||'SITE').split(/\s+/)[0] || 'SITE').toUpperCase(); }
+  function nextUsername(prefix, suffix, n, code){
+    return `${prefix||'PLU'}_${code||codeOf(siteName())}_${String(n).padStart(3,'0')}${suffix?'_'+suffix:''}`;
+  }
+  function statusBadge(st){
+    return st==='created'
+      ? `<span class="badge-created"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5 9-9"/></svg> Created</span>`
+      : `<span class="badge-pending"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg> Pending</span>`;
+  }
+  function nomadBadge(){ return `<span class="nomad-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg> Nomad</span>`; }
+  function actsLabel(n){ return n===0 ? '—' : n===U_ACTIONS.length ? `All (${n})` : `${n} / ${U_ACTIONS.length}`; }
+
+  /* ---------- Página Users (solo lectura) ---------- */
+  const U_GRID = 'grid-template-columns:1.6fr 1fr 0.9fr 1.1fr 70px 44px 44px;';
+  function renderUsers(){
+    const card = document.getElementById('usersCard');
+    if (!card) return;
+
+    // Mantener ambos timelines sincronizados (habilita el paso 3 al crear usuarios)
+    const sh = stepperHTML(sites.length>0, users.length>0);
+    const ss=document.getElementById('stepperSites'), su=document.getElementById('stepperUsers');
+    if(ss) ss.innerHTML=sh; if(su) su.innerHTML=sh;
+
+    if (users.length === 0 && managers.length === 0){
+      card.innerHTML = `
+        <div class="empty">
+          <div class="pic">
+            <svg viewBox="0 0 260 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="130" cy="92" r="62" fill="#eef1f7"/>
+              <circle cx="112" cy="82" r="20" fill="#f8fafc" stroke="#6b7789" stroke-width="2.4"/>
+              <path d="M84 128c0-15 12.5-25 28-25s28 10 28 25" fill="#f8fafc" stroke="#6b7789" stroke-width="2.4" stroke-linecap="round"/>
+              <circle cx="176" cy="120" r="20" fill="#fff6e2" stroke="#e6a83c" stroke-width="2.4"/>
+              <path d="M176 112v16M168 120h16" stroke="#e6a83c" stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Create your first user to continue the setup</h3>
+          <p>Users are required so your team can access the organization. Add at least one user to continue the setup.</p>
+          <button class="btn btn-lg" onclick="openUserWizard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg>
+            Add user
+          </button>
+        </div>`;
+      return;
+    }
+
+    const showSite  = usersTab==='all' || usersTab==='site';
+    const showAdmin = usersTab==='all' || usersTab==='admin';
+
+    const eyeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const trashSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>`;
+
+    const uRows = users.map((u,i)=>`
+      <div class="u-row" style="${U_GRID}" data-search="${(u.name+' '+u.site).toLowerCase().replace(/"/g,'')}">
+        <span class="name" style="font-weight:600;">${u.name}</span>
+        ${u.nomad ? nomadBadge() : `<span class="u-site">${u.site}</span>`}
+        <span><span class="role-badge">Site User</span></span>
+        <span class="u-site">${actsLabel(u.actions.length)}</span>
+        <span class="u-site">${u.nomad?'Yes':'—'}</span>
+        <span class="r"><button class="icon-btn" title="View details" onclick="viewUser('site',${i})">${eyeSvg}</button></span>
+        <span class="r"><button class="icon-btn danger" title="Delete user" onclick="askDeleteUser('site',${i})">${trashSvg}</button></span>
+      </div>`).join('');
+
+    const uSection = (users.length && showSite) ? `
+      <div class="u-sec-head">Site users <span class="cnt">${users.length}</span></div>
+      <div class="table-head" style="${U_GRID}">
+        <div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Nomad</div><div class="r"></div><div class="r"></div>
+      </div>
+      ${uRows}` : '';
+
+    const M_GRID = 'grid-template-columns:1.8fr 1.1fr 1fr 44px 44px;';
+    const mRows = managers.map((m,i)=>`
+      <div class="m-row" style="${M_GRID}" data-search="${((m.email||'')+' '+(m.role||'')+' '+(m.site||'')).toLowerCase().replace(/"/g,'')}">
+        <span class="m-email">${m.email}</span>
+        <span><span class="role-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg> ${m.role}</span></span>
+        <span class="u-site">${m.site || '—'}</span>
+        <span class="r"><button class="icon-btn" title="View details" onclick="viewUser('admin',${i})">${eyeSvg}</button></span>
+        <span class="r"><button class="icon-btn danger" title="Delete user" onclick="askDeleteUser('admin',${i})">${trashSvg}</button></span>
+      </div>`).join('');
+
+    const mSection = (managers.length && showAdmin) ? `
+      <div class="u-sec-head">Admin users <span class="cnt">${managers.length}</span></div>
+      <div class="table-head m-row" style="${M_GRID}">
+        <div>E-mail</div><div>Role</div><div>Site</div><div class="r"></div><div class="r"></div>
+      </div>
+      ${mRows}` : '';
+
+    let body = uSection + mSection;
+    if(!body){
+      const what = usersTab==='admin' ? 'admin users' : usersTab==='site' ? 'site users' : 'users';
+      body = `<div class="draft-empty" style="padding:44px;">No ${what} yet.</div>`;
+    }
+
+    card.innerHTML = `
+      <div class="u-tabs">
+        <button class="u-tab ${usersTab==='all'?'active':''}" onclick="setUsersTab('all')">All users <span class="tcount">${users.length+managers.length}</span></button>
+        <button class="u-tab ${usersTab==='site'?'active':''}" onclick="setUsersTab('site')">Site users <span class="tcount">${users.length}</span></button>
+        <button class="u-tab ${usersTab==='admin'?'active':''}" onclick="setUsersTab('admin')">Admin users <span class="tcount">${managers.length}</span></button>
+      </div>
+      <div class="sites-toolbar">
+        <div class="search"><input type="text" placeholder="Search by username or site..." oninput="filterUsers(this.value)"></div>
+        <div class="spacer"></div>
+        <button class="btn" onclick="openUserWizard()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg>
+          Add users
+        </button>
+      </div>
+      ${body}
+      <div class="table-footer">
+        <span>${users.length} site user${users.length!==1?'s':''} · ${managers.length} admin user${managers.length!==1?'s':''}</span>
+      </div>`;
+  }
+
+  function setUsersTab(t){ usersTab=t; renderUsers(); }
+  function filterUsers(q){
+    q=(q||'').toLowerCase().trim();
+    document.getElementById('usersCard').querySelectorAll('[data-search]').forEach(row=>{
+      row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+    });
+  }
+
+  /* ---------- Detalles de usuario (ojo) ---------- */
+  function viewUser(type,i){
+    const body=document.getElementById('userDetailsBody');
+    if(type==='site'){
+      const u=users[i]; if(!u) return;
+      const acts = u.actions.length ? u.actions.map(a=>`<span class="rev-chip">${a}</span>`).join('') : '<span class="rev-empty">No actions assigned</span>';
+      document.getElementById('userDetailsTitle').textContent='Site user details';
+      body.innerHTML = `
+        <div class="ud-row"><span class="ud-k">Username</span><span class="ud-v">${u.name}</span></div>
+        <div class="ud-row"><span class="ud-k">Role</span><span class="ud-v"><span class="role-badge">Site User</span></span></div>
+        <div class="ud-row"><span class="ud-k">Site</span><span class="ud-v">${u.nomad?'Nomad (all sites)':u.site}</span></div>
+        <div class="ud-row"><span class="ud-k">Nomad</span><span class="ud-v">${u.nomad?'Yes':'No'}</span></div>
+        <div class="ud-row"><span class="ud-k">Status</span><span class="ud-v">${statusBadge(u.status)}</span></div>
+        <div class="ud-block"><div class="ud-k" style="margin-bottom:8px;">Actions</div>${acts}</div>`;
+    } else {
+      const m=managers[i]; if(!m) return;
+      document.getElementById('userDetailsTitle').textContent='Admin user details';
+      body.innerHTML = `
+        <div class="ud-row"><span class="ud-k">E-mail</span><span class="ud-v">${m.email}</span></div>
+        <div class="ud-row"><span class="ud-k">Role</span><span class="ud-v"><span class="role-badge">${m.role}</span></span></div>
+        <div class="ud-row"><span class="ud-k">Group of sites</span><span class="ud-v">${m.groups||'—'}</span></div>
+        <div class="ud-row"><span class="ud-k">Site</span><span class="ud-v">${m.site||'—'}</span></div>
+        <div class="ud-row"><span class="ud-k">Status</span><span class="ud-v">${statusBadge(m.status)}</span></div>`;
+    }
+    document.getElementById('userDetailsModal').classList.remove('hidden');
+  }
+  function closeUserDetails(){ document.getElementById('userDetailsModal').classList.add('hidden'); }
+
+  /* ---------- Borrado de usuario (con confirmación) ---------- */
+  let userToDelete = null;
+  function askDeleteUser(type,i){
+    userToDelete = { type, i };
+    const name = type==='site' ? (users[i]&&users[i].name) : (managers[i]&&managers[i].email);
+    document.getElementById('delUserName').textContent = name || 'this user';
+    document.getElementById('deleteUserModal').classList.remove('hidden');
+  }
+  function closeDeleteUser(){ userToDelete=null; document.getElementById('deleteUserModal').classList.add('hidden'); }
+  function confirmDeleteUser(){
+    if(userToDelete){
+      if(userToDelete.type==='site') users.splice(userToDelete.i,1);
+      else managers.splice(userToDelete.i,1);
+      persistUsers();
+    }
+    closeDeleteUser();
+    renderUsers();
+    showSnack('User deleted');
+  }
+
+  /* ---------- Wizard: apertura ---------- */
+  let draftUid = 0;
+  let selDraft = new Set();   // ids de filas seleccionadas (bulk)
+
+  function openUserWizard(){
+    // clonar lo guardado a draft (con id para selección)
+    // Empezar con estado limpio: el modal solo crea usuarios NUEVOS
+    dUsers = [];
+    dMgrs  = [];
+    selDraft = new Set();
+    const opts = siteList().map(n=>`<option>${n}</option>`).join('');
+    document.getElementById('genSite').innerHTML = opts;
+    document.getElementById('bulkSite').innerHTML = opts;
+    genReset();
+    wizTab('users');
+    renderDraftUsers();
+    renderDraftMgrs();
+    document.getElementById('userWizard').classList.remove('hidden');
+  }
+  function closeUserWizard(){ document.getElementById('userWizard').classList.add('hidden'); }
+
+  function wizTab(t){
+    document.getElementById('wtab-users').classList.toggle('active', t==='users');
+    document.getElementById('wtab-mgr').classList.toggle('active', t==='mgr');
+    document.getElementById('wpane-users').style.display = t==='users' ? 'block' : 'none';
+    document.getElementById('wpane-mgr').style.display   = t==='mgr'   ? 'block' : 'none';
+  }
+  /* ---------- Generador por pasos ---------- */
+  let genStep = 1;
+  let genActs = new Set();
+  function genReset(){
+    genStep = 1;
+    genActs = new Set();
+    document.getElementById('genCount').value = 3;
+    document.getElementById('genPrefix').value = 'PLU';
+    document.getElementById('genSuffix').value = '';
+    genSyncPreview();
+    genShowStep();
+  }
+  function genShowStep(){
+    for(let s=1;s<=3;s++){
+      document.getElementById('gstep-'+s).style.display = s===genStep ? 'block' : 'none';
+      const dot=document.getElementById('gp-'+s);
+      dot.className = 'gp-dot' + (s===genStep ? ' active' : s<genStep ? ' done' : '');
+    }
+    document.getElementById('gl-1').className = 'gp-line' + (genStep>1?' done':'');
+    document.getElementById('gl-2').className = 'gp-line' + (genStep>2?' done':'');
+    document.getElementById('gpLabel').textContent = `Step ${genStep} of 3`;
+    document.getElementById('genBack').style.visibility = genStep===1 ? 'hidden' : 'visible';
+    const next=document.getElementById('genNext');
+    next.textContent = genStep===3 ? 'Generate' : 'Next';
+    if(genStep===2) genSyncPreview();
+    if(genStep===3) renderGenActions();
+  }
+  function genAdj(d){
+    const inp=document.getElementById('genCount');
+    inp.value=Math.max(1,Math.min(50,(parseInt(inp.value)||3)+d));
+    genSyncPreview();
+  }
+  function genPrefixV(){ return document.getElementById('genPrefix').value || 'PLU'; }
+  function genSuffixV(){ return document.getElementById('genSuffix').value || ''; }
+  function genSyncPreview(){
+    const p=genPrefixV(), s=genSuffixV();
+    const fmt=document.getElementById('genFmt');
+    if(fmt) fmt.textContent = `${p}_<SITE>_001${s?'_'+s:''}`;
+    const siteEl=document.getElementById('genSite');
+    const site=siteEl ? siteEl.value : siteName();
+    const code=codeOf(site);
+    const off=dUsers.filter(u=>u.site===site).length;
+    const p1=document.getElementById('genPrev1'), p2=document.getElementById('genPrev2');
+    if(p1) p1.textContent=nextUsername(p,s,off+1,code);
+    if(p2) p2.textContent=nextUsername(p,s,off+2,code);
+  }
+  function renderGenActions(){
+    document.getElementById('genActions').innerHTML = U_ACTIONS.map(a=>`
+      <label class="wiz-check"><input type="checkbox" ${genActs.has(a)?'checked':''} onchange="genToggleAction('${a.replace(/'/g,"\\'")}')"><span>${a}</span></label>`).join('');
+  }
+  function genToggleAction(a){ if(genActs.has(a)) genActs.delete(a); else genActs.add(a); }
+  function genActionsAll(on){ genActs = on ? new Set(U_ACTIONS) : new Set(); renderGenActions(); }
+  function genNext(){
+    if(genStep<3){ genStep++; genShowStep(); return; }
+    genFinish();
+  }
+  function genPrev(){ if(genStep>1){ genStep--; genShowStep(); } }
+  // Nombres ya en uso (usuarios guardados + draft actual)
+  function usedNames(extraDraft){
+    const set=new Set();
+    users.forEach(u=>set.add((u.name||'').trim().toLowerCase()));
+    (extraDraft||dUsers).forEach(u=>set.add((u.name||'').trim().toLowerCase()));
+    return set;
+  }
+  // Genera el siguiente username libre para un site (evita chocar con guardados y draft)
+  function freeUsername(p, s, code, site, used){
+    let seq = users.filter(u=>u.site===site).length + dUsers.filter(u=>u.site===site).length + 1;
+    let name;
+    do { name = nextUsername(p,s,seq,code); seq++; } while(used.has(name.toLowerCase()));
+    used.add(name.toLowerCase());
+    return name;
+  }
+  function genFinish(){
+    const n=Math.max(1,Math.min(50,parseInt(document.getElementById('genCount').value)||3));
+    const site=document.getElementById('genSite').value;
+    const code=codeOf(site);
+    const p=genPrefixV(), s=genSuffixV();
+    const acts=[...genActs];
+    const used=usedNames();
+    for(let i=1;i<=n;i++){
+      dUsers.push({ id:++draftUid, name:freeUsername(p,s,code,site,used), site, actions:[...acts], nomad:false });
+    }
+    genReset();
+    renderDraftUsers();
+  }
+
+  /* ---------- Draft: site users ---------- */
+  function draftBySite(){
+    const g={};
+    dUsers.forEach(u=>{ (g[u.site]=g[u.site]||[]).push(u); });
+    return g;
+  }
+  // Duplicados: entre el propio draft O contra usuarios ya creados
+  function dupSet(){
+    const existing = new Set(users.map(u=>(u.name||'').trim().toLowerCase()));
+    const c={}; dUsers.forEach(u=>{ const k=(u.name||'').trim().toLowerCase(); if(k) c[k]=(c[k]||0)+1; });
+    const s=new Set();
+    dUsers.forEach(u=>{
+      const k=(u.name||'').trim().toLowerCase();
+      if(k && (c[k]>1 || existing.has(k))) s.add(u.id);
+    });
+    return s;
+  }
+  // ¿el username de este draft ya existe entre los guardados?
+  function nameExists(id){
+    const u=dUsers.find(x=>x.id===id); if(!u) return false;
+    const k=(u.name||'').trim().toLowerCase();
+    return users.some(x=>(x.name||'').trim().toLowerCase()===k);
+  }
+  function addDraftUser(){
+    const site=document.getElementById('genSite').value || siteName();
+    dUsers.push({ id:++draftUid, name:freeUsername('PLU','',codeOf(site),site,usedNames()), site, actions:[], nomad:false });
+    renderDraftUsers();
+  }
+  function idxOf(id){ return dUsers.findIndex(u=>u.id===id); }
+
+  function renderDraftUsers(){
+    const box=document.getElementById('draftUsersRows');
+    const empty=document.getElementById('draftUsersEmpty');
+    empty.style.display = dUsers.length ? 'none' : 'block';
+    const dups=dupSet();
+    box.innerHTML = dUsers.map(u=>{
+      const i=u.id;
+      const acts=u.actions.length;
+      const checks=U_ACTIONS.map(a=>`<label><input type="checkbox" ${u.actions.includes(a)?'checked':''} onclick="event.stopPropagation();toggleDraftAction(${i},'${a.replace(/'/g,"\\'")}',this.checked)"><span>${a}</span></label>`).join('');
+      return `
+      <div class="draft-row" style="grid-template-columns:30px 1.4fr 1fr 1.05fr 60px 90px 32px;">
+        <div><input type="checkbox" class="draft-cb" ${selDraft.has(i)?'checked':''} onchange="toggleSel(${i},this.checked)"></div>
+        <input id="dname-${i}" class="di ${dups.has(i)?'dup':''}" value="${(u.name||'').replace(/"/g,'&quot;')}" title="${dups.has(i)?(nameExists(i)?'This username already exists':'Duplicated username'):''}" oninput="setDUserName(${i},this.value)">
+        ${u.nomad ? nomadBadge() : `<select class="di" onchange="setDUserSite(${i},this.value)">${siteList().map(n=>`<option ${u.site===n?'selected':''}>${n}</option>`).join('')}</select>`}
+        <div class="di-act">
+          <button class="u-actions-btn ${acts?'has':''}" onclick="toggleDraftPop(${i},event)">${acts?actsLabel(acts):'— optional —'}</button>
+          <div class="u-pop" id="dpop-${i}" style="display:none">
+            <div class="u-pop-head">
+              <button class="mini-link" onclick="event.stopPropagation();rowActionsAll(${i},true)">Add all</button>
+              <button class="mini-link" onclick="event.stopPropagation();rowActionsAll(${i},false)">Remove all</button>
+            </div>
+            ${checks}
+          </div>
+        </div>
+        <div class="sw ${u.nomad?'on':''}" onclick="toggleDraftNomad(${i})"><span></span></div>
+        <span class="badge-pending"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg> Pending</span>
+        <button class="u-del" onclick="deleteDraftUser(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+      </div>`;
+    }).join('');
+    updateBulkBar();
+    refreshReviewBtn();
+    // sincronizar select-all
+    const sa=document.getElementById('draftSelAll');
+    if(sa){ sa.checked = dUsers.length>0 && selDraft.size===dUsers.length; sa.indeterminate = selDraft.size>0 && selDraft.size<dUsers.length; }
+  }
+  function refreshReviewBtn(){
+    const rb=document.getElementById('wizReviewBtn');
+    if(!rb) return;
+    const hasDup=dupSet().size>0;
+    const nothing = dUsers.length===0 && dMgrs.filter(mgrReady).length===0;
+    rb.disabled = hasDup || nothing;
+    rb.style.opacity = rb.disabled ? .5 : 1;
+    rb.style.cursor = rb.disabled ? 'not-allowed' : 'pointer';
+  }
+  // Actualiza solo el estado de duplicados sin reconstruir las filas (conserva el foco)
+  function refreshDupState(){
+    const dups=dupSet();
+    dUsers.forEach(u=>{
+      const el=document.getElementById(`dname-${u.id}`);
+      if(el){ el.classList.toggle('dup', dups.has(u.id)); el.title = dups.has(u.id) ? (nameExists(u.id)?'This username already exists':'Duplicated username') : ''; }
+    });
+    document.getElementById('dupWarn').style.display = dups.size>0 ? 'flex' : 'none';
+    refreshReviewBtn();
+  }
+  function setDUserName(id,v){ const i=idxOf(id); if(i>-1){ dUsers[i].name=v; refreshDupState(); } }
+  function setDUserSite(id,v){ const i=idxOf(id); if(i>-1){ dUsers[i].site=v; } }
+  function toggleDraftPop(id,e){
+    e.stopPropagation();
+    document.querySelectorAll('.u-pop').forEach(p=>{ if(p.id!==`dpop-${id}`) p.style.display='none'; });
+    const pop=document.getElementById(`dpop-${id}`);
+    pop.style.display = pop.style.display==='none' ? 'block' : 'none';
+  }
+  function toggleDraftAction(id,name,checked){
+    const i=idxOf(id); if(i<0) return;
+    const a=dUsers[i].actions;
+    if(checked){ if(!a.includes(name)) a.push(name); } else { dUsers[i].actions=a.filter(x=>x!==name); }
+    const btn=document.querySelector(`#dpop-${id}`).parentElement.querySelector('.u-actions-btn');
+    const n=dUsers[i].actions.length;
+    btn.textContent = n?actsLabel(n):'— optional —';
+    btn.classList.toggle('has', n>0);
+  }
+  function rowActionsAll(id,on){
+    const i=idxOf(id); if(i<0) return;
+    dUsers[i].actions = on ? [...U_ACTIONS] : [];
+    const pop=document.getElementById(`dpop-${id}`);
+    if(pop){
+      pop.querySelectorAll('input[type="checkbox"]').forEach(cb=>{ cb.checked = on; });
+      const btn=pop.parentElement.querySelector('.u-actions-btn');
+      const n=dUsers[i].actions.length;
+      btn.textContent = n?actsLabel(n):'— optional —';
+      btn.classList.toggle('has', n>0);
+    }
+  }
+  function toggleDraftNomad(id){ const i=idxOf(id); if(i>-1){ dUsers[i].nomad=!dUsers[i].nomad; renderDraftUsers(); } }
+  function deleteDraftUser(id){ const i=idxOf(id); if(i>-1){ selDraft.delete(id); dUsers.splice(i,1); renderDraftUsers(); } }
+
+  /* ---------- Bulk actions ---------- */
+  function toggleSel(id,checked){ if(checked) selDraft.add(id); else selDraft.delete(id); renderDraftUsers(); }
+  function toggleSelAll(cb){ selDraft = cb.checked ? new Set(dUsers.map(u=>u.id)) : new Set(); renderDraftUsers(); }
+  function clearSel(){ selDraft=new Set(); renderDraftUsers(); }
+  function updateBulkBar(){
+    const bar=document.getElementById('bulkBar');
+    bar.style.display = selDraft.size>0 ? 'flex' : 'none';
+    document.getElementById('bulkCount').textContent = `${selDraft.size} selected`;
+  }
+  function bulkAssignSite(){
+    const site=document.getElementById('bulkSite').value;
+    dUsers.forEach(u=>{ if(selDraft.has(u.id)) u.site=site; });
+    renderDraftUsers();
+  }
+  function bulkNomad(on){ dUsers.forEach(u=>{ if(selDraft.has(u.id)) u.nomad=on; }); renderDraftUsers(); }
+  function bulkDelete(){ dUsers=dUsers.filter(u=>!selDraft.has(u.id)); selDraft=new Set(); renderDraftUsers(); }
+  function bulkRename(){
+    const p=document.getElementById('bulkPrefix').value.trim() || 'PLU';
+    const s=document.getElementById('bulkSuffix').value.trim();
+    const seqBySite={};
+    dUsers.forEach(u=>{
+      if(!selDraft.has(u.id)) return;
+      // conservar el número existente del username; si no hay, numerar por site
+      const numTok=(u.name||'').split('_').find(t=>/^\d+$/.test(t));
+      let seq;
+      if(numTok){ seq=parseInt(numTok,10); }
+      else { seqBySite[u.site]=(seqBySite[u.site]||0)+1; seq=seqBySite[u.site]; }
+      u.name = nextUsername(p,s,seq,codeOf(u.site));
+    });
+    renderDraftUsers();
+  }
+
+  /* ---------- Draft: managers ---------- */
+  const GROUPS = ['Group A','Group B','Group C','Regional Nord'];
+  function addDraftMgr(){ dMgrs.push({ email:'', role:'', groups:'', site:'' }); renderDraftMgrs(); }
+  function isEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((e||'').trim()); }
+  function mgrStatus(m){
+    if(!m.email) return 'empty';
+    if(!isEmail(m.email) || !m.role) return 'error';
+    return 'ready';
+  }
+  function mgrReady(m){ return mgrStatus(m)==='ready'; }
+  function mgrStatusHTML(m){
+    const s=mgrStatus(m);
+    if(s==='empty') return '<span class="badge-empty">— Empty</span>';
+    if(s==='error') return '<span class="badge-error"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg> Error</span>';
+    return '<span class="badge-created" style="background:#eef4ff;color:#3b53a0;border-color:#cdd8fb;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5 9-9"/></svg> Ready</span>';
+  }
+  const MGR_LOCK = `<div class="mgr-lock">— After the email —</div><div class="mgr-lock-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> Fill in the email first</div>`;
+  function mgrRoleCell(m,i){
+    const req = isEmail(m.email) && !m.role;
+    return `<select class="di ${req?'err':''}" onchange="setDMgr(${i},'role',this.value)"><option value="">Choose a role</option>${ROLES.map(r=>`<option ${m.role===r?'selected':''}>${r}</option>`).join('')}</select><div class="mgr-hint">${req?'<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg> Role required':''}</div>`;
+  }
+  function mgrGroupCell(m,i){
+    return `<select class="di" onchange="setDMgr(${i},'groups',this.value)"><option value="">Choose a group</option>${GROUPS.map(g=>`<option ${m.groups===g?'selected':''}>${g}</option>`).join('')}</select>`;
+  }
+  function mgrSiteCell(m,i){
+    const so=siteList().map(n=>`<option ${m.site===n?'selected':''}>${n}</option>`).join('');
+    return `<select class="di" onchange="setDMgr(${i},'site',this.value)"><option value="">Choose a site</option>${so}</select>`;
+  }
+  function renderDraftMgrs(){
+    const box=document.getElementById('draftMgrRows');
+    const empty=document.getElementById('draftMgrEmpty');
+    empty.style.display = dMgrs.length ? 'none' : 'block';
+    const cl=document.getElementById('mgrCountLbl');
+    if(cl) cl.textContent = `${dMgrs.length} administrator${dMgrs.length!==1?'s':''}`;
+    box.innerHTML = dMgrs.map((m,i)=>{
+      const unlocked=isEmail(m.email);
+      const emailErr = m.email && !unlocked;
+      const emailHint = !m.email
+        ? '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Start with the email'
+        : emailErr ? '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg> Invalid email address' : '';
+      return `
+      <div class="draft-row" style="grid-template-columns:1.5fr 1fr 1fr 1fr 90px 32px;align-items:start;">
+        <div>
+          <input class="di ${emailErr?'err':''}" type="email" placeholder="firstname.lastname@domain.com" value="${(m.email||'').replace(/"/g,'&quot;')}" oninput="onMgrEmail(${i},this)">
+          <div class="mgr-hint" id="memh-${i}" style="color:${emailErr?'#e2453b':'#8a94a6'};">${emailHint}</div>
+        </div>
+        <div id="mrole-${i}">${unlocked?mgrRoleCell(m,i):MGR_LOCK}</div>
+        <div id="mgrp-${i}">${unlocked?mgrGroupCell(m,i):MGR_LOCK}</div>
+        <div id="msite-${i}">${unlocked?mgrSiteCell(m,i):MGR_LOCK}</div>
+        <span id="mstat-${i}" style="align-self:center;">${mgrStatusHTML(m)}</span>
+        <button class="u-del" style="align-self:center;" onclick="deleteDraftMgr(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+      </div>`;
+    }).join('');
+    refreshReviewBtn();
+  }
+  function onMgrEmail(i, el){
+    const m=dMgrs[i]; if(!m) return;
+    const prev=isEmail(m.email); m.email=el.value; const now=isEmail(el.value);
+    const emailErr = el.value && !now;
+    el.classList.toggle('err', emailErr);
+    const hint=document.getElementById(`memh-${i}`);
+    if(hint){
+      hint.style.color = emailErr ? '#e2453b' : '#8a94a6';
+      hint.innerHTML = !el.value
+        ? '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Start with the email'
+        : emailErr ? '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg> Invalid email address' : '';
+    }
+    if(prev!==now){
+      if(!now){ m.role=''; m.groups=''; m.site=''; }
+      document.getElementById(`mrole-${i}`).innerHTML = now?mgrRoleCell(m,i):MGR_LOCK;
+      document.getElementById(`mgrp-${i}`).innerHTML  = now?mgrGroupCell(m,i):MGR_LOCK;
+      document.getElementById(`msite-${i}`).innerHTML = now?mgrSiteCell(m,i):MGR_LOCK;
+    }
+    updateMgrStatus(i);
+    refreshReviewBtn();
+  }
+  function updateMgrStatus(i){ const el=document.getElementById(`mstat-${i}`); if(el) el.innerHTML=mgrStatusHTML(dMgrs[i]); }
+  function deleteDraftMgr(i){ dMgrs.splice(i,1); renderDraftMgrs(); }
+  function setDMgr(i,field,v){
+    if(!dMgrs[i]) return;
+    dMgrs[i][field]=v;
+    if(field==='role'){ const c=document.getElementById(`mrole-${i}`); if(c) c.innerHTML=mgrRoleCell(dMgrs[i],i); }
+    updateMgrStatus(i);
+    refreshReviewBtn();
+  }
+
+  /* ---------- Review + guardar ---------- */
+  function wizReview(){
+    if(dupSet().size>0) return;
+    const validMgrs=dMgrs.filter(mgrReady);
+    if(dUsers.length===0 && validMgrs.length===0) return;
+    const g=draftBySite();
+    const siteBlocks=Object.keys(g).map(site=>`
+      <div class="rev-site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg> ${site} <span style="color:var(--muted);font-weight:600;">· ${g[site].length}</span></div>
+      <div>${g[site].map(u=>`<span class="rev-chip">${u.name}${u.nomad?' · Nomad':''}</span>`).join('')}</div>`).join('');
+    const usersBlock = dUsers.length ? `
+      <div class="rev-block">
+        <h5>Site users <span class="pill">${dUsers.length}</span></h5>
+        ${siteBlocks}
+      </div>` : '';
+    const mgrBlock = validMgrs.length ? `
+      <div class="rev-block">
+        <h5>Managers <span class="pill">${validMgrs.length}</span></h5>
+        ${validMgrs.map(m=>`<div class="rev-mrow"><span class="role-badge">${m.role}</span> <b>${m.email}</b> <span style="color:var(--muted2);margin-left:auto;">${m.site||'—'}</span></div>`).join('')}
+      </div>` : '';
+    document.getElementById('reviewBody').innerHTML = usersBlock + mgrBlock || '<div class="rev-empty">Nothing to create.</div>';
+    const total=dUsers.length+validMgrs.length;
+    document.getElementById('revSaveLbl').textContent = `Save ${total} item${total!==1?'s':''}`;
+    document.getElementById('reviewModal').classList.remove('hidden');
+  }
+  function closeReview(){ document.getElementById('reviewModal').classList.add('hidden'); }
+  function reviewConfirm(){
+    // Añadir los nuevos a los ya existentes
+    users = users.concat(dUsers.map(u=>({ name:u.name, site:u.site, actions:[...u.actions], nomad:u.nomad, status:'created' })));
+    managers = managers.concat(dMgrs.filter(mgrReady).map(m=>({ email:m.email.trim(), role:m.role, groups:m.groups||'', site:m.site, status:'created' })));
+    persistUsers();
+    closeReview();
+    closeUserWizard();
+    renderUsers();
+  }
+
+  document.addEventListener('click', ()=> document.querySelectorAll('.u-pop').forEach(p=>p.style.display='none'));
+  document.getElementById('userWizard').addEventListener('click', e=>{
+    if (e.target.id==='userWizard') closeUserWizard();
+  });
+  document.getElementById('reviewModal').addEventListener('click', e=>{
+    if (e.target.id==='reviewModal') closeReview();
+  });
+
+
+
+  // Tema claro / oscuro
+  const THEME_KEY = 'fleetview_theme';
+  const sunIcon = '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+  const moonIcon = '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>';
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    const dark = t === 'dark';
+    const label = document.getElementById('themeLabel');
+    const icon = document.getElementById('themeIcon');
+    if(label) label.textContent = dark ? 'Light mode' : 'Dark mode';
+    if(icon) icon.innerHTML = dark ? moonIcon : sunIcon;
+  }
+  function toggleTheme(){
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+    applyTheme(next);
+  }
+  function loadTheme(){
+    let t = 'light';
+    try{ t = localStorage.getItem(THEME_KEY) || 'light'; }catch(e){}
+    applyTheme(t);
+  }
+
+  loadTheme();
+  loadSites();
+  loadUsers();
+  render();
+</script>
+</body>
+</html>
