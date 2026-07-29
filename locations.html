@@ -644,6 +644,17 @@
   .map-popup .mp-name{font-weight:700;color:var(--navy);font-size:13.5px;margin-bottom:2px;}
   .map-popup .mp-type{font-size:11.5px;font-weight:600;color:var(--blue);margin-bottom:3px;}
   .map-popup .mp-loc{font-size:12px;color:var(--muted2);}
+  .map-popup{min-width:210px;}
+  .mp-storages{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+  .mp-storages-title{font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+  .mp-storage-list{display:flex;flex-direction:column;gap:7px;max-height:150px;overflow-y:auto;}
+  .mp-storage-row{display:flex;align-items:center;gap:8px;}
+  .mp-storage-ico{width:13px;flex-shrink:0;display:flex;align-items:flex-end;}
+  .mp-storage-ico svg{width:100%;height:auto;}
+  .mp-storage-info{flex:1;min-width:0;}
+  .mp-storage-name{font-size:12px;font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mp-storage-meta{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted2);margin-top:1px;}
+  .mp-crop-pill{font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:20px;white-space:nowrap;}
   .site-cluster{background:transparent;border:none;}
   .cluster-bubble{width:38px;height:38px;border-radius:50%;background:#f2b21e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 3px 10px rgba(242,178,30,.5);border:3px solid #fff;}
 </style>
@@ -1844,7 +1855,7 @@
       if (!ll) return;
       const typeKey = SITE_TYPES[s.type] ? s.type : DEFAULT_SITE_TYPE;
       const marker = L.marker(ll, { icon: PIN_ICONS[typeKey] });
-      marker.bindPopup(`<div class="map-popup"><div class="mp-name">${s.name}</div><div class="mp-type">${SITE_TYPES[typeKey].label}</div><div class="mp-loc">${s.localisation}</div></div>`);
+      marker.bindPopup(`<div class="map-popup"><div class="mp-name">${s.name}</div><div class="mp-type">${SITE_TYPES[typeKey].label}</div><div class="mp-loc">${s.localisation}</div>${mapPopupStoragesHtml(s)}</div>`);
       marker._siteName = s.name.toLowerCase();
       siteMarkers.push(marker);
       siteClusterGroup.addLayer(marker);
@@ -2154,6 +2165,32 @@
   let currentDetailSite = null, currentDetailStorage = null;
   function mockKey(siteId, storageIdx){ return siteId + ':' + storageIdx; }
 
+  // Mini-lista de storage spaces para el popup del pin de un site en el mapa.
+  function mapPopupStoragesHtml(s){
+    const storages = s.storages || [];
+    if (!storages.length) return '';
+    const rows = storages.map((st, si) => {
+      const c = CROP_COLORS[st.crop] || CROP_COLOR_DEFAULT;
+      const pct = storageMockUsed[mockKey(s.id, si)] || 0;
+      const total = parseFloat(st.capacity) || 0;
+      const available = total - Math.round(total * pct / 100);
+      return `<div class="mp-storage-row">
+        <div class="mp-storage-ico">${siloFillSvg(c.text, pct)}</div>
+        <div class="mp-storage-info">
+          <div class="mp-storage-name">${escapeAttr(st.name || st.type || 'Storage')}</div>
+          <div class="mp-storage-meta">
+            <span class="mp-crop-pill" style="background:${c.bg};color:${c.text};">${escapeAttr(st.crop || '—')}</span>
+            <span>${available} / ${total} tons</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="mp-storages">
+      <div class="mp-storages-title">Storage spaces (${storages.length})</div>
+      <div class="mp-storage-list">${rows}</div>
+    </div>`;
+  }
+
   // Modal de detalles de un storage individual (icono del ojo en la card). Solo se cierra con Close.
   function openStorageDetails(siteIdx, storageIdx){
     currentDetailSite = siteIdx;
@@ -2211,6 +2248,7 @@
     storageMockUsed[key] = seq[(idx + 1) % seq.length];
     renderStorageDetails();
     refreshSiteStoragesGridIfOpen();
+    if (siteMap) refreshMapMarkers();
   }
   function resetStorageMock(){
     if (currentDetailSite == null) return;
@@ -2218,6 +2256,7 @@
     storageMockUsed[mockKey(s.id, currentDetailStorage)] = 0;
     renderStorageDetails();
     refreshSiteStoragesGridIfOpen();
+    if (siteMap) refreshMapMarkers();
   }
   // El modal de "Site details" sigue abierto detrás del de storage; sus cards de storage
   // quedan con datos viejos si no se re-renderizan al mockear/resetear el % usado.
