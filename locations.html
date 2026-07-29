@@ -179,7 +179,7 @@
   /* Sites card: tamaño fijo (llena el espacio disponible); si hay más filas
      de las que caben, solo #rows hace scroll interno, la tarjeta no crece. */
   .sites-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;flex:1;display:flex;flex-direction:column;min-height:0;}
-  #rows{flex:1;overflow-y:auto;min-height:0;}
+  #rows{flex:1;overflow-y:auto;min-height:400px;}
   #usersCard{overflow-y:auto;}
 
   /* Scrollbar de color propio en las zonas con scroll interno, para que se
@@ -197,7 +197,7 @@
   .filters-btn{padding:9px 14px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;}
   .spacer{flex:1;}
 
-  .table-head{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:10px 6px 8px;border-bottom:1px solid var(--border);color:var(--navy);font-weight:700;font-size:14px;}
+  .table-head{display:grid;grid-template-columns:1.2fr 0.9fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:10px 6px 8px;border-bottom:1px solid var(--border);color:var(--navy);font-weight:700;font-size:14px;}
   .table-head .r{text-align:center;}
 
   .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 20px;}
@@ -208,7 +208,54 @@
 
   .table-footer{display:flex;justify-content:flex-end;align-items:center;gap:24px;color:var(--muted2);font-size:13px;padding-top:10px;margin-top:auto;}
 
-  .site-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:8px 6px;border-bottom:1px solid var(--border);font-size:13.5px;align-items:center;}
+  .site-row{display:grid;grid-template-columns:1.2fr 0.9fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:8px 6px;border-bottom:1px solid var(--border);font-size:10.5px;align-items:center;}
+  .site-type-pill{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--navy);}
+  .site-type-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  /* Cards de storage spaces dentro del modal de detalles de site */
+  .site-storages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .site-storage-card{display:flex;align-items:stretch;gap:10px;border:1px solid var(--border);border-radius:12px;padding:14px 14px 14px 16px;background:var(--card);}
+  .ssc-info{flex:1;min-width:0;}
+  .ssc-name{font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ssc-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;color:var(--muted2);margin-bottom:8px;}
+  .ssc-row:last-child{margin-bottom:0;}
+  .ssc-cap{font-weight:700;color:var(--navy);font-size:13px;}
+  .ssc-crop-pill{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+  .ssc-side{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px;}
+  .ssc-icon{width:34px;display:flex;align-items:flex-end;justify-content:center;}
+  .ssc-icon svg{width:100%;height:auto;}
+  .ssc-eye{padding:4px;}
+  .ssc-eye svg{width:15px;height:15px;}
+
+  /* Modal de detalle de un storage individual */
+  .sd-grid{display:flex;gap:16px;flex-wrap:wrap;}
+  .sd-card{flex:1;min-width:220px;border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+  .sd-card h4{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:14px;}
+  .sd-body{display:flex;align-items:flex-end;gap:16px;}
+  .sd-nums{flex:1;min-width:0;}
+  .sd-silo{flex-shrink:0;width:48px;}
+  .sd-silo svg{width:100%;height:auto;}
+  .btn-reset{width:100%;margin-top:16px;border:1px solid #f3c6c2;color:#e2453b;background:#fff;padding:11px 16px;
+    border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  .btn-reset:hover{background:#fdecec;}
+  [data-theme="dark"] .btn-reset{background:transparent;border-color:#5a2b2b;}
+  [data-theme="dark"] .btn-reset:hover{background:#2b1616;}
+  .sd-demo-btn{font-size:12px;font-weight:700;color:#b06d00;background:#fff5e9;border:1px solid #f6dcb6;
+    padding:6px 12px;border-radius:7px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .sd-demo-btn:hover{background:#fdecd2;}
+  [data-theme="dark"] .sd-demo-btn{background:#2a2113;border-color:#4a3a1c;color:#e6a83c;}
+  .sd-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;}
+  .sd-head h3{font-size:20px;margin:0;}
+  .site-groups-pill{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 8px;border-radius:20px;background:#eef1f6;color:var(--navy);font-weight:700;font-size:12px;cursor:default;}
+  .site-groups-pill.muted{background:#f2f4f8;color:var(--muted);font-weight:600;}
+  [data-theme="dark"] .site-groups-pill{background:var(--panel);color:var(--text);}
+  [data-theme="dark"] .site-groups-pill.muted{background:#1c2330;color:var(--muted2);}
+  /* Tooltip único (position:fixed), igual patrón que #atTplTip: evita el bug de
+     clipping de un tooltip absoluto dentro de #rows, que tiene overflow-y:auto. */
+  #siteGroupsTip{display:none;position:fixed;z-index:260;background:#fff;border:1px solid var(--border);
+    border-radius:9px;box-shadow:0 10px 26px rgba(20,29,51,.16);padding:8px 12px;font-size:12.5px;
+    font-weight:600;color:var(--navy);white-space:nowrap;text-align:left;}
+  .site-groups-tip-item{padding:2px 0;}
+  [data-theme="dark"] #siteGroupsTip{background:var(--card);border-color:var(--border);}
   .icon-btn.danger:hover{background:#fdecec;color:#e2453b;}
   .site-row .name{font-weight:600;color:var(--navy);}
   .site-row .r{text-align:center;color:var(--muted2);}
@@ -433,6 +480,9 @@
   .modal h3{font-size:28px;font-weight:800;color:var(--navy);max-width:440px;line-height:1.25;}
   .del-ic{width:64px;height:64px;border-radius:50%;background:#fdecec;display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
   .del-ic svg{width:28px;height:28px;color:#e2453b;}
+  .lock-ic{width:64px;height:64px;border-radius:50%;background:#eef4ff;display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+  .lock-ic svg{width:28px;height:28px;color:#4b6cb7;}
+  [data-theme="dark"] .lock-ic{background:#16233b;}
   .btn-danger{background:#e2453b;color:#fff;border:none;padding:13px 26px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;}
   .btn-danger:hover{background:#c93a31;}
 
@@ -613,8 +663,8 @@
       <a href="#" class="active" id="navSites" data-page="sites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg><span class="lbl-text">Sites</span></a>
       <a href="#" id="navUsers" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.5-1-4-3-4.6"/></svg><span class="lbl-text">Users</span></a>
       <a href="#" id="navLicenses" data-page="licenses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg><span class="lbl-text">Licenses</span></a>
-      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg><span class="lbl-text">Dashboard</span></a>
-      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg><span class="lbl-text">Devices</span></a>
+      <a href="#" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg><span class="lbl-text">Dashboard</span></a>
+      <a href="#" data-page="devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg><span class="lbl-text">Devices</span></a>
     </nav>
     <div class="nav-bottom">
       <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark">
@@ -624,7 +674,7 @@
         </span>
         <span class="theme-switch"><span></span></span>
       </div>
-      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 9v11M15 9v11"/></svg><span class="lbl-text">Data</span></a>
+      <a href="#" data-page="data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 9v11M15 9v11"/></svg><span class="lbl-text">Data</span></a>
       <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.6 2.6c-.7.3-1.3.9-1.3 1.8v.4"/><circle cx="11.9" cy="17" r="0.4" fill="currentColor" stroke="none"/></svg><span class="lbl-text">Help center</span></a>
     </div>
   </aside>
@@ -679,6 +729,7 @@
 
           <div class="table-head">
             <div>Site name</div>
+            <div class="r">Type</div>
             <div class="r">Localisation</div>
             <div class="r">Group(s)</div>
             <div class="r">Capacity</div>
@@ -1138,6 +1189,35 @@
   </div>
 </div>
 
+<!-- Modal: detalles de site. Solo se cierra con el botón Close (sin click fuera, sin X). -->
+<div class="modal-overlay hidden" id="siteDetailsModal">
+  <div class="form-modal" style="max-width:700px;">
+    <div class="form-scroll" style="padding:24px 26px;">
+      <h3 class="storage-title" id="siteDetailsTitle" style="font-size:20px;margin-bottom:16px;">Site details</h3>
+      <div id="siteDetailsBody"></div>
+    </div>
+    <div class="form-footer" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeSiteDetails()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: detalles de un storage individual. Solo se cierra con el botón Close. -->
+<div class="modal-overlay hidden" id="storageDetailsModal">
+  <div class="form-modal" style="max-width:640px;">
+    <div class="form-scroll" style="padding:24px 26px;">
+      <div class="sd-head">
+        <h3 class="storage-title" id="storageDetailsTitle">Storage details</h3>
+        <button class="sd-demo-btn" onclick="mockStorageFill()">Mock the storage (DEMO)</button>
+      </div>
+      <div id="storageDetailsBody"></div>
+    </div>
+    <div class="form-footer" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeStorageDetails()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: confirmar borrado de usuario -->
 <div class="modal-overlay hidden" id="deleteUserModal">
   <div class="modal" style="max-width:420px;padding:32px 30px;">
@@ -1164,6 +1244,20 @@
     <div style="display:flex;gap:12px;width:100%;justify-content:center;">
       <button class="btn-back" onclick="closeDeleteSite()">Cancel</button>
       <button class="btn-danger" onclick="confirmDeleteSite()">Delete site</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: sección bloqueada hasta que exista al menos un usuario -->
+<div class="modal-overlay hidden" id="requireUsersModal">
+  <div class="modal" style="max-width:440px;padding:36px 34px;">
+    <div class="lock-ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+    </div>
+    <h3 id="requireUsersTitle" style="font-size:22px;">Add a user to unlock this section</h3>
+    <p id="requireUsersDesc" style="font-size:15px;">This section is linked to users, so you need at least one user before you can access it.</p>
+    <div style="display:flex;gap:12px;width:100%;justify-content:center;">
+      <button class="btn" onclick="closeRequireUsersModal()">Got it</button>
     </div>
   </div>
 </div>
@@ -1286,6 +1380,9 @@
   </div>
 </div>
 
+<!-- Tooltip de grupos de un site (tabla de sites) -->
+<div id="siteGroupsTip"></div>
+
 <!-- Snackbar -->
 <div id="snackbar"></div>
 
@@ -1334,6 +1431,47 @@
     render();
   }
 
+  // Trunca direcciones largas en la tabla de sites; el texto completo queda como
+  // tooltip (title) para no romper el layout de la fila con direcciones muy largas.
+  function escapeAttr(str){
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  }
+  function truncateAddr(text, max = 25){
+    const str = String(text || '');
+    return str.length > max ? str.slice(0, max) + '…' : str;
+  }
+  // Atributo title (tooltip) con la dirección completa, solo cuando hubo truncado.
+  function addrTitleAttr(text, max = 25){
+    const str = String(text || '');
+    return str.length > max ? ` title="${escapeAttr(str)}"` : '';
+  }
+
+  // Grupos a los que pertenece un site (por siteIds del grupo, no por s.group que no se usa).
+  function siteGroupNames(s){
+    return groups.filter(g => (g.siteIds||[]).includes(s.id)).map(g => g.name);
+  }
+  // Celda de la tabla de sites: número de grupos + tooltip fijo con sus nombres al hacer hover.
+  function siteGroupsCell(s, i){
+    const names = siteGroupNames(s);
+    if (!names.length) return `<span class="site-groups-pill muted">0</span>`;
+    return `<span class="site-groups-pill" onmouseenter="showSiteGroupsTip(event, ${i})" onmouseleave="hideSiteGroupsTip()">${names.length}</span>`;
+  }
+  function showSiteGroupsTip(ev, i){
+    const s = sites[i];
+    const tip = document.getElementById('siteGroupsTip');
+    if (!s || !tip) return;
+    tip.innerHTML = siteGroupNames(s).map(n => `<div class="site-groups-tip-item">${escapeAttr(n)}</div>`).join('');
+    const r = ev.currentTarget.getBoundingClientRect();
+    tip.style.left = (r.left + r.width / 2) + 'px';
+    tip.style.top = (r.bottom + 8) + 'px';
+    tip.style.transform = 'translateX(-50%)';
+    tip.style.display = 'block';
+  }
+  function hideSiteGroupsTip(){
+    const tip = document.getElementById('siteGroupsTip');
+    if (tip) tip.style.display = 'none';
+  }
+
   function render(){
     const hasSites = sites.length > 0;
     const rows = document.getElementById('rows');
@@ -1366,15 +1504,16 @@
       ? visible.map(({s, i}) => `
       <div class="site-row">
         <span class="name">${s.name}</span>
-        <span class="r">${s.localisation}</span>
-        <span class="r">${s.group}</span>
+        <span class="r">${siteTypeLabel(s)}</span>
+        <span class="r"${addrTitleAttr(s.localisation)}>${truncateAddr(s.localisation)}</span>
+        <span class="r">${siteGroupsCell(s, i)}</span>
         <span class="r cap-cell">${capacityLabel(s)}
           <button class="icon-btn" title="Edit capacity" onclick="openStorage(${i})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
           </button>
         </span>
         <span class="r">
-          <button class="icon-btn" title="View details">
+          <button class="icon-btn" title="View details" onclick="openSiteDetails(${i})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </span>
@@ -1622,6 +1761,13 @@
     industrial: { label: 'Industrial site',  color: '#2f6bff', glyph: '<path d="M4 21V11L12 5L20 11V21Z" fill="#fff"/>' },
   };
   const DEFAULT_SITE_TYPE = 'industrial'; // fallback solo para sites guardados antes de que "type" existiera
+
+  // Etiqueta de tipo de site para la tabla (con punto de color a juego con el pin del mapa)
+  function siteTypeLabel(s){
+    const typeKey = SITE_TYPES[s.type] ? s.type : DEFAULT_SITE_TYPE;
+    const t = SITE_TYPES[typeKey];
+    return `<span class="site-type-pill"><span class="site-type-dot" style="background:${t.color}"></span>${t.label}</span>`;
+  }
 
   function buildPinIcon(typeKey){
     const t = SITE_TYPES[typeKey] || SITE_TYPES[DEFAULT_SITE_TYPE];
@@ -1893,6 +2039,7 @@
     groups.push({ name, siteIds: gSelected.slice() });
     persistGroups();
     renderGroupsList();
+    render();
     closeGroupModal();
     showSnack('Group created');
   }
@@ -1933,6 +2080,152 @@
 
   function siteTons(s){ return (s.storages||[]).reduce((t,x)=> t + (parseFloat(x.capacity)||0), 0); }
   function capacityLabel(s){ const t = siteTons(s); return t > 0 ? t + ' tons' : '0'; }
+
+  // Paleta de colores por crop (pill), estilo pastel a juego con el resto de badges de la app.
+  const CROP_COLORS = {
+    Barley:  { bg:'#fde3c0', text:'#a15c00' },
+    Wheat:   { bg:'#fde3b8', text:'#b06d00' },
+    Corn:    { bg:'#eef2c2', text:'#6b7a1e' },
+    Rice:    { bg:'#e6f2e0', text:'#3a7a3d' },
+    Soybean: { bg:'#e2f0e9', text:'#1c8a4b' },
+    Oats:    { bg:'#f3e9d9', text:'#8a6a3a' },
+  };
+  const CROP_COLOR_DEFAULT = { bg:'#eef1f6', text:'#6b7688' };
+
+  // Modal de detalles de site (icono del ojo en la tabla). Solo se cierra con el botón Close.
+  function openSiteDetails(i){
+    const s = sites[i];
+    if (!s) return;
+    document.getElementById('siteDetailsTitle').textContent = s.name || 'Site details';
+    const groupNames = siteGroupNames(s);
+    const storages = s.storages || [];
+    const storagesHtml = storages.length
+      ? `<div class="site-storages-grid">${storages.map((st, si) => {
+          const c = CROP_COLORS[st.crop] || CROP_COLOR_DEFAULT;
+          const pct = storageMockUsed[mockKey(s.id, si)] || 0;
+          const total = parseFloat(st.capacity) || 0;
+          const used = Math.round(total * pct / 100);
+          const available = total - used;
+          return `<div class="site-storage-card">
+            <div class="ssc-info">
+              <div class="ssc-name">${escapeAttr(st.name || st.type || 'Storage')}</div>
+              <div class="ssc-row"><span>Type</span><span class="ssc-cap">${escapeAttr(st.type || '—')}</span></div>
+              <div class="ssc-row"><span>Species</span><span class="ssc-crop-pill" style="background:${c.bg};color:${c.text};">${escapeAttr(st.crop || '—')}</span></div>
+              <div class="ssc-row"><span>Capacity</span><span class="ssc-cap">${available} / ${total} tons</span></div>
+            </div>
+            <div class="ssc-side">
+              <button class="icon-btn ssc-eye" title="View storage details" onclick="openStorageDetails(${i},${si})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <div class="ssc-icon">${siloFillSvg(c.text, pct)}</div>
+            </div>
+          </div>`;
+        }).join('')}</div>`
+      : `<span class="ud-v" style="font-weight:500;color:var(--muted2);">No storage spaces yet</span>`;
+    document.getElementById('siteDetailsBody').innerHTML = `
+      <div class="ud-row"><span class="ud-k">Site name</span><span class="ud-v">${escapeAttr(s.name)}</span></div>
+      <div class="ud-row"><span class="ud-k">Type</span><span class="ud-v">${siteTypeLabel(s)}</span></div>
+      <div class="ud-row"><span class="ud-k">Localisation</span><span class="ud-v">${escapeAttr(s.localisation || '—')}</span></div>
+      <div class="ud-row"><span class="ud-k">Coordinates</span><span class="ud-v">${s.lat != null && s.lng != null ? `${s.lat}, ${s.lng}` : '—'}</span></div>
+      <div class="ud-row"><span class="ud-k">Groups</span><span class="ud-v">${groupNames.length ? escapeAttr(groupNames.join(', ')) : '—'}</span></div>
+      <div class="ud-row"><span class="ud-k">Capacity</span><span class="ud-v">${capacityLabel(s)}</span></div>
+      <div class="ud-block"><div class="ud-k" style="margin-bottom:8px;">Storage spaces</div>${storagesHtml}</div>`;
+    document.getElementById('siteDetailsModal').classList.remove('hidden');
+  }
+  function closeSiteDetails(){ document.getElementById('siteDetailsModal').classList.add('hidden'); }
+
+  // Silueta de silo rellena hasta el % usado. Solo demo: el "used" real siempre es 0
+  // salvo que se use el botón "Mock the storage (DEMO)" para forzar 25/50/75/100%.
+  let siloFillUid = 0;
+  function siloFillSvg(color, pct){
+    // El domo empieza en y=13 (ápice) y el cuerpo termina en y=68: alto total 55.
+    // Un poco más (60) asegura que el 100% cubra también la curva del domo, sin dejar la punta vacía.
+    const fillY = 68 - (60 * pct / 100);
+    const clipId = `sdSiloClip-${siloFillUid++}`;
+    return `<svg viewBox="0 0 40 70" fill="none">
+      <defs><clipPath id="${clipId}"><path d="M6 68 V27 A14 14 0 0 1 34 27 V68 Z"/></clipPath></defs>
+      <rect x="0" y="${fillY}" width="40" height="70" fill="${color}" clip-path="url(#${clipId})"/>
+      <path d="M6 68 V27 A14 14 0 0 1 34 27 V68 Z" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  // Estado (solo en memoria, no se persiste) del % "usado" mockeado por storage, para el DEMO.
+  let storageMockUsed = {};
+  let currentDetailSite = null, currentDetailStorage = null;
+  function mockKey(siteId, storageIdx){ return siteId + ':' + storageIdx; }
+
+  // Modal de detalles de un storage individual (icono del ojo en la card). Solo se cierra con Close.
+  function openStorageDetails(siteIdx, storageIdx){
+    currentDetailSite = siteIdx;
+    currentDetailStorage = storageIdx;
+    renderStorageDetails();
+    document.getElementById('storageDetailsModal').classList.remove('hidden');
+  }
+  function closeStorageDetails(){
+    document.getElementById('storageDetailsModal').classList.add('hidden');
+    currentDetailSite = null; currentDetailStorage = null;
+  }
+  function renderStorageDetails(){
+    const s = sites[currentDetailSite];
+    const st = s && s.storages[currentDetailStorage];
+    if (!s || !st) return;
+    const key = mockKey(s.id, currentDetailStorage);
+    const pct = storageMockUsed[key] || 0;
+    const total = parseFloat(st.capacity) || 0;
+    const used = Math.round(total * pct / 100);
+    const available = total - used;
+    const c = CROP_COLORS[st.crop] || CROP_COLOR_DEFAULT;
+    document.getElementById('storageDetailsTitle').textContent = st.name || st.type || 'Storage details';
+    document.getElementById('storageDetailsBody').innerHTML = `
+      <div class="sd-grid">
+        <div class="sd-card">
+          <h4>Storage capacity</h4>
+          <div class="info-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            Storage capacities are estimated according to the species expected in the allocation plan.
+          </div>
+          <div class="sd-body">
+            <div class="sd-nums">
+              <div class="ud-row"><span class="ud-k">Total capacity</span><span class="ud-v">${total} tons</span></div>
+              <div class="ud-row"><span class="ud-k">Used</span><span class="ud-v">${used} tons</span></div>
+              <div class="ud-row"><span class="ud-k">Available</span><span class="ud-v">${available} tons</span></div>
+            </div>
+            <div class="sd-silo">${siloFillSvg(c.text, pct)}</div>
+          </div>
+          <button class="btn-reset" onclick="resetStorageMock()">Reset</button>
+        </div>
+        <div class="sd-card">
+          <h4>Your allotment plan</h4>
+          <div class="ud-row"><span class="ud-k">Expected species</span><span class="ud-v"><span class="ssc-crop-pill" style="background:${c.bg};color:${c.text};">${escapeAttr(st.crop || '—')}</span></span></div>
+          <div class="ud-row"><span class="ud-k">Protein content (%)</span><span class="ud-v">&lt; 50%</span></div>
+          <div class="ud-row"><span class="ud-k">Required varieties</span><span class="ud-v">Abony, Absint, Coa</span></div>
+        </div>
+      </div>`;
+  }
+  function mockStorageFill(){
+    if (currentDetailSite == null) return;
+    const s = sites[currentDetailSite];
+    const key = mockKey(s.id, currentDetailStorage);
+    const seq = [0, 25, 50, 75, 100];
+    const idx = seq.indexOf(storageMockUsed[key] || 0);
+    storageMockUsed[key] = seq[(idx + 1) % seq.length];
+    renderStorageDetails();
+    refreshSiteStoragesGridIfOpen();
+  }
+  function resetStorageMock(){
+    if (currentDetailSite == null) return;
+    const s = sites[currentDetailSite];
+    storageMockUsed[mockKey(s.id, currentDetailStorage)] = 0;
+    renderStorageDetails();
+    refreshSiteStoragesGridIfOpen();
+  }
+  // El modal de "Site details" sigue abierto detrás del de storage; sus cards de storage
+  // quedan con datos viejos si no se re-renderizan al mockear/resetear el % usado.
+  function refreshSiteStoragesGridIfOpen(){
+    if (currentDetailSite != null && !document.getElementById('siteDetailsModal').classList.contains('hidden')){
+      openSiteDetails(currentDetailSite);
+    }
+  }
 
   function openStorage(i){
     currentSite = i;
@@ -2145,9 +2438,22 @@
   function openModal(){ document.getElementById('siteModal').classList.remove('hidden'); }
   function closeModal(){ document.getElementById('siteModal').classList.add('hidden'); }
 
+  // Bloqueo de secciones ligadas a usuarios (Licenses/Dashboard/Devices/Data): sin usuarios
+  // no tiene sentido acceder, así que se redirige a Users y se explica por qué en un modal.
+  function openRequireUsersModal(sectionLabel){
+    document.getElementById('requireUsersTitle').textContent = `Add a user to unlock ${sectionLabel}`;
+    document.getElementById('requireUsersDesc').textContent = `${sectionLabel} is linked to users, so you need at least one user before you can access it.`;
+    document.getElementById('requireUsersModal').classList.remove('hidden');
+    showPage('users');
+  }
+  function closeRequireUsersModal(){ document.getElementById('requireUsersModal').classList.add('hidden'); }
+
   // Cerrar al hacer click fuera del modal
   document.getElementById('siteModal').addEventListener('click', e => {
     if (e.target.id === 'siteModal') closeModal();
+  });
+  document.getElementById('requireUsersModal').addEventListener('click', e => {
+    if (e.target.id === 'requireUsersModal') closeRequireUsersModal();
   });
   document.getElementById('deleteSiteModal').addEventListener('click', e => {
     if (e.target.id === 'deleteSiteModal') closeDeleteSite();
@@ -2170,8 +2476,13 @@
       // Sin ningún site, el resto de secciones quedan bloqueadas
       if (sites.length === 0){ openModal(); return; }
       if (page === 'users'){ showPage('users'); return; }
-      if (page === 'licenses'){ showPage('licenses'); return; }
-      // Otras secciones no tienen página en este prototipo
+      // Licenses/Dashboard/Devices/Data dependen de que exista al menos un usuario
+      const USER_LOCKED_PAGES = { licenses:'Licenses', dashboard:'Dashboard', devices:'Devices', data:'Data' };
+      if (USER_LOCKED_PAGES[page]){
+        if (users.length === 0){ openRequireUsersModal(USER_LOCKED_PAGES[page]); return; }
+        if (page === 'licenses'){ showPage('licenses'); return; }
+        // Dashboard/Devices/Data no tienen página propia en este prototipo
+      }
     });
   });
 
