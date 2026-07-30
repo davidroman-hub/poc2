@@ -104,6 +104,8 @@
   .nav-bottom a{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:9px;color:#c9cfdb;text-decoration:none;font-size:15px;font-weight:500;white-space:nowrap;}
   .nav-bottom a:hover{background:#1f2a44;}
   .nav-bottom a svg{width:20px;height:20px;stroke-width:1.8;flex-shrink:0;}
+  .nav-bottom a.demo-reset{color:#ff8a80;}
+  .nav-bottom a.demo-reset:hover{background:#3a1a1a;}
 
   /* Sidebar colapsado: solo iconos */
   .sidebar.collapsed{width:74px;padding:18px 10px;}
@@ -256,6 +258,32 @@
     font-weight:600;color:var(--navy);white-space:nowrap;text-align:left;}
   .site-groups-tip-item{padding:2px 0;}
   [data-theme="dark"] #siteGroupsTip{background:var(--card);border-color:var(--border);}
+
+  /* Tooltip de licencias (mismo patrón fixed que #siteGroupsTip) */
+  #licTip{display:none;position:fixed;z-index:260;background:#fff;border:1px solid var(--border);
+    border-radius:10px;box-shadow:0 10px 26px rgba(20,29,51,.16);padding:14px 16px;font-size:12.5px;
+    color:var(--navy);text-align:left;width:280px;}
+  [data-theme="dark"] #licTip{background:var(--card);border-color:var(--border);}
+  .lic-tip-title{font-weight:700;font-size:13px;margin-bottom:8px;}
+  .lic-tip-row{padding:7px 0;}
+  .lic-tip-row+.lic-tip-row{border-top:1px solid var(--border);}
+  .lic-tip-line{display:flex;justify-content:space-between;gap:10px;}
+  .lic-tip-label{display:flex;align-items:center;gap:6px;font-weight:600;}
+  .lic-tip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .lic-tip-sub{color:var(--muted2);font-size:11px;margin-top:3px;}
+  .lic-tip-total{display:flex;justify-content:space-between;font-weight:700;padding-top:8px;border-top:1px solid var(--border);margin-top:2px;}
+  .lic-info{display:inline-flex;color:#4b6cb7;cursor:default;vertical-align:middle;margin-left:4px;}
+  .lic-table-scroll{overflow-x:auto;}
+  .pool-card{display:flex;align-items:center;gap:14px;cursor:pointer;margin-bottom:16px;}
+  .pool-card:hover{border-color:var(--blue);}
+  .pool-ico{width:44px;height:44px;border-radius:12px;background:#eaf1ff;color:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .pool-ico svg{width:22px;height:22px;}
+  .pool-count{font-size:22px;font-weight:800;color:var(--navy);line-height:1.1;}
+  .pool-label{font-size:13px;color:var(--muted2);margin-top:2px;}
+  [data-theme="dark"] .pool-ico{background:#16233b;}
+  .credits-card{align-items:flex-start;}
+  .credits-card .pool-ico{background:#eef4ff;}
+  [data-theme="dark"] .credits-card .pool-ico{background:#16233b;}
   .icon-btn.danger:hover{background:#fdecec;color:#e2453b;}
   .site-row .name{font-weight:600;color:var(--navy);}
   .site-row .r{text-align:center;color:var(--muted2);}
@@ -380,6 +408,8 @@
   .mgr-hint{font-size:10px;color:#e2453b;display:flex;align-items:center;gap:4px;margin-top:3px;min-height:12px;}
   .badge-empty{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#f2f4f8;color:#8a94a6;border:1px solid #e3e7ee;}
   .badge-error{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#fdecec;color:#c0392b;border:1px solid #f6c9c4;}
+  .badge-upcoming{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#f1ecfe;color:#7c4dff;border:1px solid #ddd0fb;}
+  [data-theme="dark"] .badge-upcoming{background:#241c3a;border-color:#3a2c5c;color:#b49dff;}
   .mgr-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 32px;gap:10px;align-items:center;margin-bottom:10px;}
   .mgr-row input,.mgr-row select{border:1px solid var(--border);border-radius:8px;padding:10px 11px;font-size:13px;font-family:inherit;outline:none;width:100%;color:var(--navy);background:#fff;}
   .mgr-row input:focus,.mgr-row select:focus{border-color:var(--blue);}
@@ -621,6 +651,13 @@
   .storage-footer .btn{padding:14px 28px;font-size:15px;}
   .storage-footer .btn-back{padding:13px 26px;}
 
+  /* Modal: agregar pack de créditos a una licencia */
+  .pack-modal{background:var(--card);border-radius:16px;box-shadow:0 24px 60px rgba(20,29,51,.28);
+    width:94%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
+  .pack-list{display:flex;flex-direction:column;gap:10px;max-height:320px;overflow-y:auto;}
+  .pack-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer;}
+  .pack-row input{width:16px;height:16px;flex-shrink:0;}
+
   /* Formulario de storage compacto (evita scroll) */
   .storage-scroll{padding:20px 24px 10px;}
   .storage-body{min-height:0;}
@@ -709,6 +746,7 @@
       </div>
       <a href="#" data-page="data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 9v11M15 9v11"/></svg><span class="lbl-text">Data</span></a>
       <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.6 2.6c-.7.3-1.3.9-1.3 1.8v.4"/><circle cx="11.9" cy="17" r="0.4" fill="currentColor" stroke="none"/></svg><span class="lbl-text">Help center</span></a>
+      <a href="#" class="demo-reset" onclick="resetMockDemo(); return false;" title="Erase all the data & reset the demo POC"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span class="lbl-text">Reset mock (DEMO)</span></a>
     </div>
   </aside>
 
@@ -851,11 +889,32 @@
         <h1 class="page-title">Licenses</h1>
         <p class="page-sub">Assign licenses to your users.</p>
       </div>
-    </div>
-    <div class="sites-card" style="margin-top:22px;align-items:center;justify-content:center;text-align:center;">
-      <div class="empty">
-        <h3>I'm licenses</h3>
+      <div style="display:flex;align-items:center;">
+        <button class="sd-demo-btn" onclick="mockLicenses()">Mock licenses (DEMO)</button>
       </div>
+    </div>
+    <div class="content" style="margin-top:22px;">
+      <div class="stepper-card pool-card" onclick="openPoolModal()" title="View credit packs pool">
+        <div class="pool-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+        <div>
+          <div class="pool-count" id="poolCount">0</div>
+          <div class="pool-label">Credit packs available in the pool</div>
+        </div>
+      </div>
+      <div class="stepper-card pool-card credits-card" onclick="toggleCreditsSummaryTip(event)" title="Click for the full breakdown">
+        <div class="pool-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg></div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="pool-label">Credits consumed</div>
+            <span class="badge-empty" id="creditsFilterBadge">All countries</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-top:6px;">
+            <span class="pool-count" id="consumedCreditsCount">0</span>
+            <span class="pool-label">of <b id="totalCreditsCount">0</b> total credits</span>
+          </div>
+        </div>
+      </div>
+      <div class="sites-card" id="licensesCard"></div>
     </div>
    </div><!-- /page-licenses -->
 
@@ -1320,6 +1379,54 @@
   </div>
 </div>
 
+<!-- Modal: ver el pool de paquetes de créditos sin asignar -->
+<div class="modal-overlay hidden" id="poolModal">
+  <div class="pack-modal">
+    <div class="storage-scroll">
+      <h3 class="storage-title">Credit packs pool</h3>
+      <p class="storage-sub">Packs not yet assigned to any license.</p>
+      <div class="pack-list" id="poolListBody"></div>
+    </div>
+    <div class="storage-footer">
+      <button class="btn" onclick="closePoolModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: buscar y asignar un usuario a una licencia -->
+<div class="modal-overlay hidden" id="assignUserModal">
+  <div class="pack-modal">
+    <div class="storage-scroll">
+      <h3 class="storage-title">Assign user</h3>
+      <p class="storage-sub">Search and select a user for <b id="assignUserLicenseLabel">this license</b>.</p>
+      <div class="fld-search" style="position:relative;margin-bottom:14px;">
+        <input class="fld" id="assignUserSearch" placeholder="Search user..." autocomplete="off" oninput="renderAssignUserList()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <div class="pack-list" id="assignUserList"></div>
+    </div>
+    <div class="storage-footer">
+      <button class="btn-back" onclick="closeAssignUserModal()">Cancel</button>
+      <button class="btn" id="assignUserApplyBtn" onclick="confirmAssignUser()" disabled>Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: agregar paquetes de créditos a una licencia -->
+<div class="modal-overlay hidden" id="addPackModal">
+  <div class="pack-modal">
+    <div class="storage-scroll">
+      <h3 class="storage-title">Add credit pack</h3>
+      <p class="storage-sub">Select packs from the unassigned pool to add to <b id="addPackLicenseLabel">this license</b>.</p>
+      <div class="pack-list" id="packListBody"></div>
+    </div>
+    <div class="storage-footer">
+      <button class="btn-back" onclick="closeAddPackModal()">Cancel</button>
+      <button class="btn" id="addPackConfirmBtn" onclick="confirmAddPack()">Add</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: confirmar borrado de grupo -->
 <div class="modal-overlay hidden" id="deleteGroupModal">
   <div class="modal" style="max-width:440px;padding:36px 34px;">
@@ -1440,6 +1547,7 @@
 
 <!-- Tooltip de grupos de un site (tabla de sites) -->
 <div id="siteGroupsTip"></div>
+<div id="licTip"></div>
 
 <!-- Snackbar -->
 <div id="snackbar"></div>
@@ -2515,6 +2623,7 @@
     if (active) active.classList.add('active');
     if (name==='users') renderUsers();
     else if (name==='sites') render();
+    else if (name==='licenses') renderLicenses();
     else if (name==='map'){
       initMap();
       requestAnimationFrame(() => { siteMap.invalidateSize(); refreshMapMarkers(); });
@@ -2549,6 +2658,15 @@
   });
   document.getElementById('userDetailsModal').addEventListener('click', e => {
     if (e.target.id === 'userDetailsModal') closeUserDetails();
+  });
+  document.getElementById('addPackModal').addEventListener('click', e => {
+    if (e.target.id === 'addPackModal') closeAddPackModal();
+  });
+  document.getElementById('poolModal').addEventListener('click', e => {
+    if (e.target.id === 'poolModal') closePoolModal();
+  });
+  document.getElementById('assignUserModal').addEventListener('click', e => {
+    if (e.target.id === 'assignUserModal') closeAssignUserModal();
   });
 
   // Navegación del menú
@@ -2598,6 +2716,15 @@
   let users = [];       // saved site users: { name, site, actions:[], nomad, status }
   let managers = [];    // saved managers: { email, role, site, status }
   let usersTab = 'all'; // pestaña activa en la tabla de usuarios
+
+  // Licencias: 5 licencias, cada una puede contener paquetes de créditos y
+  // puede estar asignada a un usuario. Los paquetes empiezan como un pool
+  // sin asignar (aún no hay funcionalidad para meterlos dentro de una licencia).
+  // En producción los packs no son todos iguales: distintas ofertas traen distinta cantidad de créditos.
+  const PACK_SIZES = [10, 50, 100, 500, 1000];
+  let creditPacks = Array.from({length:20}, (_,i)=>({ id:i+1, credits: PACK_SIZES[Math.floor(Math.random()*PACK_SIZES.length)] })); // pool sin asignar
+  const LICENSE_COUNTRIES = ['France','Spain','Italy'];
+  let licenses = Array.from({length:11}, (_,i)=>({ id:i+1, packs:[], userIndex:null, location:LICENSE_COUNTRIES[i%3] })); // userIndex -> índice en `users`
 
   // Persistencia de usuarios y managers
   const USERS_KEY = 'fleetview_users_v1';
@@ -2733,10 +2860,6 @@
       <div class="sites-toolbar">
         <div class="search"><input type="text" placeholder="Search by username or site..." oninput="filterUsers(this.value)"></div>
         <div class="spacer"></div>
-        <button class="btn" onclick="openUserWizard()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg>
-          Add users
-        </button>
       </div>`}
       ${body}
       <div class="table-footer">
@@ -2745,6 +2868,460 @@
   }
 
   function setUsersTab(t){ usersTab=t; renderUsers(); }
+
+  /* ---------- Licenses ---------- */
+  function fmtDate(iso){
+    const d = new Date(iso);
+    return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+  }
+
+  // Un pack está "en cours" si hoy cae dentro de su rango, "en attente" si arranca
+  // en el futuro (encolado detrás de otro pack) y "expiré" si ya terminó.
+  function packStatus(pack){
+    const now = new Date(), act = new Date(pack.activation), exp = new Date(pack.expiration);
+    if (now < act) return 'pending';
+    if (now > exp) return 'expired';
+    return 'current';
+  }
+  const PACK_STATUS_LABEL = { current:'Current pack', pending:'Upcoming pack', expired:'Expired pack' };
+  const PACK_STATUS_COLOR = { current:'#1c8a4b', pending:'#3b53a0', expired:'#c0392b' };
+
+  function licenseStats(lic){
+    return {
+      remaining: lic.packs.reduce((s,p)=>s+(p.credits-p.consumed),0),
+      consumed: lic.packs.reduce((s,p)=>s+p.consumed,0),
+      total: lic.packs.reduce((s,p)=>s+p.credits,0),
+    };
+  }
+
+  // Fechas "de la licencia" = las del pack actualmente en curso (o el primero en cola si aún no hay ninguno activo).
+  function licenseDates(lic){
+    if (!lic.packs.length) return null;
+    return lic.packs.find(p=>packStatus(p)==='current') || lic.packs[0];
+  }
+
+  function licenseStatus(lic){
+    if (!lic.packs.length) return 'unassigned';
+    const statuses = lic.packs.map(packStatus);
+    if (statuses.includes('current')) return 'active';
+    if (statuses.every(s=>s==='expired')) return 'expired';
+    return 'upcoming';
+  }
+  function licenseStatusBadge(status){
+    if (status==='active') return `<span class="badge-created">active</span>`;
+    if (status==='expired') return `<span class="badge-error">expired</span>`;
+    if (status==='upcoming') return `<span class="badge-upcoming">upcoming</span>`;
+    return `<span class="badge-empty">unassigned</span>`;
+  }
+
+  function assignLicense(licenseId, userIndexStr){
+    if (userIndexStr === '') return;
+    const lic = licenses.find(l=>l.id===licenseId);
+    if (!lic) return;
+    lic.userIndex = Number(userIndexStr);
+    renderLicenses();
+  }
+
+  /* ---------- Modal: buscar y asignar un usuario a una licencia ---------- */
+  let assignUserTargetId = null;
+  let assignUserSelected = null; // índice del usuario elegido en el modal
+
+  function openAssignUserModal(licenseId){
+    assignUserTargetId = licenseId;
+    assignUserSelected = null;
+    document.getElementById('assignUserLicenseLabel').textContent = `License #${licenseId}`;
+    document.getElementById('assignUserSearch').value = '';
+    renderAssignUserList();
+    document.getElementById('assignUserModal').classList.remove('hidden');
+  }
+  function closeAssignUserModal(){
+    document.getElementById('assignUserModal').classList.add('hidden');
+  }
+  function renderAssignUserList(){
+    const list = document.getElementById('assignUserList');
+    const f = document.getElementById('assignUserSearch').value.trim().toLowerCase();
+    const matches = users.map((u,i)=>({u,i})).filter(({u}) => !f || u.name.toLowerCase().includes(f) || (u.site||'').toLowerCase().includes(f));
+    list.innerHTML = matches.length
+      ? matches.map(({u,i})=>`
+        <label class="pack-row" style="cursor:pointer;${assignUserSelected===i?'border-color:var(--blue);background:#eef4ff;':''}" onclick="selectAssignUser(${i})">
+          ${u.name}${u.site ? ` <span style="color:var(--muted2);font-weight:400;">— ${u.site}</span>` : ''}
+        </label>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;">No matching users.</p>`;
+    const btn = document.getElementById('assignUserApplyBtn');
+    if (btn) btn.disabled = assignUserSelected===null;
+  }
+  function selectAssignUser(i){
+    assignUserSelected = i;
+    renderAssignUserList();
+  }
+  function confirmAssignUser(){
+    if (assignUserSelected===null || assignUserTargetId===null) return;
+    assignLicense(assignUserTargetId, String(assignUserSelected));
+    closeAssignUserModal();
+  }
+
+  function unassignLicense(licenseId){
+    const lic = licenses.find(l=>l.id===licenseId);
+    if (!lic || licenseStatus(lic)==='expired') return; // las licencias expiradas no se pueden desasignar
+    lic.userIndex = null;
+    renderLicenses();
+  }
+
+  const plusSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`;
+  const trashSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>`;
+  const infoIcoSvg = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.6 2.6c-.7.3-1.3.9-1.3 1.8v.4"/><circle cx="11.9" cy="17" r="0.4" fill="currentColor" stroke="none"/></svg>`;
+  function infoIco(type, licenseId){
+    return `<span class="lic-info" onmouseenter="showLicTip(event,'${type}',${licenseId})" onmouseleave="hideLicTip()">${infoIcoSvg}</span>`;
+  }
+
+  function showLicTip(ev, type, licenseId){
+    const lic = licenses.find(l=>l.id===licenseId);
+    const tip = document.getElementById('licTip');
+    if (!lic || !tip) return;
+    tip.innerHTML = type==='consumed' ? consumedTipHTML(lic) : type==='remaining' ? remainingTipHTML(lic) : packsTipHTML(lic);
+    const r = ev.currentTarget.getBoundingClientRect();
+    tip.style.left = (r.left + r.width/2) + 'px';
+    tip.style.top = (r.bottom + 8) + 'px';
+    tip.style.transform = 'translateX(-50%)';
+    tip.style.display = 'block';
+  }
+  function hideLicTip(){ const t=document.getElementById('licTip'); if (t){ t.style.display='none'; delete t.dataset.mode; } }
+
+  // Resumen de créditos de la card "Credits consumed": respeta el filtro de país activo.
+  function creditsSummary(){
+    const list = licensesCountry==='all' ? licenses : licenses.filter(l=>l.location===licensesCountry);
+    const consumed = list.reduce((s,l)=>s+licenseStats(l).consumed,0);
+    const total = list.reduce((s,l)=>s+licenseStats(l).total,0);
+    return { consumed, remaining: total - consumed, total };
+  }
+  function creditsSummaryTipHTML(){
+    const s = creditsSummary();
+    return `<div class="lic-tip-title">Credits summary${licensesCountry!=='all' ? ' — '+licensesCountry : ''}</div>
+      <div class="lic-tip-line"><span>Credits consumed</span><span>${s.consumed}</span></div>
+      <div class="lic-tip-line"><span>Credits remaining</span><span>${s.remaining}</span></div>
+      <div class="lic-tip-total"><span>Total credits</span><span>= ${s.total}</span></div>`;
+  }
+  function refreshCreditsSummaryTip(){
+    const t = document.getElementById('licTip');
+    if (t) t.innerHTML = creditsSummaryTipHTML();
+  }
+  function toggleCreditsSummaryTip(ev){
+    ev.stopPropagation();
+    const tip = document.getElementById('licTip');
+    if (!tip) return;
+    if (tip.style.display==='block' && tip.dataset.mode==='credits'){ hideLicTip(); return; }
+    tip.dataset.mode = 'credits';
+    tip.innerHTML = creditsSummaryTipHTML();
+    const r = ev.currentTarget.getBoundingClientRect();
+    tip.style.left = (r.left + r.width/2) + 'px';
+    tip.style.top = (r.bottom + 8) + 'px';
+    tip.style.transform = 'translateX(-50%)';
+    tip.style.display = 'block';
+  }
+  document.addEventListener('click', e=>{
+    const tip = document.getElementById('licTip');
+    if (tip && tip.style.display==='block' && tip.dataset.mode==='credits' && !tip.contains(e.target)) hideLicTip();
+  });
+
+  function remainingTipHTML(lic){
+    const current = lic.packs.find(p=>packStatus(p)==='current');
+    const upcoming = lic.packs.filter(p=>packStatus(p)==='pending');
+    const currentRemaining = current ? current.credits - current.consumed : 0;
+    const upcomingTotal = upcoming.reduce((s,p)=>s+p.credits,0);
+    const total = lic.packs.reduce((s,p)=>s+(p.credits-p.consumed),0);
+    const lines = [];
+    if (current) lines.push(`<div class="lic-tip-line"><span>Remaining in current pack</span><span>+${currentRemaining}</span></div>`);
+    if (upcoming.length) lines.push(`<div class="lic-tip-line"><span>Credits from upcoming packs</span><span>+${upcomingTotal}</span></div>`);
+    if (!lines.length) lines.push(`<div class="lic-tip-line"><span>No credits available</span><span>+0</span></div>`);
+    return `${lines.join('')}<div class="lic-tip-total"><span>Credits remaining</span><span>= ${total}</span></div>`;
+  }
+  function consumedTipHTML(lic){
+    const consuming = lic.packs.filter(p=>p.consumed>0);
+    const total = lic.packs.reduce((s,p)=>s+p.consumed,0);
+    const lines = consuming.length
+      ? consuming.map(p=>`<div class="lic-tip-line"><span>Consumed from ${PACK_STATUS_LABEL[packStatus(p)].toLowerCase()}</span><span>+${p.consumed}</span></div>`).join('')
+      : `<div class="lic-tip-line"><span>No consumption yet</span><span>+0</span></div>`;
+    return `${lines}<div class="lic-tip-total"><span>Credits consumed</span><span>= ${total}</span></div>`;
+  }
+  function packsTipHTML(lic){
+    const total = lic.packs.reduce((s,p)=>s+p.credits,0);
+    const rows = lic.packs.map(p=>{
+      const st = packStatus(p);
+      return `<div class="lic-tip-row">
+        <div class="lic-tip-line">
+          <span class="lic-tip-label"><span class="lic-tip-dot" style="background:${PACK_STATUS_COLOR[st]};"></span>${PACK_STATUS_LABEL[st]}</span>
+          <span>${p.credits} cr.</span>
+        </div>
+        <div class="lic-tip-sub">Activation: ${fmtDate(p.activation)} · Expiration: ${fmtDate(p.expiration)}</div>
+      </div>`;
+    }).join('');
+    return `<div class="lic-tip-title">Packs (${lic.packs.length})</div>${rows}<div class="lic-tip-total"><span>Total credits purchased</span><span>= ${total}</span></div>`;
+  }
+
+  let licensesTab = 'all'; // all | active | upcoming | expired | unassigned | nolicense
+  function setLicensesTab(t){ licensesTab=t; renderLicenses(); }
+
+  let licensesCountry = 'all'; // all | one of LICENSE_COUNTRIES
+  function setLicensesCountry(v){ licensesCountry=v; renderLicenses(); }
+
+  function usersWithoutLicense(){
+    return users.map((u,i)=>({u,i})).filter(({i})=>!licenses.some(l=>l.userIndex===i));
+  }
+
+  function licensesTabTabsHTML(counts){
+    const tabs = [
+      ['all','All',counts.all],
+      ['active','Active',counts.active],
+      ['upcoming','Upcoming',counts.upcoming],
+      ['expired','Expired',counts.expired],
+      ['nolicense','Users without a license',counts.nolicense],
+      ['unassigned','No user assigned',counts.unassigned],
+    ];
+    return `<div class="u-tabs">${tabs.map(([key,label,count])=>
+      `<button class="u-tab ${licensesTab===key?'active':''}" onclick="setLicensesTab('${key}')">${label} <span class="tcount">${count}</span></button>`
+    ).join('')}</div>`;
+  }
+
+  // Genera datos ficticios de consumo/histórico para las 11 licencias, con varios
+  // escenarios realistas (botón "Mock licenses (DEMO)"): algunas activas con consumo
+  // parcial, algunas que ya se les acabó el pack anterior y se les asignó otro,
+  // algunas totalmente expiradas, algunas con un pack "upcoming" (activación futura),
+  // y algunas sin ningún pack (unassigned). No toca el pool ni el usuario asignado.
+  function mockLicenses(){
+    const day = 86400000;
+
+    // Primero, devolver al pool todos los packs que ya estén en licencias, para
+    // que el mock siempre reparta desde los packs realmente disponibles (y se
+    // pueda repetir el botón sin ir agotando el pool para siempre).
+    licenses.forEach(lic=>{
+      lic.packs.forEach(p=> creditPacks.push({ id:p.id, credits:p.credits }));
+      lic.packs = [];
+      lic.userIndex = null;
+    });
+
+    const takePack = () => creditPacks.length
+      ? creditPacks.splice(Math.floor(Math.random()*creditPacks.length), 1)[0]
+      : null;
+    const enrich = (pack, actDays, expDays, consumedRatio) => pack && {
+      ...pack,
+      consumed: Math.round(pack.credits * consumedRatio),
+      activation: new Date(Date.now() + actDays*day).toISOString(),
+      expiration: new Date(Date.now() + expDays*day).toISOString(),
+    };
+
+    licenses.forEach(lic=>{
+      const roll = Math.random();
+      if (roll < 0.15){
+        // unassigned: sin packs todavía
+      } else if (roll < 0.40){
+        // active: un solo pack en curso, con consumo parcial al azar
+        const p = enrich(takePack(), -30, 335, Math.random());
+        if (p) lic.packs.push(p);
+      } else if (roll < 0.65){
+        // renewed: el pack anterior ya se agotó/expiró y se le asignó uno nuevo
+        const p1 = enrich(takePack(), -400, -35, 1);
+        const p2 = enrich(takePack(), -35, 330, Math.random());
+        if (p1) lic.packs.push(p1);
+        if (p2) lic.packs.push(p2);
+      } else if (roll < 0.85){
+        // expired: el único pack que tuvo ya venció
+        const p = enrich(takePack(), -400, -35, 0.4 + Math.random()*0.6);
+        if (p) lic.packs.push(p);
+      } else {
+        // upcoming: pack comprado pero que activa en el futuro
+        const p = enrich(takePack(), 10, 375, 0);
+        if (p) lic.packs.push(p);
+      }
+    });
+
+    // Repartir usuarios reales entre las licencias, dejando algunas sin asignar
+    // (así se siguen poblando las tabs "No user assigned" / "Users without a license").
+    const shuffledUsers = users.map((_,i)=>i).sort(()=>Math.random()-0.5);
+    let cursor = 0;
+    licenses.forEach(lic=>{
+      if (shuffledUsers.length && Math.random() < 0.8){
+        lic.userIndex = shuffledUsers[cursor % shuffledUsers.length];
+        cursor++;
+      }
+    });
+
+    renderLicenses();
+  }
+
+  function renderLicenses(){
+    const card = document.getElementById('licensesCard');
+    if (!card) return;
+
+    const counts = {
+      all: licenses.length,
+      active: licenses.filter(l=>licenseStatus(l)==='active').length,
+      upcoming: licenses.filter(l=>licenseStatus(l)==='upcoming').length,
+      expired: licenses.filter(l=>licenseStatus(l)==='expired').length,
+      unassigned: licenses.filter(l=>l.userIndex===null).length,
+      nolicense: usersWithoutLicense().length,
+    };
+    const tabsHTML = licensesTabTabsHTML(counts);
+
+    // Vista especial: usuarios que no tienen ninguna licencia asociada (no hay fila de licencia que mostrar).
+    if (licensesTab === 'nolicense'){
+      const NL_GRID = 'grid-template-columns:1.5fr 1fr 1fr;';
+      const nlRows = usersWithoutLicense().map(({u})=>`
+        <div class="u-row" style="${NL_GRID}">
+          <span class="name" style="font-weight:600;">${u.name}</span>
+          <span class="u-site">${u.site || '—'}</span>
+          <span><span class="badge-empty">No license</span></span>
+        </div>`).join('') || `<div class="draft-empty" style="padding:44px;">All users have a license.</div>`;
+
+      card.innerHTML = `
+        ${tabsHTML}
+        <div class="table-head" style="${NL_GRID}">
+          <div>User</div><div>Site</div><div>License status</div>
+        </div>
+        ${nlRows}
+        <div class="table-footer"><span>${counts.nolicense} of ${users.length} users without a license</span></div>`;
+      return;
+    }
+
+    let filtered = licenses;
+    if (licensesTab==='active') filtered = licenses.filter(l=>licenseStatus(l)==='active');
+    else if (licensesTab==='upcoming') filtered = licenses.filter(l=>licenseStatus(l)==='upcoming');
+    else if (licensesTab==='expired') filtered = licenses.filter(l=>licenseStatus(l)==='expired');
+    else if (licensesTab==='unassigned') filtered = licenses.filter(l=>l.userIndex===null);
+    if (licensesCountry!=='all') filtered = filtered.filter(l=>l.location===licensesCountry);
+
+    const L_GRID = 'grid-template-columns:1fr 100px 100px 100px 130px 150px 140px 150px 110px 110px 44px 44px;min-width:1560px;';
+    const rows = filtered.map(lic => {
+      const stats = licenseStats(lic);
+      const dates = licenseDates(lic);
+      const status = licenseStatus(lic);
+      const assignedUser = lic.userIndex!==null ? users[lic.userIndex] : null;
+
+      const assignCell = assignedUser
+        ? `<span class="name" style="font-weight:600;">${assignedUser.name}</span>`
+        : (users.length
+            ? `<button class="btn" style="padding:7px 14px;font-size:13px;" onclick="openAssignUserModal(${lic.id})">Assign user</button>`
+            : `<span class="u-site">No users yet</span>`);
+
+      const canChangeAssignment = status!=='expired';
+      return `
+      <div class="u-row" style="${L_GRID}">
+        <span>${assignCell}</span>
+        <span class="name" style="font-weight:600;">License #${lic.id}</span>
+        <span class="u-site">${lic.location}</span>
+        <span>${licenseStatusBadge(status)}</span>
+        <span class="u-site">${stats.remaining} ${infoIco('remaining',lic.id)}</span>
+        <span class="u-site">${stats.consumed} ${infoIco('consumed',lic.id)}</span>
+        <span class="u-site">${stats.total} ${infoIco('packs',lic.id)}</span>
+        <span class="u-site">${lic.packs.length ? 'Classic credit pack' : '—'}</span>
+        <span class="u-site">${dates ? fmtDate(dates.activation) : '—'}</span>
+        <span class="u-site">${dates ? fmtDate(dates.expiration) : '—'}</span>
+        <span class="r">${status==='expired' ? `<button class="icon-btn" title="Expired licenses can't get new packs" disabled style="opacity:.35;cursor:not-allowed;">${plusSvg}</button>` : `<button class="icon-btn" title="Add pack" onclick="openAddPackModal(${lic.id})">${plusSvg}</button>`}</span>
+        <span class="r">${assignedUser ? (canChangeAssignment ? `<button class="icon-btn danger" title="Unassign user" onclick="unassignLicense(${lic.id})">${trashSvg}</button>` : `<button class="icon-btn danger" title="Expired licenses can't be unassigned" disabled style="opacity:.35;cursor:not-allowed;">${trashSvg}</button>`) : ''}</span>
+      </div>`;
+    }).join('') || `<div class="draft-empty" style="padding:44px;">No licenses in this category.</div>`;
+
+    const poolCountEl = document.getElementById('poolCount');
+    if (poolCountEl) poolCountEl.textContent = creditPacks.length;
+
+    const summary = creditsSummary();
+    const consumedEl = document.getElementById('consumedCreditsCount');
+    const totalEl = document.getElementById('totalCreditsCount');
+    const filterBadgeEl = document.getElementById('creditsFilterBadge');
+    if (consumedEl) consumedEl.textContent = summary.consumed;
+    if (totalEl) totalEl.textContent = summary.total;
+    if (filterBadgeEl) filterBadgeEl.textContent = licensesCountry==='all' ? 'All countries' : licensesCountry;
+    if (document.getElementById('licTip')?.dataset.mode==='credits') refreshCreditsSummaryTip();
+
+    card.innerHTML = `
+      ${tabsHTML}
+      <div class="sites-toolbar">
+        <span class="all">${filtered.length} of ${licenses.length} licenses</span>
+        <div class="spacer"></div>
+        <select style="border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:14px;color:var(--navy);background:#fff;" onchange="setLicensesCountry(this.value)">
+          <option value="all" ${licensesCountry==='all'?'selected':''}>All countries</option>
+          ${LICENSE_COUNTRIES.map(c=>`<option value="${c}" ${licensesCountry===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="lic-table-scroll">
+        <div class="table-head" style="${L_GRID}">
+          <div>Assigned user</div><div>License</div><div>Location</div><div>Status</div><div>Credits remaining</div><div>Credits consumed</div><div>Total purchased</div><div>Plan</div><div>Activation</div><div>Expiration</div><div class="r"></div><div class="r"></div>
+        </div>
+        ${rows}
+      </div>
+      <div class="table-footer">
+        <span>${licenses.filter(l=>l.userIndex!==null).length} of ${licenses.length} licenses assigned</span>
+        <span><b>${licenses.reduce((s,l)=>s+licenseStats(l).consumed,0)}</b> credits consumed in total</span>
+      </div>`;
+  }
+
+  /* ---------- Add credit pack to a license (modal) ---------- */
+  let addPackTargetId = null;
+  let addPackSelected = [];
+
+  /* ---------- View the unassigned credit packs pool (read-only) ---------- */
+  function openPoolModal(){
+    const body = document.getElementById('poolListBody');
+    body.innerHTML = creditPacks.length
+      ? creditPacks.map(p=>`<div class="pack-row" style="cursor:default;">Pack #${p.id} — ${p.credits} credits</div>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;">No credit packs left in the pool — they've all been added to licenses.</p>`;
+    document.getElementById('poolModal').classList.remove('hidden');
+  }
+  function closePoolModal(){
+    document.getElementById('poolModal').classList.add('hidden');
+  }
+
+  function openAddPackModal(licenseId){
+    const lic = licenses.find(l=>l.id===licenseId);
+    if (!lic || licenseStatus(lic)==='expired') return; // las licencias expiradas no pueden recibir packs nuevos
+    addPackTargetId = licenseId;
+    addPackSelected = [];
+    document.getElementById('addPackLicenseLabel').textContent = `License #${licenseId}`;
+    renderPackList();
+    document.getElementById('addPackModal').classList.remove('hidden');
+  }
+
+  function closeAddPackModal(){
+    document.getElementById('addPackModal').classList.add('hidden');
+  }
+
+  function togglePackSelect(id){
+    const idx = addPackSelected.indexOf(id);
+    if (idx===-1) addPackSelected.push(id); else addPackSelected.splice(idx,1);
+    renderPackList();
+  }
+
+  function renderPackList(){
+    const body = document.getElementById('packListBody');
+    if (!body) return;
+    body.innerHTML = creditPacks.length
+      ? creditPacks.map(p=>`
+        <label class="pack-row">
+          <input type="checkbox" ${addPackSelected.includes(p.id)?'checked':''} onchange="togglePackSelect(${p.id})">
+          Pack #${p.id} — ${p.credits} credits
+        </label>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;">No credit packs left in the pool.</p>`;
+    const btn = document.getElementById('addPackConfirmBtn');
+    if (btn) btn.disabled = addPackSelected.length===0;
+  }
+
+  function confirmAddPack(){
+    const lic = licenses.find(l=>l.id===addPackTargetId);
+    if (!lic) return;
+    addPackSelected.forEach(id=>{
+      const idx = creditPacks.findIndex(p=>p.id===id);
+      if (idx===-1) return;
+      const pack = creditPacks.splice(idx,1)[0];
+      // Los packs se consumen en orden: el nuevo arranca donde termina el último
+      // pack en cola (o ahora mismo, si es el primero) y dura 1 año.
+      const last = lic.packs[lic.packs.length-1];
+      const activation = last ? new Date(last.expiration) : new Date();
+      const expiration = new Date(activation);
+      expiration.setFullYear(expiration.getFullYear()+1);
+      lic.packs.push({ ...pack, consumed:0, activation:activation.toISOString(), expiration:expiration.toISOString() });
+    });
+    closeAddPackModal();
+    renderLicenses();
+  }
 
   /* ---------- Tool: Actions template ---------- */
   let actionTemplates = [];  // { name, actions:[] }
@@ -3629,6 +4206,14 @@
     let t = 'light';
     try{ t = localStorage.getItem(THEME_KEY) || 'light'; }catch(e){}
     applyTheme(t);
+  }
+
+  function resetMockDemo(){
+    if (!confirm('Reset mock (DEMO)\n\nThis will erase all the data , info etc.. and will reset the POC as the initial configuration. Continue?')) return;
+    try{
+      [SITES_KEY, GROUPS_KEY, USERS_KEY, ACTION_TEMPLATES_KEY].forEach(k => localStorage.removeItem(k));
+    }catch(e){}
+    location.reload();
   }
 
   loadTheme();
