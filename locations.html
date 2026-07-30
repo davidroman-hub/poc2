@@ -473,6 +473,9 @@
   .naming-box input:focus{border-color:var(--blue);}
   .preview-line{font-size:13px;color:var(--muted2);margin-top:6px;}
   .preview-line b{color:var(--navy);}
+  .site-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;margin:2px 0 4px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .stgl-title{font-size:13px;font-weight:600;color:var(--navy);}
+  .stgl-sub{font-size:12px;color:var(--muted2);margin-top:2px;}
   .wiz-actions-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
   .wiz-actions-title button{font-size:12px;font-weight:600;color:var(--blue);background:#eff5ff;border:1px solid #cfe0ff;padding:4px 11px;border-radius:6px;cursor:pointer;font-family:inherit;}
   .wiz-check{display:flex;align-items:center;gap:10px;padding:8px 2px;font-size:14px;color:var(--navy);cursor:pointer;}
@@ -1164,6 +1167,13 @@
           <div class="naming-box compact" style="margin-top:18px;margin-bottom:0;">
             <div class="nrow"><label>Prefix</label><input id="genPrefix" value="PLU" oninput="genSyncPreview()"></div>
             <div class="nrow"><label>Suffix</label><input id="genSuffix" placeholder="optional" oninput="genSyncPreview()"></div>
+            <div class="site-toggle-row">
+              <div>
+                <div class="stgl-title">Include site in username</div>
+                <div class="stgl-sub">Adds the site code to each generated username</div>
+              </div>
+              <div class="sw on" id="genSiteToggle" onclick="toggleGenIncludeSite()"><span></span></div>
+            </div>
             <div class="preview-line">Username format: <b id="genFmt">PLU_&lt;SITE&gt;_001</b></div>
           </div>
         </div>
@@ -2608,8 +2618,9 @@
   function siteList(){ return sites.length ? sites.map(s=>s.name) : ['Your site']; }
   function siteName(){ return sites.length ? sites[0].name : 'Your site'; }
   function codeOf(name){ return ((name||'SITE').split(/\s+/)[0] || 'SITE').toUpperCase(); }
-  function nextUsername(prefix, suffix, n, code){
-    return `${prefix||'PLU'}_${code||codeOf(siteName())}_${String(n).padStart(3,'0')}${suffix?'_'+suffix:''}`;
+  function nextUsername(prefix, suffix, n, code, includeSite){
+    const siteSeg = includeSite===false ? '' : `${code||codeOf(siteName())}_`;
+    return `${prefix||'PLU'}_${siteSeg}${String(n).padStart(3,'0')}${suffix?'_'+suffix:''}`;
   }
   function statusBadge(st){
     return st==='created'
@@ -3046,15 +3057,25 @@
   let genStep = 1;
   let genActs = new Set();
   let genSelectedTemplate = null; // índice del template actualmente aplicado en actionTemplates, o null
+  let genIncludeSite = true; // por defecto el username incluye el site
   function genReset(){
     genStep = 1;
     genActs = new Set();
     genSelectedTemplate = null;
+    genIncludeSite = true;
     document.getElementById('genCount').value = 3;
     document.getElementById('genPrefix').value = 'PLU';
     document.getElementById('genSuffix').value = '';
+    const st=document.getElementById('genSiteToggle');
+    if(st) st.classList.add('on');
     genSyncPreview();
     genShowStep();
+  }
+  function toggleGenIncludeSite(){
+    genIncludeSite = !genIncludeSite;
+    const st=document.getElementById('genSiteToggle');
+    if(st) st.classList.toggle('on', genIncludeSite);
+    genSyncPreview();
   }
   function genShowStep(){
     for(let s=1;s<=3;s++){
@@ -3089,14 +3110,14 @@
   function genSyncPreview(){
     const p=genPrefixV(), s=genSuffixV();
     const fmt=document.getElementById('genFmt');
-    if(fmt) fmt.textContent = `${p}_<SITE>_001${s?'_'+s:''}`;
+    if(fmt) fmt.textContent = genIncludeSite ? `${p}_<SITE>_001${s?'_'+s:''}` : `${p}_001${s?'_'+s:''}`;
     const siteEl=document.getElementById('genSite');
     const site=siteEl ? siteEl.value : siteName();
     const code=codeOf(site);
     const off=dUsers.filter(u=>u.site===site).length;
     const p1=document.getElementById('genPrev1'), p2=document.getElementById('genPrev2');
-    if(p1) p1.textContent=nextUsername(p,s,off+1,code);
-    if(p2) p2.textContent=nextUsername(p,s,off+2,code);
+    if(p1) p1.textContent=nextUsername(p,s,off+1,code,genIncludeSite);
+    if(p2) p2.textContent=nextUsername(p,s,off+2,code,genIncludeSite);
   }
   function renderGenActions(){
     genRenderActionDropdown(document.getElementById('genActionSearch') ? document.getElementById('genActionSearch').value : '');
@@ -3231,10 +3252,10 @@
     return set;
   }
   // Genera el siguiente username libre para un site (evita chocar con guardados y draft)
-  function freeUsername(p, s, code, site, used){
+  function freeUsername(p, s, code, site, used, includeSite){
     let seq = users.filter(u=>u.site===site).length + dUsers.filter(u=>u.site===site).length + 1;
     let name;
-    do { name = nextUsername(p,s,seq,code); seq++; } while(used.has(name.toLowerCase()));
+    do { name = nextUsername(p,s,seq,code,includeSite); seq++; } while(used.has(name.toLowerCase()));
     used.add(name.toLowerCase());
     return name;
   }
@@ -3246,7 +3267,7 @@
     const acts=[...genActs];
     const used=usedNames();
     for(let i=1;i<=n;i++){
-      dUsers.push({ id:++draftUid, name:freeUsername(p,s,code,site,used), site, actions:[...acts], nomad:false });
+      dUsers.push({ id:++draftUid, name:freeUsername(p,s,code,site,used,genIncludeSite), site, actions:[...acts], nomad:false });
     }
     genReset();
     closeAutoGenModal();
