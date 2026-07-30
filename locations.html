@@ -52,7 +52,7 @@
   [data-theme="dark"] .filters-btn,[data-theme="dark"] .btn-back,[data-theme="dark"] .btn-export,
   [data-theme="dark"] .btn-outline,[data-theme="dark"] .stepper-num button{background:var(--card);color:var(--text);}
   [data-theme="dark"] .filters-btn:hover,[data-theme="dark"] .btn-back:hover,[data-theme="dark"] .btn-export:hover,[data-theme="dark"] .btn-outline:hover{background:var(--panel);}
-  [data-theme="dark"] .adm-banner{background:#16233b;border-color:#2b3d5e;}
+  [data-theme="dark"] .adm-banner,[data-theme="dark"] .auto-gen-banner{background:#16233b;border-color:#2b3d5e;}
   [data-theme="dark"] .role-chip2,[data-theme="dark"] .role-tip,[data-theme="dark"] .u-pop,[data-theme="dark"] .autocomplete-pop,[data-theme="dark"] .cap-wrap{background:var(--card);border-color:var(--border);}
   [data-theme="dark"] .group-item.active,[data-theme="dark"] .sp-item.active{background:var(--sidebar-active-bg);}
   [data-theme="dark"] .group-item:hover:not(.active){background:var(--panel);}
@@ -329,6 +329,14 @@
   .mgr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-weight:700;color:var(--navy);font-size:15px;}
   .req-note{color:#e2453b;font-weight:500;font-size:12px;margin-left:6px;}
 
+  /* Banner: sugerencia de auto-generación de usuarios */
+  .auto-gen-banner{display:flex;align-items:center;gap:14px;background:#eef4ff;border:1px solid #d3e0fb;border-radius:12px;padding:14px 18px;margin-bottom:18px;}
+  .auto-gen-banner > svg{width:24px;height:24px;color:var(--blue);flex-shrink:0;}
+  .agb-text{flex:1;}
+  .agb-title{font-weight:700;color:var(--navy);font-size:14px;}
+  .agb-sub{color:#41527e;font-size:12.5px;margin-top:3px;line-height:1.4;}
+  .auto-gen-banner .btn-outline{flex-shrink:0;white-space:nowrap;}
+
   /* Banner administradores */
   .adm-banner{background:#eef4ff;border:1px solid #d3e0fb;border-radius:12px;padding:16px 18px;margin-bottom:18px;}
   .adm-banner-head{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--navy);font-size:15px;}
@@ -502,13 +510,13 @@
   .form-modal{background:var(--card);border-radius:16px;box-shadow:0 24px 60px rgba(20,29,51,.28);
     width:92%;max-width:680px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
   .form-scroll{overflow-y:auto;padding:26px 30px 10px;}
-  /* Scroller colorido del modal "Add users": siempre visible, no solo al hacer scroll/hover */
-  #userWizard .form-scroll{overflow-y:scroll;scrollbar-width:auto;scrollbar-color:#8b6cf0 rgba(139,108,240,.14);}
+  /* Scroller del modal "Add users": siempre visible, no solo al hacer scroll/hover */
+  #userWizard .form-scroll{overflow-y:scroll;scrollbar-width:auto;scrollbar-color:var(--blue) rgba(47,107,255,.14);}
   #userWizard .form-scroll::-webkit-scrollbar{width:11px;}
-  #userWizard .form-scroll::-webkit-scrollbar-track{background:rgba(139,108,240,.14);border-radius:20px;}
+  #userWizard .form-scroll::-webkit-scrollbar-track{background:rgba(47,107,255,.14);border-radius:20px;}
   #userWizard .form-scroll::-webkit-scrollbar-thumb{border-radius:20px;border:2px solid transparent;background-clip:padding-box;min-height:40px;
-    background-image:linear-gradient(180deg,#6c8dff,#8b6cf0,#ef6cae,#f5a95a);}
-  #userWizard .form-scroll::-webkit-scrollbar-thumb:hover{background-image:linear-gradient(180deg,#5a7dff,#7a5be0,#e05a9e,#e6934a);}
+    background-color:var(--blue);}
+  #userWizard .form-scroll::-webkit-scrollbar-thumb:hover{background-color:var(--blue-hover);}
   .form-top{text-align:center;color:var(--muted2);font-size:15px;margin-bottom:22px;}
   .form-card{border:1px solid var(--border);border-radius:14px;padding:24px 26px;margin-bottom:20px;}
   .form-card h4{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:20px;}
@@ -1024,66 +1032,13 @@
 
       <!-- ===== Site users ===== -->
       <div id="wpane-users">
-        <!-- Generador por pasos -->
-        <div class="gen-wiz" id="genWiz">
-          <div class="gen-progress">
-            <span class="gp-dot" id="gp-1">1</span><span class="gp-line" id="gl-1"></span>
-            <span class="gp-dot" id="gp-2">2</span><span class="gp-line" id="gl-2"></span>
-            <span class="gp-dot" id="gp-3">3</span>
-            <span class="gp-label" id="gpLabel">Step 1 of 3</span>
+        <div class="auto-gen-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>
+          <div class="agb-text">
+            <div class="agb-title">Do you want to generate users automatically?</div>
+            <div class="agb-sub">Try the auto-generate users tool: pick how many, the site and the actions, and we'll create ready-to-use usernames for you.</div>
           </div>
-
-          <!-- Paso 1: cuántos + formato del nombre -->
-          <div class="gen-step" id="gstep-1">
-            <div class="gen-q">How many users do you want to create?</div>
-            <div class="stepper-num" style="margin-top:14px;">
-              <button type="button" onclick="genAdj(-1)">−</button>
-              <input id="genCount" type="number" min="1" max="50" value="3" oninput="genSyncPreview()">
-              <button type="button" onclick="genAdj(1)">+</button>
-            </div>
-            <div class="naming-box compact" style="margin-top:18px;margin-bottom:0;">
-              <div class="nrow"><label>Prefix</label><input id="genPrefix" value="PLU" oninput="genSyncPreview()"></div>
-              <div class="nrow"><label>Suffix</label><input id="genSuffix" placeholder="optional" oninput="genSyncPreview()"></div>
-              <div class="preview-line">Username format: <b id="genFmt">PLU_&lt;SITE&gt;_001</b></div>
-            </div>
-          </div>
-
-          <!-- Paso 2: a qué site -->
-          <div class="gen-step" id="gstep-2" style="display:none;">
-            <div class="gen-q">Those users will be assigned to</div>
-            <select class="fld" id="genSite" style="margin-top:14px;margin-bottom:0;"></select>
-            <div class="preview-line" style="margin-top:12px;">Preview: <b id="genPrev1">PLU_SITE_001</b>, <b id="genPrev2">PLU_SITE_002</b>, …</div>
-          </div>
-
-          <!-- Paso 3: acciones -->
-          <div class="gen-step" id="gstep-3" style="display:none;">
-            <div class="gen-q" style="display:flex;justify-content:space-between;align-items:center;">
-              <span>Assign actions to those users</span>
-              <span>
-                <button type="button" class="mini-link" onclick="genActionsAll(true)">Add all</button>
-                <button type="button" class="mini-link" onclick="genActionsAll(false)">Remove all</button>
-              </span>
-            </div>
-
-            <div class="fld-search" id="genActionSearchWrap" style="position:relative;margin-top:10px;margin-bottom:0;">
-              <input class="fld" id="genActionSearch" placeholder="Search actions..." autocomplete="off"
-                oninput="genFilterActions()" onfocus="genShowActionDropdown()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-              <div class="autocomplete-pop" id="genActionDropdown" style="display:none;max-height:230px;overflow:auto;"></div>
-            </div>
-
-            <div id="genActionChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;"></div>
-
-            <div style="margin-top:20px;">
-              <div class="gen-q" style="font-size:13px;">Or apply an actions template</div>
-              <div id="genTemplatesList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
-            </div>
-          </div>
-
-          <div class="gen-nav">
-            <button type="button" class="btn-back" id="genBack" onclick="genPrev()" style="visibility:hidden;">Back</button>
-            <button type="button" class="btn" id="genNext" onclick="genNext()">Next</button>
-          </div>
+          <button type="button" class="btn-outline sm" onclick="openAutoGenModal()">Auto-generate users</button>
         </div>
 
         <div class="dup-warn" id="dupWarn" style="display:none;">
@@ -1179,6 +1134,77 @@
     <div class="form-footer">
       <button class="btn-back" onclick="closeUserWizard()">Cancel</button>
       <button class="btn" id="wizReviewBtn" onclick="wizReview()">Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: generador automático de usuarios (3 pasos) -->
+<div class="modal-overlay hidden" id="autoGenModal">
+  <div class="form-modal" style="max-width:560px;">
+    <div class="form-scroll">
+      <h3 class="storage-title" style="text-align:center;">Auto-generate users</h3>
+      <p class="wiz-top">Follow these 3 steps and we'll create the users for you.</p>
+
+      <div class="gen-wiz" id="genWiz">
+        <div class="gen-progress">
+          <span class="gp-dot" id="gp-1">1</span><span class="gp-line" id="gl-1"></span>
+          <span class="gp-dot" id="gp-2">2</span><span class="gp-line" id="gl-2"></span>
+          <span class="gp-dot" id="gp-3">3</span>
+          <span class="gp-label" id="gpLabel">Step 1 of 3</span>
+        </div>
+
+        <!-- Paso 1: cuántos + formato del nombre -->
+        <div class="gen-step" id="gstep-1">
+          <div class="gen-q">How many users do you want to create?</div>
+          <div class="stepper-num" style="margin-top:14px;">
+            <button type="button" onclick="genAdj(-1)">−</button>
+            <input id="genCount" type="number" min="1" max="50" value="3" oninput="genSyncPreview()">
+            <button type="button" onclick="genAdj(1)">+</button>
+          </div>
+          <div class="naming-box compact" style="margin-top:18px;margin-bottom:0;">
+            <div class="nrow"><label>Prefix</label><input id="genPrefix" value="PLU" oninput="genSyncPreview()"></div>
+            <div class="nrow"><label>Suffix</label><input id="genSuffix" placeholder="optional" oninput="genSyncPreview()"></div>
+            <div class="preview-line">Username format: <b id="genFmt">PLU_&lt;SITE&gt;_001</b></div>
+          </div>
+        </div>
+
+        <!-- Paso 2: a qué site -->
+        <div class="gen-step" id="gstep-2" style="display:none;">
+          <div class="gen-q">Those users will be assigned to</div>
+          <select class="fld" id="genSite" style="margin-top:14px;margin-bottom:0;"></select>
+          <div class="preview-line" style="margin-top:12px;">Preview: <b id="genPrev1">PLU_SITE_001</b>, <b id="genPrev2">PLU_SITE_002</b>, …</div>
+        </div>
+
+        <!-- Paso 3: acciones -->
+        <div class="gen-step" id="gstep-3" style="display:none;">
+          <div class="gen-q" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Assign actions to those users</span>
+            <span>
+              <button type="button" class="mini-link" onclick="genActionsAll(true)">Add all</button>
+              <button type="button" class="mini-link" onclick="genActionsAll(false)">Remove all</button>
+            </span>
+          </div>
+
+          <div class="fld-search" id="genActionSearchWrap" style="position:relative;margin-top:10px;margin-bottom:0;">
+            <input class="fld" id="genActionSearch" placeholder="Search actions..." autocomplete="off"
+              oninput="genFilterActions()" onfocus="genShowActionDropdown()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <div class="autocomplete-pop" id="genActionDropdown" style="display:none;max-height:230px;overflow:auto;"></div>
+          </div>
+
+          <div id="genActionChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;"></div>
+
+          <div style="margin-top:20px;">
+            <div class="gen-q" style="font-size:13px;">Or apply an actions template</div>
+            <div id="genTemplatesList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <div class="gen-nav">
+          <button type="button" class="btn-back" id="genBack" onclick="genBackClick()" style="visibility:hidden;">Back</button>
+          <button type="button" class="btn" id="genNext" onclick="genNext()">Next</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2995,6 +3021,21 @@
   }
   function closeUserWizard(){ document.getElementById('userWizard').classList.add('hidden'); }
 
+  /* ---------- Modal separado: auto-generar usuarios (3 pasos) ---------- */
+  function openAutoGenModal(){
+    genReset();
+    document.getElementById('userWizard').classList.add('hidden');
+    document.getElementById('autoGenModal').classList.remove('hidden');
+  }
+  function closeAutoGenModal(){
+    document.getElementById('autoGenModal').classList.add('hidden');
+    document.getElementById('userWizard').classList.remove('hidden');
+  }
+  function genBackClick(){
+    if(genStep===1) closeAutoGenModal();
+    else genPrev();
+  }
+
   function wizTab(t){
     document.getElementById('wtab-users').classList.toggle('active', t==='users');
     document.getElementById('wtab-mgr').classList.toggle('active', t==='mgr');
@@ -3024,7 +3065,9 @@
     document.getElementById('gl-1').className = 'gp-line' + (genStep>1?' done':'');
     document.getElementById('gl-2').className = 'gp-line' + (genStep>2?' done':'');
     document.getElementById('gpLabel').textContent = `Step ${genStep} of 3`;
-    document.getElementById('genBack').style.visibility = genStep===1 ? 'hidden' : 'visible';
+    const back=document.getElementById('genBack');
+    back.style.visibility = 'visible';
+    back.textContent = genStep===1 ? 'Cancel' : 'Back';
     const next=document.getElementById('genNext');
     next.textContent = genStep===3 ? 'Generate' : 'Next';
     if(genStep===2) genSyncPreview();
@@ -3206,7 +3249,9 @@
       dUsers.push({ id:++draftUid, name:freeUsername(p,s,code,site,used), site, actions:[...acts], nomad:false });
     }
     genReset();
+    closeAutoGenModal();
     renderDraftUsers();
+    showSnack(`${n} user${n>1?'s':''} generated`);
   }
 
   /* ---------- Draft: site users ---------- */
@@ -3506,6 +3551,9 @@
   document.addEventListener('click', ()=> document.querySelectorAll('.u-pop').forEach(p=>p.style.display='none'));
   document.getElementById('userWizard').addEventListener('click', e=>{
     if (e.target.id==='userWizard') closeUserWizard();
+  });
+  document.getElementById('autoGenModal').addEventListener('click', e=>{
+    if (e.target.id==='autoGenModal') closeAutoGenModal();
   });
   document.getElementById('reviewModal').addEventListener('click', e=>{
     if (e.target.id==='reviewModal') closeReview();
