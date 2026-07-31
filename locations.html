@@ -1393,6 +1393,21 @@
   </div>
 </div>
 
+<!-- Modal: asignar licencias a varios usuarios sin licencia a la vez (bulk assign) -->
+<div class="modal-overlay hidden" id="bulkAssignModal">
+  <div class="pack-modal">
+    <div class="storage-scroll">
+      <h3 class="storage-title">Assign licenses</h3>
+      <p class="storage-sub">Choose which license goes to each selected user.</p>
+      <div id="bulkAssignRows" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+    <div class="storage-footer">
+      <button class="btn-back" onclick="closeBulkAssignModal()">Cancel</button>
+      <button class="btn" id="bulkAssignConfirmBtn" onclick="confirmBulkAssign()">Assign</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: buscar y asignar un usuario a una licencia -->
 <div class="modal-overlay hidden" id="assignUserModal">
   <div class="pack-modal">
@@ -2668,6 +2683,9 @@
   document.getElementById('assignUserModal').addEventListener('click', e => {
     if (e.target.id === 'assignUserModal') closeAssignUserModal();
   });
+  document.getElementById('bulkAssignModal').addEventListener('click', e => {
+    if (e.target.id === 'bulkAssignModal') closeBulkAssignModal();
+  });
 
   // Navegación del menú
   document.querySelectorAll('.nav a, .nav-bottom a').forEach(link => {
@@ -3059,13 +3077,98 @@
   }
 
   let licensesTab = 'all'; // all | active | upcoming | expired | unassigned | nolicense
-  function setLicensesTab(t){ licensesTab=t; renderLicenses(); }
+  function setLicensesTab(t){ licensesTab=t; if (t!=='nolicense') nolicenseSelected.clear(); renderLicenses(); }
 
   let licensesCountry = 'all'; // all | one of LICENSE_COUNTRIES
   function setLicensesCountry(v){ licensesCountry=v; renderLicenses(); }
 
+  // Selección para el bulk-assign de la tab "Users without a license" (índices en `users`).
+  let nolicenseSelected = new Set();
+
   function usersWithoutLicense(){
     return users.map((u,i)=>({u,i})).filter(({i})=>!licenses.some(l=>l.userIndex===i));
+  }
+
+  function toggleNolicenseSelect(i, checked){
+    const availableLicenses = licenses.filter(l=>l.userIndex===null).length;
+    if (checked){
+      if (nolicenseSelected.size >= availableLicenses) return; // no hay más licencias libres para repartir
+      nolicenseSelected.add(i);
+    } else {
+      nolicenseSelected.delete(i);
+    }
+    renderLicenses();
+  }
+  function clearNolicenseSelection(){
+    nolicenseSelected.clear();
+    renderLicenses();
+  }
+
+  /* ---------- Modal: bulk-assign de licencias a varios usuarios sin licencia ----------
+     El estado vive en `bulkAssignPicks` (userIndex -> licenseId|null), no se lee del DOM:
+     así, si dos usuarios terminan apuntando a la misma licencia, se resuelve de forma
+     determinística (gana quien la acaba de elegir; al otro se le quita y queda "sin elegir"). */
+  let bulkAssignPicks = {};
+
+  function openBulkAssignModal(){
+    if (!nolicenseSelected.size) return;
+    const availableLics = licenses.filter(l=>l.userIndex===null);
+    bulkAssignPicks = {};
+    Array.from(nolicenseSelected).forEach((i, idx)=>{ bulkAssignPicks[i] = availableLics[idx] ? availableLics[idx].id : null; });
+    renderBulkAssignRows();
+    document.getElementById('bulkAssignModal').classList.remove('hidden');
+  }
+  function closeBulkAssignModal(){
+    document.getElementById('bulkAssignModal').classList.add('hidden');
+  }
+  function bulkAssignPick(userIndex, licenseIdStr){
+    const licenseId = licenseIdStr === '' ? null : Number(licenseIdStr);
+    if (licenseId !== null){
+      // Si otro usuario ya tenía elegida esta misma licencia, se la quitamos y lo forzamos a elegir otra.
+      Object.keys(bulkAssignPicks).forEach(key=>{
+        const otherIndex = Number(key);
+        if (otherIndex !== userIndex && bulkAssignPicks[otherIndex] === licenseId) bulkAssignPicks[otherIndex] = null;
+      });
+    }
+    bulkAssignPicks[userIndex] = licenseId;
+    renderBulkAssignRows();
+  }
+  function renderBulkAssignRows(){
+    const box = document.getElementById('bulkAssignRows');
+    if (!box) return;
+    const availableLics = licenses.filter(l=>l.userIndex===null);
+    const selectedUsers = Array.from(nolicenseSelected);
+    const takenIds = new Set(Object.values(bulkAssignPicks).filter(v=>v!==null));
+
+    box.innerHTML = selectedUsers.map(i=>{
+      const u = users[i];
+      const pick = bulkAssignPicks[i] ?? null;
+      // Cada select ve las licencias libres + la que él mismo tiene elegida (para no desaparecer de su propio select).
+      const options = availableLics.filter(l=> l.id===pick || !takenIds.has(l.id));
+      return `
+      <div class="pack-row" style="cursor:default;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <span>${u.name}${u.site ? ` <span style="color:var(--muted2);font-weight:400;">— ${u.site}</span>` : ''}</span>
+        <select onchange="bulkAssignPick(${i}, this.value)" style="border:1px solid var(--border);border-radius:9px;padding:6px 8px;font-size:13px;color:var(--navy);">
+          <option value="" ${pick===null?'selected':''}>Choose a license…</option>
+          ${options.map(l=>`<option value="${l.id}" ${pick===l.id?'selected':''}>License #${l.id} — ${l.location}</option>`).join('')}
+        </select>
+      </div>`;
+    }).join('');
+
+    const btn = document.getElementById('bulkAssignConfirmBtn');
+    if (btn) btn.disabled = selectedUsers.some(i => bulkAssignPicks[i]===null);
+  }
+  function confirmBulkAssign(){
+    if (Array.from(nolicenseSelected).some(i => bulkAssignPicks[i]===null)) return;
+    Object.entries(bulkAssignPicks).forEach(([key, licenseId])=>{
+      if (licenseId===null) return;
+      const lic = licenses.find(l=>l.id===licenseId);
+      if (lic && lic.userIndex===null) lic.userIndex = Number(key);
+    });
+    nolicenseSelected.clear();
+    bulkAssignPicks = {};
+    closeBulkAssignModal();
+    renderLicenses();
   }
 
   function licensesTabTabsHTML(counts){
@@ -3164,20 +3267,38 @@
 
     // Vista especial: usuarios que no tienen ninguna licencia asociada (no hay fila de licencia que mostrar).
     if (licensesTab === 'nolicense'){
-      const NL_GRID = 'grid-template-columns:1.5fr 1fr 1fr;';
-      const nlRows = usersWithoutLicense().map(({u})=>`
+      const withoutLicense = usersWithoutLicense(); // [{u,i}]
+      const validIdx = new Set(withoutLicense.map(x=>x.i));
+      Array.from(nolicenseSelected).forEach(i=>{ if (!validIdx.has(i)) nolicenseSelected.delete(i); });
+      const availableLicenses = licenses.filter(l=>l.userIndex===null).length;
+      while (nolicenseSelected.size > availableLicenses) nolicenseSelected.delete(Array.from(nolicenseSelected).pop());
+
+      const NL_GRID = 'grid-template-columns:36px 1.5fr 1fr 1fr;';
+      const nlRows = withoutLicense.map(({u,i})=>{
+        const checked = nolicenseSelected.has(i);
+        const disabled = !checked && nolicenseSelected.size>=availableLicenses;
+        return `
         <div class="u-row" style="${NL_GRID}">
+          <span><input type="checkbox" ${checked?'checked':''} ${disabled?'disabled':''} onchange="toggleNolicenseSelect(${i},this.checked)"></span>
           <span class="name" style="font-weight:600;">${u.name}</span>
           <span class="u-site">${u.site || '—'}</span>
           <span><span class="badge-empty">No license</span></span>
-        </div>`).join('') || `<div class="draft-empty" style="padding:44px;">All users have a license.</div>`;
+        </div>`;
+      }).join('') || `<div class="draft-empty" style="padding:44px;">All users have a license.</div>`;
 
       card.innerHTML = `
         ${tabsHTML}
+        ${availableLicenses===0 && withoutLicense.length ? `<div class="draft-empty" style="padding:10px 2px;text-align:left;">No unassigned licenses available right now.</div>` : ''}
         <div class="table-head" style="${NL_GRID}">
-          <div>User</div><div>Site</div><div>License status</div>
+          <div></div><div>User</div><div>Site</div><div>License status</div>
         </div>
         ${nlRows}
+        ${nolicenseSelected.size>0 ? `
+        <div class="bulk-bar" style="display:flex;">
+          <span class="bc">${nolicenseSelected.size} of ${availableLicenses} available licenses selected</span>
+          <button class="bbtn" onclick="openBulkAssignModal()">Assign</button>
+          <button class="bbtn bclear" onclick="clearNolicenseSelection()">Clear</button>
+        </div>` : ''}
         <div class="table-footer"><span>${counts.nolicense} of ${users.length} users without a license</span></div>`;
       return;
     }
