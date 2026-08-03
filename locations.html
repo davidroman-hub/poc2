@@ -284,6 +284,17 @@
   .credits-card{align-items:flex-start;}
   .credits-card .pool-ico{background:#eef4ff;}
   [data-theme="dark"] .credits-card .pool-ico{background:#16233b;}
+  .lic-meter-wrap{display:flex;align-items:center;gap:10px;margin-top:12px;width:100%;}
+  .lic-meter{flex:1;height:10px;border-radius:20px;background:#eaf1ff;overflow:hidden;}
+  .lic-meter-fill{height:100%;border-radius:20px;background:var(--blue);transition:width .35s ease;}
+  .lic-meter-pct{font-size:12.5px;font-weight:700;color:var(--navy);min-width:38px;text-align:right;flex-shrink:0;}
+  [data-theme="dark"] .lic-meter{background:#16233b;}
+  .col-chart{display:flex;align-items:flex-end;gap:24px;height:150px;border-bottom:1px solid var(--border);}
+  .col-chart-item{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;height:100%;}
+  .col-chart-value{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+  .col-chart-bar{width:100%;max-width:56px;border-radius:8px 8px 0 0;background:var(--blue);min-height:4px;transition:height .35s ease;}
+  .col-chart-labels{display:flex;gap:24px;padding-top:8px;}
+  .col-chart-label{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted2);}
   .icon-btn.danger:hover{background:#fdecec;color:#e2453b;}
   .site-row .name{font-weight:600;color:var(--navy);}
   .site-row .r{text-align:center;color:var(--muted2);}
@@ -912,7 +923,15 @@
             <span class="pool-count" id="consumedCreditsCount">0</span>
             <span class="pool-label">of <b id="totalCreditsCount">0</b> total credits</span>
           </div>
+          <div class="lic-meter-wrap">
+            <div class="lic-meter"><div class="lic-meter-fill" id="creditsMeterFill" style="width:0%;"></div></div>
+            <span class="lic-meter-pct" id="creditsMeterPct">0%</span>
+          </div>
         </div>
+      </div>
+      <div class="stepper-card" style="margin-bottom:16px;">
+        <div class="pool-label" style="margin-bottom:14px;">Credits consumed by country</div>
+        <div id="creditsByCountryChart"></div>
       </div>
       <div class="sites-card" id="licensesCard"></div>
     </div>
@@ -3012,6 +3031,22 @@
     const total = list.reduce((s,l)=>s+licenseStats(l).total,0);
     return { consumed, remaining: total - consumed, total };
   }
+  function renderCreditsByCountryChart(){
+    const box = document.getElementById('creditsByCountryChart');
+    if (!box) return;
+    const data = LICENSE_COUNTRIES.map(country=>{
+      const consumed = licenses.filter(l=>l.location===country).reduce((s,l)=>s+licenseStats(l).consumed,0);
+      return { country, consumed };
+    }).sort((a,b)=>b.consumed-a.consumed);
+    const max = Math.max(1, ...data.map(d=>d.consumed));
+    const bars = data.map(d=>`
+      <div class="col-chart-item">
+        <span class="col-chart-value">${d.consumed}</span>
+        <div class="col-chart-bar" style="height:${Math.max(4, d.consumed/max*100)}%;"></div>
+      </div>`).join('');
+    const labels = data.map(d=>`<span class="col-chart-label">${d.country}</span>`).join('');
+    box.innerHTML = `<div class="col-chart">${bars}</div><div class="col-chart-labels">${labels}</div>`;
+  }
   function creditsSummaryTipHTML(){
     const s = creditsSummary();
     return `<div class="lic-tip-title">Credits summary${licensesCountry!=='all' ? ' — '+licensesCountry : ''}</div>
@@ -3345,13 +3380,19 @@
     if (poolCountEl) poolCountEl.textContent = creditPacks.length;
 
     const summary = creditsSummary();
+    const pct = summary.total ? Math.min(100, summary.consumed/summary.total*100) : 0;
     const consumedEl = document.getElementById('consumedCreditsCount');
     const totalEl = document.getElementById('totalCreditsCount');
     const filterBadgeEl = document.getElementById('creditsFilterBadge');
+    const meterEl = document.getElementById('creditsMeterFill');
+    const pctEl = document.getElementById('creditsMeterPct');
     if (consumedEl) consumedEl.textContent = summary.consumed;
     if (totalEl) totalEl.textContent = summary.total;
     if (filterBadgeEl) filterBadgeEl.textContent = licensesCountry==='all' ? 'All countries' : licensesCountry;
+    if (meterEl) meterEl.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = Math.round(pct) + '%';
     if (document.getElementById('licTip')?.dataset.mode==='credits') refreshCreditsSummaryTip();
+    renderCreditsByCountryChart();
 
     card.innerHTML = `
       ${tabsHTML}
