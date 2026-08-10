@@ -24,6 +24,14 @@
     --sidebar-active-bg:#eef2ff;
     --input-bg:#ffffff;
     --panel:#f8f9fc;
+    /* Categorical chart series (Activity tab), fixed slot per crop regardless of which appear */
+    --viz-1:#2a78d6;
+    --viz-2:#eb6834;
+    --viz-3:#1baf7a;
+    --viz-4:#eda100;
+    --viz-5:#e87ba4;
+    --viz-6:#008300;
+    --crd-hoverband:#eef1ff;
   }
   :root[data-theme="dark"]{
     --navy:#e9e9ec;
@@ -38,6 +46,13 @@
     --sidebar-active-bg:#2a2a30;
     --input-bg:#2a2a2f;
     --panel:#1c1c20;
+    --viz-1:#3987e5;
+    --viz-2:#d95926;
+    --viz-3:#199e70;
+    --viz-4:#c98500;
+    --viz-5:#d55181;
+    --viz-6:#008300;
+    --crd-hoverband:#20263d;
   }
   /* Overrides de superficies claras en modo oscuro */
   [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background-color:var(--input-bg);color:var(--text);border-color:var(--border);}
@@ -135,7 +150,8 @@
   .layout{display:flex;gap:18px;margin-top:16px;flex:1;min-height:0;}
 
   /* Left card - groups */
-  .groups{width:280px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;overflow-y:auto;}
+  .groups{width:280px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;overflow-y:auto;transition:width .18s ease,padding .18s ease;}
+  .groups-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
   .groups h2{font-size:17px;font-weight:700;color:var(--navy);}
   .groups .desc{color:var(--muted2);font-size:13px;margin:8px 0 14px;line-height:1.45;}
   .new-group{width:100%;justify-content:center;margin-bottom:14px;}
@@ -149,6 +165,21 @@
   .grp-del{opacity:0;transition:opacity .15s;}
   .group-item:hover .grp-del{opacity:1;}
   .groups-note{margin-top:auto;border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--muted2);font-size:12.5px;line-height:1.45;}
+
+  .groups-toggle-btn{display:flex;align-items:center;justify-content:center;width:26px;height:26px;flex-shrink:0;border:1px solid var(--border);border-radius:7px;background:var(--card);color:var(--muted2);cursor:pointer;padding:0;}
+  .groups-toggle-btn:hover{background:#f6f8fc;color:var(--navy);}
+  .groups-toggle-btn svg{width:14px;height:14px;transition:transform .18s ease;}
+  [data-theme="dark"] .groups-toggle-btn:hover{background:var(--panel);}
+  .groups-collapsed-icon{display:none;width:34px;height:34px;align-items:center;justify-content:center;border-radius:9px;color:var(--muted);margin-top:14px;}
+  .groups-collapsed-icon svg{width:18px;height:18px;}
+
+  .groups.collapsed{width:56px;padding:16px 10px;overflow:visible;}
+  .groups.collapsed .groups-head{justify-content:center;}
+  .groups.collapsed .groups-toggle-btn svg{transform:rotate(180deg);}
+  .groups.collapsed h2,.groups.collapsed .desc,.groups.collapsed .new-group,
+  .groups.collapsed #grpAll,.groups.collapsed #grpShared,.groups.collapsed #customGroups,
+  .groups.collapsed .groups-note{display:none;}
+  .groups.collapsed .groups-collapsed-icon{display:flex;}
 
   /* Right column */
   .content{flex:1;display:flex;flex-direction:column;gap:14px;min-height:0;}
@@ -191,14 +222,15 @@
   .sites-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;flex:1;display:flex;flex-direction:column;min-height:0;}
   #rows{flex:1;overflow-y:auto;min-height:400px;}
   #usersCard{overflow-y:auto;}
+  #dataRows{max-height:480px;overflow-y:auto;}
 
   /* Scrollbar de color propio en las zonas con scroll interno, para que se
      note a simple vista que hay más filas/opciones debajo. */
-  #rows,#usersCard,.groups{scrollbar-width:thin;scrollbar-color:var(--blue) transparent;}
-  #rows::-webkit-scrollbar,#usersCard::-webkit-scrollbar,.groups::-webkit-scrollbar{width:8px;}
-  #rows::-webkit-scrollbar-track,#usersCard::-webkit-scrollbar-track,.groups::-webkit-scrollbar-track{background:transparent;}
-  #rows::-webkit-scrollbar-thumb,#usersCard::-webkit-scrollbar-thumb,.groups::-webkit-scrollbar-thumb{background:var(--blue);border-radius:20px;border:2px solid transparent;background-clip:padding-box;}
-  #rows::-webkit-scrollbar-thumb:hover,#usersCard::-webkit-scrollbar-thumb:hover,.groups::-webkit-scrollbar-thumb:hover{background:var(--blue-hover);background-clip:padding-box;}
+  #rows,#usersCard,.groups,#dataRows{scrollbar-width:thin;scrollbar-color:var(--blue) transparent;}
+  #rows::-webkit-scrollbar,#usersCard::-webkit-scrollbar,.groups::-webkit-scrollbar,#dataRows::-webkit-scrollbar{width:8px;}
+  #rows::-webkit-scrollbar-track,#usersCard::-webkit-scrollbar-track,.groups::-webkit-scrollbar-track,#dataRows::-webkit-scrollbar-track{background:transparent;}
+  #rows::-webkit-scrollbar-thumb,#usersCard::-webkit-scrollbar-thumb,.groups::-webkit-scrollbar-thumb,#dataRows::-webkit-scrollbar-thumb{background:var(--blue);border-radius:20px;border:2px solid transparent;background-clip:padding-box;}
+  #rows::-webkit-scrollbar-thumb:hover,#usersCard::-webkit-scrollbar-thumb:hover,.groups::-webkit-scrollbar-thumb:hover,#dataRows::-webkit-scrollbar-thumb:hover{background:var(--blue-hover);background-clip:padding-box;}
   .sites-toolbar{display:flex;align-items:center;gap:12px;}
   .sites-toolbar .all{font-size:15px;font-weight:700;color:var(--navy);}
   .search{flex:1;max-width:420px;}
@@ -442,6 +474,102 @@
   .badge-error{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#fdecec;color:#c0392b;border:1px solid #f6c9c4;}
   .badge-upcoming{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#f1ecfe;color:#7c4dff;border:1px solid #ddd0fb;}
   [data-theme="dark"] .badge-upcoming{background:#241c3a;border-color:#3a2c5c;color:#b49dff;}
+
+  /* Data page: status pills + table cells */
+  .status-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;white-space:nowrap;}
+  .status-pill svg{width:13px;height:13px;flex-shrink:0;}
+  .status-partial{background:#f2f4f8;color:#6b7688;border:1px solid #e3e7ee;}
+  .status-incomplete{background:#eaf1ff;color:#2f6bff;border:1px solid #cfe0ff;}
+  .status-complete{background:#eefaf1;color:#1c8a4b;border:1px solid #c4ecd1;}
+  [data-theme="dark"] .status-partial{background:var(--panel);border-color:var(--border);color:var(--muted2);}
+  [data-theme="dark"] .status-incomplete{background:#16233b;border-color:#2b3d5e;color:#7fa8ff;}
+  [data-theme="dark"] .status-complete{background:#122619;border-color:#1e3d29;color:#5cd08a;}
+  .dc-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .col-dots{color:var(--muted);flex-shrink:0;}
+  .data-th{display:flex;align-items:center;gap:4px;}
+  .data-pager{display:flex;align-items:center;gap:6px;}
+  .data-pager button{background:none;border:none;color:var(--muted2);cursor:pointer;padding:4px;border-radius:6px;display:flex;}
+  .data-pager button:disabled{opacity:.4;cursor:default;}
+  .data-pager button:not(:disabled):hover{background:#f1f3f8;color:var(--navy);}
+  .data-pager svg{width:16px;height:16px;}
+  .rpp-select{border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--card);}
+
+  /* Data action detail modal */
+  .dad-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+  .dad-title{font-size:22px;font-weight:800;color:var(--navy);line-height:1.3;}
+  .dad-meta{color:var(--muted2);font-size:13px;margin-top:6px;}
+  .dad-status{margin-top:14px;}
+  .dad-share{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-size:13.5px;font-weight:600;color:var(--navy);background:#fff;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;}
+  .dad-share:hover{background:#f6f7fb;}
+  .dad-share svg{width:15px;height:15px;}
+  [data-theme="dark"] .dad-share{background:var(--card);}
+  [data-theme="dark"] .dad-share:hover{background:var(--panel);}
+  .dad-grid{display:grid;grid-template-columns:1fr 1.35fr;gap:24px;margin-top:26px;align-items:start;}
+  .dad-h2{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:12px;}
+  .dad-ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .dad-ico svg{width:22px;height:22px;}
+  .dad-origin-top{display:flex;gap:14px;align-items:flex-start;}
+  .dad-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:11px;}
+  .dad-info-row{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--navy);}
+  .dad-info-row svg{width:16px;height:16px;color:var(--muted);flex-shrink:0;}
+  .dad-photos{display:flex;gap:10px;flex-wrap:wrap;}
+  .dad-photo{width:90px;height:90px;border-radius:10px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;}
+  .dad-photo svg{width:100%;height:100%;display:block;}
+  .dad-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:13.5px;}
+  .dad-row span:first-child{font-weight:700;color:var(--navy);}
+  .dad-row span:last-child{color:var(--muted2);text-align:right;}
+  .dad-note{font-size:12.5px;color:var(--muted2);line-height:1.55;margin-top:10px;}
+
+  /* Activity tab */
+  .act-stats{display:flex;gap:18px;margin-bottom:18px;flex-wrap:wrap;}
+  .act-stat{flex:1;min-width:200px;border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--card);}
+  .act-stat-label{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted2);font-weight:600;}
+  .act-stat-label svg{width:15px;height:15px;color:var(--muted);cursor:default;flex-shrink:0;}
+  .act-stat-value{font-size:32px;font-weight:800;margin-top:8px;letter-spacing:-.5px;}
+  .act-stat-value.blue{color:var(--blue);}
+  .act-stat-value.green{color:#1c8a4b;}
+  .act-stat-value.muted{color:var(--muted);}
+  .act-grid{display:flex;gap:18px;align-items:stretch;flex-wrap:wrap;}
+  .act-chart-card{flex:1.6;min-width:380px;border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--card);}
+  .act-users-card{flex:1;min-width:340px;border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--card);display:flex;flex-direction:column;}
+  .act-card-title{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:700;color:var(--navy);}
+  .act-card-title svg{width:15px;height:15px;color:var(--muted);cursor:default;flex-shrink:0;}
+  .act-chart-wrap{position:relative;margin-top:14px;}
+  .act-chart-wrap svg{width:100%;height:auto;display:block;overflow:visible;}
+  .act-crosshair{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;opacity:0;pointer-events:none;}
+  .act-hoverdot{opacity:0;pointer-events:none;}
+  .act-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;}
+  .act-legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--navy);}
+  .act-legend-swatch{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
+  .act-users-table{margin-top:14px;flex:1;overflow-y:auto;max-height:400px;}
+  .act-users-head{display:grid;padding:8px 6px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px;align-items:end;min-height:60px;}
+  .act-users-row{display:grid;padding:11px 6px;border-bottom:1px solid var(--border);align-items:center;font-size:13.5px;}
+  .act-user-name{font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .act-user-site{font-size:11.5px;color:var(--muted2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .act-num{text-align:right;font-variant-numeric:tabular-nums;}
+  .act-crop-vert{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;text-transform:none;font-size:11px;font-weight:700;color:var(--muted2);letter-spacing:.2px;justify-self:end;}
+  .act-users-footer{display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:auto;color:var(--muted2);font-size:13px;flex-wrap:wrap;gap:8px;}
+  #actChartTip{display:none;position:fixed;z-index:260;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 26px rgba(20,29,51,.16);padding:10px 12px;font-size:12.5px;color:var(--navy);min-width:150px;}
+  .act-tip-date{font-weight:700;margin-bottom:6px;}
+  .act-tip-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:2px 0;}
+  .act-tip-key{display:flex;align-items:center;gap:6px;color:var(--muted2);}
+  .act-tip-line{width:14px;height:2px;border-radius:2px;flex-shrink:0;}
+  .act-tip-val{font-weight:700;color:var(--navy);}
+
+  /* Crop distribution (by variety) block, appended below the Activity tab */
+  .crd-crop-tabs{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .crd-crop-btn{padding:9px 18px;border-radius:9px;border:1px solid var(--border);background:var(--card);font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;}
+  .crd-crop-btn:hover{background:var(--panel);}
+  .crd-crop-btn.active{border-color:var(--blue);background:#eaf1ff;color:var(--blue);}
+  [data-theme="dark"] .crd-crop-btn.active{background:#16233b;}
+  .crd-notes{list-style:disc;padding-left:20px;color:var(--muted2);font-size:13px;line-height:1.7;margin-bottom:20px;}
+  .crd-info{display:inline-flex;color:var(--blue);cursor:default;vertical-align:middle;margin-left:2px;}
+  .crd-info svg{width:14px;height:14px;}
+  .crd-results-value{font-size:44px;font-weight:800;margin-top:10px;letter-spacing:-1px;}
+  .crd-chart-wrap{position:relative;margin-top:6px;}
+  .crd-chart-wrap svg{width:100%;height:auto;display:block;overflow:visible;}
+  .crd-hoverband{opacity:0;pointer-events:none;}
+  .crd-hit{cursor:default;}
   .mgr-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 32px;gap:10px;align-items:center;margin-bottom:10px;}
   .mgr-row input,.mgr-row select{border:1px solid var(--border);border-radius:8px;padding:10px 11px;font-size:13px;font-family:inherit;outline:none;width:100%;color:var(--navy);background:#fff;}
   .mgr-row input:focus,.mgr-row select:focus{border-color:var(--blue);}
@@ -773,7 +901,6 @@
       <a href="#" class="active" id="navSites" data-page="sites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg><span class="lbl-text">Sites</span></a>
       <a href="#" id="navUsers" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.5-1-4-3-4.6"/></svg><span class="lbl-text">Users</span></a>
       <a href="#" id="navLicenses" data-page="licenses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg><span class="lbl-text">Licenses</span></a>
-      <a href="#" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg><span class="lbl-text">Dashboard</span></a>
       <a href="#" data-page="devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg><span class="lbl-text">Devices</span></a>
     </nav>
     <div class="nav-bottom">
@@ -803,7 +930,15 @@
     <div class="layout">
       <!-- Groups -->
       <section class="groups" id="siteGroups">
-        <h2>Site groups</h2>
+        <div class="groups-head">
+          <h2>Site groups</h2>
+          <button class="groups-toggle-btn" id="groupsToggleBtn" onclick="toggleGroupsPanel()" title="Collapse site groups">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+          </button>
+        </div>
+        <div class="groups-collapsed-icon" title="Site groups" onclick="toggleGroupsPanel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        </div>
         <p class="desc">Organize your sites into groups so you can more easily assign them to your users</p>
         <button class="btn new-group" onclick="openGroupModal()">New group</button>
         <div class="group-item active" id="grpAll" onclick="selectGroupFilter('all')">
@@ -1013,6 +1148,29 @@
       </div>
     </div>
    </div><!-- /page-map -->
+
+   <!-- ================= DATA PAGE ================= -->
+   <div id="page-data" style="display:none;">
+    <div class="header-row">
+      <div>
+        <h1 class="page-title">Data</h1>
+        <p class="page-sub">Explore analysis results across your sites, devices & users.</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <button class="sd-demo-btn" onclick="mockDataActions()">Mock</button>
+      </div>
+    </div>
+
+    <div class="content" style="margin-top:22px;">
+      <div class="sites-card">
+        <div class="u-tabs">
+          <button class="u-tab active" onclick="setDataSection('data')" id="dataTabBtn-data">Data</button>
+          <button class="u-tab" onclick="setDataSection('activity')" id="dataTabBtn-activity">Activity</button>
+        </div>
+        <div id="dataSectionBody"></div>
+      </div>
+    </div>
+   </div><!-- /page-data -->
   </main>
 </div>
 
@@ -1361,6 +1519,18 @@
   </div>
 </div>
 
+<!-- Modal: detalles de una acción (Data page). Solo se cierra con el botón Close. -->
+<div class="modal-overlay hidden" id="dataActionModal">
+  <div class="storage-modal">
+    <div class="storage-scroll">
+      <div id="dataActionBody"></div>
+    </div>
+    <div class="storage-footer">
+      <button class="btn" onclick="closeDataActionModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: detalles de site. Solo se cierra con el botón Close (sin click fuera, sin X). -->
 <div class="modal-overlay hidden" id="siteDetailsModal">
   <div class="form-modal" style="max-width:700px;">
@@ -1618,6 +1788,7 @@
 <!-- Tooltip de grupos de un site (tabla de sites) -->
 <div id="siteGroupsTip"></div>
 <div id="licTip"></div>
+<div id="actChartTip"></div>
 
 <!-- Snackbar -->
 <div id="snackbar"></div>
@@ -2328,6 +2499,722 @@
   };
   const CROP_COLOR_DEFAULT = { bg:'#eef1f6', text:'#6b7688' };
 
+  /* ================= DATA PAGE ================= */
+  let dataActions = [];
+  let dataSection = 'data';
+  let dataPage = 1;
+  const DATA_PAGE_SIZE = 50;
+  let cropDetailCrop = null; // crop selected in the "Distribution by variety" block
+
+  // Variedades y rangos de análisis por crop; el crop de cada action se deriva del
+  // texto entre paréntesis del propio action name (p.ej. "Varieties (Barley)" -> Barley).
+  const DATA_VARIETIES = {
+    Wheat:   ['Non renseigné','Audace','KWS Kingdom','Extase','Rubisko','Providence','Chevignon','Fructidor'],
+    Barley:  ['Non renseigné','Allegro','Faro','Etincel','KWS Feeris','Sébastian'],
+    Corn:    ['Non renseigné','DKC6182','P8834','LG31235'],
+    Soybean: ['Non renseigné','ES Mentor','RGT Shouna','ES Comandor'],
+    Rice:    ['Non renseigné','Arelate','Cigalon','Onyx'],
+  };
+  const DATA_STATUSES = [
+    { key:'partial',    label:'Partially completed',    weight:0.30 },
+    { key:'incomplete', label:'Finished – incomplete',  weight:0.50 },
+    { key:'complete',   label:'Finished – complete',    weight:0.20 },
+  ];
+  const DATA_DEVICES = ['OnePlus IN2023','Samsung Galaxy A54','Xiaomi Redmi Note 12','Motorola G84','Samsung Galaxy XCover 6'];
+  const DATA_ANALYSIS_RANGES = {
+    Wheat:   { humidity:[10.5,14.5], testWeight:[74,83], protein:[9.5,14.5] },
+    Barley:  { humidity:[10.5,14.0], testWeight:[58,68], protein:[8.5,12.5] },
+    Corn:    { humidity:[13,18],     testWeight:[68,76], protein:[7,10] },
+    Soybean: { humidity:[11,14],     testWeight:[70,78], protein:[34,42] },
+    Rice:    { humidity:[12,16],     testWeight:[52,58], protein:[6,9] },
+  };
+
+  function dataPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function dataRandomId(len){
+    const chars = '0123456789abcdef';
+    let s=''; for(let i=0;i<len;i++) s += chars[Math.floor(Math.random()*chars.length)];
+    return s;
+  }
+  function dataUuid(){ return `${dataRandomId(8)}-${dataRandomId(4)}-${dataRandomId(4)}-${dataRandomId(4)}-${dataRandomId(12)}`; }
+  function dataRange(range){ return (range[0] + Math.random()*(range[1]-range[0])).toFixed(1); }
+  function dataPickStatus(){
+    const roll = Math.random();
+    let acc = 0;
+    for (const s of DATA_STATUSES){ acc += s.weight; if (roll <= acc) return s; }
+    return DATA_STATUSES[DATA_STATUSES.length-1];
+  }
+  // Deriva el crop del texto entre paréntesis al final del action name
+  // (p.ej. "Thousand kernel weight (Barley)" -> Barley, "Vitreousness (Durum wheat)" -> Wheat colors).
+  function dataCropFromAction(actionName){
+    const m = actionName.match(/\(([^)]+)\)\s*$/);
+    const raw = m ? m[1] : 'Wheat';
+    const norm = raw.replace(/^Durum\s+/i,'').trim();
+    const key = norm.charAt(0).toUpperCase()+norm.slice(1).toLowerCase();
+    return { key: CROP_COLORS[key] ? key : 'Wheat', label: raw };
+  }
+
+  const DATA_STATUS_ICONS = {
+    partial: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>`,
+    incomplete: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><path d="M8 12.5l2.6 2.6L16 9.5"/></svg>`,
+    complete: `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/><path d="M8 12.3l2.5 2.5L16.5 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+  };
+  const DATA_STATUS_CLASS = { partial:'status-partial', incomplete:'status-incomplete', complete:'status-complete' };
+  function statusPill(statusKey, label){
+    return `<span class="status-pill ${DATA_STATUS_CLASS[statusKey]}">${DATA_STATUS_ICONS[statusKey]}${label}</span>`;
+  }
+
+  function generateMockDataActions(n){
+    const out = [];
+    if (!users.length) return out; // no site users saved yet, nothing real to mock from
+    const now = Date.now();
+    for (let i=0;i<n;i++){
+      const u = dataPick(users);
+      const actionPool = (u.actions && u.actions.length) ? u.actions : U_ACTIONS;
+      const actionName = dataPick(actionPool);
+      const { key: cropKey, label: cropLabel } = dataCropFromAction(actionName);
+      const siteName = u.nomad && sites.length ? dataPick(sites).name : (u.site || (sites.length ? dataPick(sites).name : 'Unknown site'));
+      const status = dataPickStatus();
+      const hasResult = status.key !== 'partial';
+      const date = new Date(now - Math.random()*10*86400000);
+      const r = DATA_ANALYSIS_RANGES[cropKey];
+      const varietyPool = DATA_VARIETIES[cropKey] || ['Non renseigné'];
+      out.push({
+        statusKey: status.key,
+        statusLabel: status.label,
+        crop: cropKey,
+        cropLabel,
+        sampleId: hasResult ? (Math.random()<0.5 ? String(Math.floor(500000000+Math.random()*20000000)) : dataRandomId(8)) : '',
+        username: u.name,
+        site: siteName,
+        actionName,
+        actionDate: date,
+        variety: hasResult ? dataPick(varietyPool) : '',
+        actionId: dataUuid(),
+        device: `${u.device || dataPick(DATA_DEVICES)} of ${u.name} (${1+Math.floor(Math.random()*3)})`,
+        humidity: hasResult ? dataRange(r.humidity) : null,
+        testWeight: hasResult ? dataRange(r.testWeight) : null,
+        protein: hasResult ? dataRange(r.protein) : null,
+        visualCriteria: hasResult ? Math.random() < 0.08 : null,
+        photoCount: hasResult ? (Math.random()<0.15 ? 0 : (Math.random()<0.5 ? 1 : 2)) : 0,
+        infraredId: hasResult ? dataUuid() : '',
+      });
+    }
+    out.sort((a,b)=> b.actionDate - a.actionDate);
+    return out;
+  }
+
+  function mockDataActions(){
+    if (!users.length){ showSnack('Add at least one user first'); return; }
+    dataActions = generateMockDataActions(100);
+    dataPage = 1;
+    setDataSection('data');
+  }
+
+  function dataChangePage(delta){
+    const totalPages = Math.max(1, Math.ceil(dataActions.length / DATA_PAGE_SIZE));
+    dataPage = Math.min(totalPages, Math.max(1, dataPage + delta));
+    renderDataPage();
+  }
+
+  function setDataSection(name){
+    dataSection = name;
+    ['data','activity'].forEach(k=>{
+      const btn = document.getElementById('dataTabBtn-'+k);
+      if (btn) btn.classList.toggle('active', k===name);
+    });
+    renderDataPage();
+  }
+
+  const DATA_GRID = 'grid-template-columns:52px 1.5fr 1fr 1fr 1.3fr 1.5fr 1.4fr 1.2fr 0.9fr;';
+  function dataActionDate(a){
+    return a.actionDate.toLocaleString('en-US',{month:'numeric',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+  }
+
+  function renderDataPage(){
+    const body = document.getElementById('dataSectionBody');
+    if (!body) return;
+
+    if (dataSection === 'activity'){
+      renderActivityTab(body);
+      return;
+    }
+
+    if (dataActions.length === 0){
+      body.innerHTML = dataEmptyStateHtml();
+      return;
+    }
+
+    const eyeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const dotsSvg = `<svg class="col-dots" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>`;
+
+    const head = `
+      <div class="table-head" style="${DATA_GRID}">
+        <div></div>
+        <div class="data-th">Action status ${dotsSvg}</div>
+        <div class="data-th">Crop name ${dotsSvg}</div>
+        <div class="data-th">Sample ID ${dotsSvg}</div>
+        <div class="data-th">Username ${dotsSvg}</div>
+        <div class="data-th">Site ${dotsSvg}</div>
+        <div class="data-th">Action name ${dotsSvg}</div>
+        <div class="data-th">Action date ${dotsSvg}</div>
+        <div class="data-th">Variety ${dotsSvg}</div>
+      </div>`;
+
+    const totalPages = Math.max(1, Math.ceil(dataActions.length / DATA_PAGE_SIZE));
+    if (dataPage > totalPages) dataPage = totalPages;
+    const startIdx = (dataPage-1) * DATA_PAGE_SIZE;
+    const pageItems = dataActions.slice(startIdx, startIdx + DATA_PAGE_SIZE);
+
+    const rows = pageItems.map((a,idx)=>{
+      const i = startIdx + idx;
+      const c = CROP_COLORS[a.crop] || CROP_COLOR_DEFAULT;
+      return `
+      <div class="site-row" style="${DATA_GRID}" data-search="${(a.username+' '+a.site+' '+a.sampleId+' '+a.actionName+' '+a.variety).toLowerCase().replace(/"/g,'')}">
+        <span class="r"><button class="icon-btn" title="View details" onclick="viewDataAction(${i})">${eyeSvg}</button></span>
+        <span>${statusPill(a.statusKey, a.statusLabel)}</span>
+        <span><span class="ssc-crop-pill" style="background:${c.bg};color:${c.text};">${a.cropLabel}</span></span>
+        <span class="dc-ellipsis">${a.sampleId || ''}</span>
+        <span class="dc-ellipsis" title="${a.username}">${a.username}</span>
+        <span class="dc-ellipsis" title="${a.site}">${a.site}</span>
+        <span class="dc-ellipsis">${a.actionName}</span>
+        <span class="dc-ellipsis">${dataActionDate(a)}</span>
+        <span class="dc-ellipsis">${a.variety || ''}</span>
+      </div>`;
+    }).join('');
+
+    const rangeEnd = Math.min(startIdx + DATA_PAGE_SIZE, dataActions.length);
+    const footer = `
+      <div class="table-footer">
+        <span>Rows per page: <select class="rpp-select" disabled><option>${DATA_PAGE_SIZE}</option></select></span>
+        <span>${startIdx+1}–${rangeEnd} of ${dataActions.length}</span>
+        <span class="data-pager">
+          <button ${dataPage<=1?'disabled':''} title="Previous page" onclick="dataChangePage(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <button ${dataPage>=totalPages?'disabled':''} title="Next page" onclick="dataChangePage(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        </span>
+      </div>`;
+
+    body.innerHTML = `
+      <div class="sites-toolbar" style="margin:14px 0;">
+        <div class="search"><input type="text" placeholder="Search by username, site or sample ID..." oninput="filterDataActions(this.value)"></div>
+        <div class="spacer"></div>
+      </div>
+      ${head}
+      <div id="dataRows">${rows}</div>
+      ${footer}`;
+  }
+
+  function filterDataActions(q){
+    q = (q||'').toLowerCase().trim();
+    document.getElementById('dataRows').querySelectorAll('[data-search]').forEach(row=>{
+      row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+    });
+  }
+
+  function dataEmptyStateHtml(){
+    return `
+      <div class="empty">
+        <div class="pic">
+          <svg viewBox="0 0 260 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="130" cy="92" r="62" fill="#eef1f7"/>
+            <rect x="90" y="66" width="80" height="58" rx="6" fill="#f8fafc" stroke="#8b97ab" stroke-width="2.2"/>
+            <path d="M90 84h80M90 102h80M116 66v58M144 66v58" stroke="#c3cad8" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <h3>No results yet</h3>
+        <p>Analysis results from your team will show up here as a table. Generate mock data to preview it.</p>
+        <button class="btn btn-lg" onclick="mockDataActions()">Mock data</button>
+      </div>`;
+  }
+
+  /* ---------- Activity tab: stats + per-species chart + users mini table ---------- */
+  // Slot fijo por crop (nunca reordenado según qué crops aparezcan) para que el color
+  // siga siempre a la misma especie, tal como pide la paleta categórica del sistema.
+  const CROP_CHART_VAR = { Barley:'--viz-1', Wheat:'--viz-2', Corn:'--viz-3', Rice:'--viz-4', Soybean:'--viz-5', Oats:'--viz-6' };
+  const ACT_VB_W = 640, ACT_VB_H = 260;
+  const ACT_PAD = { l:38, r:14, t:12, b:28 };
+
+  // "Distribution by variety" block: reuses each crop's own established color
+  // (same family as CROP_COLORS pills) at a more vivid, bar/number-legible strength.
+  const CROP_DISPLAY_NAME = { Barley:'Barley', Wheat:'Wheat (Soft)', Corn:'Corn', Rice:'Rice', Soybean:'Soybean', Oats:'Oats' };
+  const CROP_VIVID = { Barley:'#e8791a', Wheat:'#f0b429', Corn:'#a3c122', Rice:'#3fae53', Soybean:'#1c8a4b', Oats:'#c99a4a' };
+  const CROP_VIVID_DEFAULT = '#8a94a6';
+  const PROTEIN_BAR_COLOR = '#c9a878';
+  const CRD_VB_W = 1000, CRD_VB_H = 340;
+  const CRD_PAD = { l:46, r:50, t:16, b:100 };
+
+  function activityBuildSeries(cropsPresent){
+    const byDay = {};
+    dataActions.forEach(a=>{
+      const key = a.actionDate.toISOString().slice(0,10);
+      if (!byDay[key]) byDay[key] = {};
+      byDay[key][a.crop] = (byDay[key][a.crop]||0) + 1;
+    });
+    const days = Object.keys(byDay).sort();
+    const series = cropsPresent.map(crop => ({ crop, values: days.map(d => byDay[d][crop] || 0) }));
+    return { days, series };
+  }
+
+  function activityUsersRows(){
+    const counts = {};
+    dataActions.forEach(a=>{
+      if (!counts[a.username]){
+        const ru = users.find(u=>u.name===a.username);
+        counts[a.username] = { name:a.username, site: ru ? (ru.nomad ? 'Nomad (all sites)' : ru.site) : a.site, total:0 };
+      }
+      counts[a.username].total++;
+      counts[a.username][a.crop] = (counts[a.username][a.crop]||0) + 1;
+    });
+    return Object.values(counts).sort((a,b)=> b.total - a.total);
+  }
+
+  function niceMax(v){
+    if (v<=0) return 25;
+    let step;
+    if (v<=25) step=5;
+    else if (v<=50) step=10;
+    else if (v<=100) step=25;
+    else if (v<=250) step=50;
+    else if (v<=500) step=100;
+    else step=Math.ceil(v/1000)*200;
+    return Math.ceil(v/step)*step;
+  }
+
+  function activityChartSvg(days, series){
+    const plotW = ACT_VB_W - ACT_PAD.l - ACT_PAD.r;
+    const plotH = ACT_VB_H - ACT_PAD.t - ACT_PAD.b;
+    const maxVal = Math.max(1, ...series.flatMap(s=>s.values), 0);
+    const yMax = niceMax(maxVal);
+    const tickCount = 5;
+    const xAt = i => days.length<=1 ? ACT_PAD.l + plotW/2 : ACT_PAD.l + plotW * (i/(days.length-1));
+    const yAt = v => ACT_PAD.t + plotH - (plotH * v/yMax);
+
+    let gridSvg = '';
+    for (let t=0;t<=tickCount;t++){
+      const val = Math.round(yMax * t / tickCount);
+      const y = yAt(val);
+      gridSvg += `<line x1="${ACT_PAD.l}" y1="${y}" x2="${ACT_VB_W-ACT_PAD.r}" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
+      gridSvg += `<text x="${ACT_PAD.l-8}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)">${val}</text>`;
+    }
+
+    const labelEvery = Math.max(1, Math.ceil(days.length/8));
+    let xLabelsSvg = '';
+    days.forEach((d,i)=>{
+      if (i % labelEvery !== 0 && i !== days.length-1) return;
+      const dt = new Date(d+'T00:00:00');
+      const label = dt.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'});
+      xLabelsSvg += `<text x="${xAt(i)}" y="${ACT_VB_H-ACT_PAD.b+18}" text-anchor="middle" font-size="10" fill="var(--muted)">${label}</text>`;
+    });
+
+    let areasSvg = '', linesSvg = '', markersSvg = '';
+    series.forEach(s=>{
+      const varName = CROP_CHART_VAR[s.crop] || '--viz-1';
+      const pts = s.values.map((v,i)=>[xAt(i), yAt(v)]);
+      const baseline = yAt(0);
+      const areaPath = `M${pts[0][0]},${baseline} ` + pts.map(p=>`L${p[0]},${p[1]}`).join(' ') + ` L${pts[pts.length-1][0]},${baseline} Z`;
+      const linePath = `M` + pts.map(p=>`${p[0]},${p[1]}`).join(' L');
+      areasSvg += `<path d="${areaPath}" fill="var(${varName})" fill-opacity="0.14" stroke="none"/>`;
+      linesSvg += `<path d="${linePath}" fill="none" stroke="var(${varName})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      markersSvg += pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(${varName})" stroke="var(--card)" stroke-width="2"/>`).join('');
+    });
+
+    return `
+      <svg viewBox="0 0 ${ACT_VB_W} ${ACT_VB_H}" preserveAspectRatio="xMidYMid meet">
+        ${gridSvg}
+        <line x1="${ACT_PAD.l}" y1="${yAt(0)}" x2="${ACT_VB_W-ACT_PAD.r}" y2="${yAt(0)}" stroke="var(--muted)" stroke-width="1"/>
+        ${areasSvg}
+        ${linesSvg}
+        ${markersSvg}
+        ${xLabelsSvg}
+        <line class="act-crosshair" id="actCrosshair" x1="0" y1="${ACT_PAD.t}" x2="0" y2="${ACT_VB_H-ACT_PAD.b}"/>
+        <rect id="actHoverRect" x="${ACT_PAD.l}" y="${ACT_PAD.t}" width="${plotW}" height="${plotH}" fill="transparent"/>
+      </svg>`;
+  }
+
+  function initActivityChartHover(days, series){
+    const wrap = document.getElementById('actChartWrap');
+    const svg = wrap && wrap.querySelector('svg');
+    const rect = svg && svg.querySelector('#actHoverRect');
+    const crosshair = svg && svg.querySelector('#actCrosshair');
+    if (!svg || !rect || !days.length) return;
+    const plotW = ACT_VB_W - ACT_PAD.l - ACT_PAD.r;
+    const xAt = i => days.length<=1 ? ACT_PAD.l + plotW/2 : ACT_PAD.l + plotW * (i/(days.length-1));
+
+    rect.addEventListener('pointermove', ev=>{
+      const box = svg.getBoundingClientRect();
+      const localX = (ev.clientX - box.left) * (ACT_VB_W / box.width);
+      let idx = 0, best = Infinity;
+      days.forEach((d,i)=>{ const dx = Math.abs(xAt(i)-localX); if (dx<best){ best=dx; idx=i; } });
+      const cx = xAt(idx);
+      crosshair.setAttribute('x1', cx); crosshair.setAttribute('x2', cx);
+      crosshair.style.opacity = '1';
+
+      const dt = new Date(days[idx]+'T00:00:00');
+      const dateLabel = dt.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'});
+      const rowsHtml = series.map(s=>`
+        <div class="act-tip-row">
+          <span class="act-tip-key"><span class="act-tip-line" style="background:var(${CROP_CHART_VAR[s.crop]});"></span>${s.crop}</span>
+          <span class="act-tip-val">${s.values[idx]}</span>
+        </div>`).join('');
+      const tip = document.getElementById('actChartTip');
+      tip.innerHTML = `<div class="act-tip-date">${dateLabel}</div>${rowsHtml}`;
+      tip.style.left = (ev.clientX + 14) + 'px';
+      tip.style.top = (ev.clientY + 14) + 'px';
+      tip.style.display = 'block';
+    });
+    rect.addEventListener('pointerleave', ()=>{
+      crosshair.style.opacity = '0';
+      const tip = document.getElementById('actChartTip');
+      if (tip) tip.style.display = 'none';
+    });
+  }
+
+  function setCropDetailCrop(crop){
+    cropDetailCrop = crop;
+    renderDataPage();
+  }
+
+  // Solo cuenta actions con resultado (partial se excluye), para que coincida con
+  // la nota "Actions without results are excluded from this count".
+  function cropDistributionData(crop){
+    const varietyPool = DATA_VARIETIES[crop] || ['Non renseigné'];
+    const matches = dataActions.filter(a => a.crop===crop && a.statusKey!=='partial');
+    const items = varietyPool.map(v=>{
+      const rows = matches.filter(a=>a.variety===v);
+      const count = rows.length;
+      const protein = count ? rows.reduce((s,a)=>s+parseFloat(a.protein),0)/count : 0;
+      return { variety:v, count, protein };
+    });
+    return { total: matches.length, items };
+  }
+
+  function cropDistChartSvg(items, countColor){
+    const plotW = CRD_VB_W - CRD_PAD.l - CRD_PAD.r;
+    const plotH = CRD_VB_H - CRD_PAD.t - CRD_PAD.b;
+    const n = items.length || 1;
+    const groupW = plotW / n;
+    const barW = Math.min(16, groupW*0.34);
+    const gap = 2;
+
+    const proteinMax = niceMax(Math.max(1, ...items.map(x=>x.protein)));
+    const countMax = niceMax(Math.max(1, ...items.map(x=>x.count)));
+    const tickCount = 3;
+    const yP = v => CRD_PAD.t + plotH - plotH*v/proteinMax;
+    const yC = v => CRD_PAD.t + plotH - plotH*v/countMax;
+    const baseline = CRD_PAD.t + plotH;
+
+    let gridSvg = '', axisLabelsSvg = '';
+    for (let t=0;t<=tickCount;t++){
+      const pv = Math.round(proteinMax*t/tickCount);
+      const cv = Math.round(countMax*t/tickCount);
+      const y = yP(pv);
+      gridSvg += `<line x1="${CRD_PAD.l}" y1="${y}" x2="${CRD_VB_W-CRD_PAD.r}" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
+      axisLabelsSvg += `<text x="${CRD_PAD.l-8}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)">${pv}%</text>`;
+      axisLabelsSvg += `<text x="${CRD_VB_W-CRD_PAD.r+8}" y="${yC(cv)+4}" text-anchor="start" font-size="10" fill="var(--muted)">${cv}</text>`;
+    }
+
+    let barsSvg = '', labelsSvg = '', hitSvg = '';
+    items.forEach((it,i)=>{
+      const cx = CRD_PAD.l + groupW*(i+0.5);
+      const px = cx - barW - gap/2;
+      const qx = cx + gap/2;
+      barsSvg += `<rect x="${px}" y="${yP(it.protein)}" width="${barW}" height="${Math.max(0,baseline-yP(it.protein))}" fill="${PROTEIN_BAR_COLOR}"/>`;
+      barsSvg += `<rect x="${qx}" y="${yC(it.count)}" width="${barW}" height="${Math.max(0,baseline-yC(it.count))}" fill="${countColor}"/>`;
+      const labelY = baseline + 14;
+      labelsSvg += `<text x="${cx}" y="${labelY}" text-anchor="end" font-size="10" fill="var(--muted2)" transform="rotate(-40 ${cx} ${labelY})">${it.variety}</text>`;
+      hitSvg += `<rect class="crd-hit" data-i="${i}" x="${CRD_PAD.l+groupW*i}" y="${CRD_PAD.t}" width="${groupW}" height="${plotH}" fill="transparent"/>`;
+    });
+
+    return `
+      <svg viewBox="0 0 ${CRD_VB_W} ${CRD_VB_H}" preserveAspectRatio="xMidYMid meet">
+        <rect id="crdHoverBand" class="crd-hoverband" x="${CRD_PAD.l}" y="${CRD_PAD.t}" width="${groupW}" height="${plotH}" fill="var(--crd-hoverband)"/>
+        ${gridSvg}
+        <line x1="${CRD_PAD.l}" y1="${baseline}" x2="${CRD_VB_W-CRD_PAD.r}" y2="${baseline}" stroke="var(--muted)" stroke-width="1"/>
+        ${barsSvg}
+        ${axisLabelsSvg}
+        ${labelsSvg}
+        ${hitSvg}
+      </svg>`;
+  }
+
+  function initCropDistHover(items, countColor){
+    const wrap = document.getElementById('cropDistChartWrap');
+    const svg = wrap && wrap.querySelector('svg');
+    if (!svg || !items.length) return;
+    const band = svg.querySelector('#crdHoverBand');
+    const plotW = CRD_VB_W - CRD_PAD.l - CRD_PAD.r;
+    const groupW = plotW / items.length;
+
+    svg.querySelectorAll('.crd-hit').forEach(hit=>{
+      const i = parseInt(hit.dataset.i, 10);
+      const it = items[i];
+      hit.addEventListener('pointerenter', ()=>{
+        band.setAttribute('x', CRD_PAD.l + groupW*i);
+        band.style.opacity = '1';
+      });
+      hit.addEventListener('pointermove', ev=>{
+        const tip = document.getElementById('actChartTip');
+        tip.innerHTML = `
+          <div class="act-tip-date">${it.variety}</div>
+          <div class="act-tip-row"><span class="act-tip-key"><span class="act-tip-line" style="background:${PROTEIN_BAR_COLOR};"></span>Protein rate %</span><span class="act-tip-val">${it.protein.toFixed(3)}</span></div>
+          <div class="act-tip-row"><span class="act-tip-key"><span class="act-tip-line" style="background:${countColor};"></span>Number of actions</span><span class="act-tip-val">${it.count}</span></div>`;
+        tip.style.left = (ev.clientX + 14) + 'px';
+        tip.style.top = (ev.clientY + 14) + 'px';
+        tip.style.display = 'block';
+      });
+      hit.addEventListener('pointerleave', ()=>{
+        band.style.opacity = '0';
+        const tip = document.getElementById('actChartTip');
+        if (tip) tip.style.display = 'none';
+      });
+    });
+  }
+
+  function renderActivityTab(body){
+    if (dataActions.length === 0){
+      body.innerHTML = dataEmptyStateHtml();
+      return;
+    }
+
+    const cropsPresent = CROPS.filter(c => dataActions.some(a=>a.crop===c));
+    const { days, series } = activityBuildSeries(cropsPresent);
+    const activeNames = new Set(dataActions.map(a=>a.username));
+    const totalUsers = users.length;
+    const activeUsers = activeNames.size;
+    const inactiveUsers = Math.max(0, totalUsers - activeUsers);
+
+    const infoSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v5.5M12 8v.01"/></svg>`;
+    const warnSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5 22 20H2L12 3.5Z"/><path d="M12 10v4.5M12 17.5v.01"/></svg>`;
+
+    const statsHtml = `
+      <div class="act-stats">
+        <div class="act-stat">
+          <div class="act-stat-label">Total users</div>
+          <div class="act-stat-value blue">${totalUsers}</div>
+        </div>
+        <div class="act-stat">
+          <div class="act-stat-label">Active users <span title="Users who performed at least one action in this data set">${infoSvg}</span></div>
+          <div class="act-stat-value green">${activeUsers}</div>
+        </div>
+        <div class="act-stat">
+          <div class="act-stat-label">Inactive users <span title="Users who haven't performed any action yet">${warnSvg}</span></div>
+          <div class="act-stat-value muted">${inactiveUsers}</div>
+        </div>
+      </div>`;
+
+    const legendHtml = `<div class="act-legend">${series.map(s=>`<div class="act-legend-item"><span class="act-legend-swatch" style="background:var(${CROP_CHART_VAR[s.crop]});"></span>${s.crop}</div>`).join('')}</div>`;
+
+    const userRows = activityUsersRows();
+    const gridCols = `2.2fr 0.55fr ${cropsPresent.map(()=>'0.5fr').join(' ')}`;
+    const usersHead = `
+      <div class="act-users-head" style="grid-template-columns:${gridCols};">
+        <div>User</div><div class="act-num">Total</div>${cropsPresent.map(c=>`<div class="act-num"><span class="act-crop-vert">${c}</span></div>`).join('')}
+      </div>`;
+    const usersRowsHtml = userRows.map(u=>`
+      <div class="act-users-row" style="grid-template-columns:${gridCols};">
+        <div>
+          <div class="act-user-name" title="${u.name}">${u.name}</div>
+          <div class="act-user-site" title="${u.site}">${u.site||'—'}</div>
+        </div>
+        <div class="act-num">${u.total}</div>
+        ${cropsPresent.map(c=>`<div class="act-num">${u[c]||0}</div>`).join('')}
+      </div>`).join('') || `<div class="draft-empty" style="padding:30px 2px;">No active users yet.</div>`;
+
+    if (!cropDetailCrop || !cropsPresent.includes(cropDetailCrop)) cropDetailCrop = cropsPresent[0];
+    const { total: crdTotal, items: crdItems } = cropDistributionData(cropDetailCrop);
+    const crdColor = CROP_VIVID[cropDetailCrop] || CROP_VIVID_DEFAULT;
+    const crdTabsHtml = cropsPresent.map(c=>`<button class="crd-crop-btn ${c===cropDetailCrop?'active':''}" onclick="setCropDetailCrop('${c}')">${CROP_DISPLAY_NAME[c]||c}</button>`).join('');
+    const crdChartCardHtml = crdTotal > 0 ? `
+      <div class="sd-card" style="margin-top:16px;">
+        <div class="act-card-title">Distribution by variety</div>
+        <div class="crd-chart-wrap" id="cropDistChartWrap">${cropDistChartSvg(crdItems, crdColor)}</div>
+        <div class="act-legend">
+          <div class="act-legend-item"><span class="act-legend-swatch" style="background:${PROTEIN_BAR_COLOR};"></span>Protein rate %</div>
+          <div class="act-legend-item"><span class="act-legend-swatch" style="background:${crdColor};"></span>Number of actions</div>
+        </div>
+      </div>` : `
+      <div class="sd-card" style="margin-top:16px;">
+        <div class="act-card-title">Distribution by variety</div>
+        <div class="draft-empty" style="padding:30px 2px;">No completed actions for ${CROP_DISPLAY_NAME[cropDetailCrop]||cropDetailCrop} yet.</div>
+      </div>`;
+
+    const crdSectionHtml = `
+      <div class="crd-section" style="margin-top:28px;">
+        <div class="crd-crop-tabs">${crdTabsHtml}</div>
+        <ul class="crd-notes">
+          <li>Actions without results are excluded from this count</li>
+          <li>Outbound and average measures can't be displayed. To keep dashboard accurate, we only include inbound measurements. <span class="crd-info" title="Only inbound (received) measurements are counted, to avoid double-counting or skewed averages.">${infoSvg}</span></li>
+        </ul>
+        <div class="sd-card">
+          <div class="act-card-title">Results (${CROP_DISPLAY_NAME[cropDetailCrop]||cropDetailCrop}) <span title="Total completed actions for this crop">${infoSvg}</span></div>
+          <div class="crd-results-value" style="color:${crdColor};">${crdTotal}</div>
+        </div>
+        ${crdChartCardHtml}
+      </div>`;
+
+    body.innerHTML = `
+      ${statsHtml}
+      <div class="act-grid">
+        <div class="act-chart-card">
+          <div class="act-card-title">Number of actions per species <span title="Actions logged per day, split by crop">${infoSvg}</span></div>
+          <div class="act-chart-wrap" id="actChartWrap">${activityChartSvg(days, series)}</div>
+          ${legendHtml}
+        </div>
+        <div class="act-users-card">
+          <div class="act-card-title">Users</div>
+          ${usersHead}
+          <div class="act-users-table">${usersRowsHtml}</div>
+          <div class="act-users-footer">
+            <span>Total actions ${dataActions.length}</span>
+            <span style="display:flex;align-items:center;gap:10px;">
+              <span>${userRows.length ? `1–${userRows.length} of ${userRows.length}` : '0 of 0'}</span>
+              <span class="data-pager">
+                <button disabled title="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+                <button disabled title="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+      ${crdSectionHtml}`;
+
+    initActivityChartHover(days, series);
+    if (crdTotal > 0) initCropDistHover(crdItems, crdColor);
+  }
+
+  function dataActionDateShort(a){
+    return a.actionDate.toLocaleString('en-US',{month:'numeric',day:'numeric',year:'numeric'});
+  }
+
+  const DAD_ICON_PERSON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.5-1-4-3-4.6"/></svg>`;
+  const DAD_ICON_CAL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg>`;
+  const DAD_ICON_PIN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>`;
+  const DAD_ICON_PHONE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg>`;
+  const DAD_ICON_SHARE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.4 10.7l7.2-4.4M8.4 13.3l7.2 4.4"/></svg>`;
+  const DAD_ICON_GRAIN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="9" cy="12" rx="4" ry="6" transform="rotate(-20 9 12)"/><ellipse cx="16" cy="9" rx="3" ry="4.5" transform="rotate(15 16 9)"/></svg>`;
+
+  // Fotos decorativas (no hay fotos reales en este POC): una textura de grano y una captura de móvil.
+  const DAD_PHOTO_GRAIN = (()=>{
+    const shades = ['#b7ac93','#cabf9f','#a89b7e','#e0d6bd'];
+    let dots = '';
+    for (let i=0;i<70;i++){
+      const x=(Math.random()*100).toFixed(1), y=(Math.random()*100).toFixed(1), r=(1.2+Math.random()*1.8).toFixed(1);
+      dots += `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${(r*0.7).toFixed(1)}" fill="${shades[Math.floor(Math.random()*shades.length)]}"/>`;
+    }
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><rect width="100" height="100" fill="#ded5bd"/>${dots}</svg>`;
+  })();
+  const DAD_PHOTO_SCREEN = `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+    <rect width="100" height="100" fill="#12151c"/>
+    <rect x="6" y="8" width="88" height="14" rx="2" fill="#2a3040"/>
+    <rect x="10" y="12" width="30" height="6" rx="1" fill="#5b8dee"/>
+    <rect x="6" y="28" width="40" height="6" rx="1" fill="#3a4256"/>
+    <rect x="6" y="38" width="60" height="6" rx="1" fill="#3a4256"/>
+    <rect x="6" y="48" width="50" height="6" rx="1" fill="#3a4256"/>
+    <rect x="6" y="60" width="88" height="30" rx="2" fill="#1c2130"/>
+    <circle cx="20" cy="75" r="8" fill="#5b8dee"/>
+    <rect x="34" y="70" width="50" height="4" rx="1" fill="#3a4256"/>
+    <rect x="34" y="78" width="35" height="4" rx="1" fill="#3a4256"/>
+  </svg>`;
+
+  function dadOriginCard(a){
+    const c = CROP_COLORS[a.crop] || CROP_COLOR_DEFAULT;
+    return `
+      <div class="sd-card">
+        <div class="dad-origin-top">
+          <div class="dad-ico" style="background:${c.bg};color:${c.text};">${DAD_ICON_GRAIN}</div>
+          <div class="dad-info">
+            <div class="dad-info-row">${DAD_ICON_PERSON}${a.username}</div>
+            <div class="dad-info-row">${DAD_ICON_CAL}${dataActionDate(a)}</div>
+            <div class="dad-info-row">${DAD_ICON_PIN}${a.site}</div>
+            <div class="dad-info-row">${DAD_ICON_PHONE}${a.device}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function dadPhotosCard(a){
+    if (!a.photoCount) return `<div class="sd-card"><div class="draft-empty" style="padding:6px 2px;">No photos yet.</div></div>`;
+    const imgs = [DAD_PHOTO_GRAIN, DAD_PHOTO_SCREEN].slice(0, a.photoCount);
+    return `<div class="sd-card"><div class="dad-photos">${imgs.map(svg=>`<div class="dad-photo">${svg}</div>`).join('')}</div></div>`;
+  }
+
+  function dadGrainTrackerCard(a){
+    return `
+      <div class="sd-card">
+        <h4>Grain Tracker Model</h4>
+        <div class="dad-row"><span>Humidité</span><span>${a.humidity} %</span></div>
+        <div class="dad-row"><span>PS</span><span>${a.testWeight} Kg/hL</span></div>
+        <div class="dad-row"><span>Protéine</span><span>${a.protein} %</span></div>
+      </div>`;
+  }
+
+  function dadVarietyCard(a){
+    if (!a.variety || a.variety === 'Non renseigné'){
+      return `
+        <div class="sd-card" style="margin-top:14px;">
+          <h4>${a.cropLabel} Variety Non reconnue 100%</h4>
+          <div class="dad-row"><span>Composition variétale</span><span>non reconnus 100%</span></div>
+          <p class="dad-note">Certains grains sont "non reconnus" car nous ne pouvons pas les identifier avec certitude. Ils peuvent provenir d'une variété connue, mais dont l'apparence diffère en raison du climat ou du terroir, ou d'une variété inconnue jusqu'à présent.</p>
+        </div>`;
+    }
+    return `
+      <div class="sd-card" style="margin-top:14px;">
+        <h4>${a.cropLabel} Variety ${a.variety} 100%</h4>
+        <div class="dad-row"><span>Composition variétale</span><span>${a.variety} 100%</span></div>
+      </div>`;
+  }
+
+  function dadVisualCriteriaCard(a){
+    const yn = a.visualCriteria ? 'Oui' : 'Non';
+    return `
+      <div class="sd-card" style="margin-top:14px;">
+        <h4>Visual criteria ${yn}</h4>
+        <div class="dad-row"><span>Sclérote d'ergot visible dans l'échantillon</span><span>${yn}</span></div>
+      </div>`;
+  }
+
+  function viewDataAction(i){
+    const a = dataActions[i];
+    if (!a) return;
+    const hasResult = a.statusKey !== 'partial';
+
+    const analysisHtml = hasResult
+      ? `${dadGrainTrackerCard(a)}${dadVarietyCard(a)}${dadVisualCriteriaCard(a)}`
+      : `<div class="sd-card"><div class="draft-empty" style="padding:6px 2px;">This action is still in progress — no analysis results yet.</div></div>`;
+
+    const annotationsHtml = hasResult ? `
+      <h2 class="dad-h2" style="margin-top:24px;">Annotations</h2>
+      <div class="sd-card">
+        <div class="ud-row"><span class="ud-k">Sample comment</span><span class="ud-v">${a.sampleId ? a.sampleId.slice(-3) : '—'}</span></div>
+        <div class="ud-row"><span class="ud-k">Infrared machine screen</span><span class="ud-v">${a.infraredId}</span></div>
+        <div class="ud-row"><span class="ud-k">Declared ${a.cropLabel.toLowerCase()} variety</span><span class="ud-v">${(a.variety && a.variety!=='Non renseigné') ? 'Variété '+a.variety : 'Variété Inconnue'}</span></div>
+      </div>` : '';
+
+    document.getElementById('dataActionBody').innerHTML = `
+      <div class="dad-head">
+        <div>
+          <div class="dad-title">${a.actionName}, ${a.cropLabel} - ${dataActionDateShort(a)}</div>
+          <div class="dad-meta">Action ID : ${a.actionId} | Sample ID: ${a.sampleId || '—'}</div>
+          <div class="dad-status">${statusPill(a.statusKey, a.statusLabel)}</div>
+        </div>
+        <button class="dad-share" onclick="showSnack('Link copied to clipboard')">${DAD_ICON_SHARE} Share</button>
+      </div>
+      <div class="dad-grid">
+        <div>
+          <h2 class="dad-h2">Origin</h2>
+          ${dadOriginCard(a)}
+          <h2 class="dad-h2" style="margin-top:20px;">Photos</h2>
+          ${dadPhotosCard(a)}
+        </div>
+        <div>
+          <h2 class="dad-h2">Analysis</h2>
+          ${analysisHtml}
+        </div>
+      </div>
+      ${annotationsHtml}`;
+    document.getElementById('dataActionModal').classList.remove('hidden');
+  }
+  function closeDataActionModal(){ document.getElementById('dataActionModal').classList.add('hidden'); }
+
   // Modal de detalles de site (icono del ojo en la tabla). Solo se cierra con el botón Close.
   function openSiteDetails(i){
     const s = sites[i];
@@ -2738,7 +3625,7 @@
 
   // Navegación entre páginas (Sites / Users / Licenses)
   function showPage(name){
-    const pages = { sites:'page-sites', users:'page-users', licenses:'page-licenses', map:'page-map' };
+    const pages = { sites:'page-sites', users:'page-users', licenses:'page-licenses', map:'page-map', data:'page-data' };
     Object.entries(pages).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) el.style.display = k===name ? 'block' : 'none'; });
     const navIds = { sites:'navSites', users:'navUsers', licenses:'navLicenses', map:'navMap' };
     document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
@@ -2747,6 +3634,7 @@
     if (name==='users') renderUsers();
     else if (name==='sites') render();
     else if (name==='licenses') renderLicenses();
+    else if (name==='data') renderDataPage();
     else if (name==='map'){
       initMap();
       requestAnimationFrame(() => { siteMap.invalidateSize(); refreshMapMarkers(); });
@@ -2782,6 +3670,9 @@
   document.getElementById('userDetailsModal').addEventListener('click', e => {
     if (e.target.id === 'userDetailsModal') closeUserDetails();
   });
+  document.getElementById('dataActionModal').addEventListener('click', e => {
+    if (e.target.id === 'dataActionModal') closeDataActionModal();
+  });
   document.getElementById('addPackModal').addEventListener('click', e => {
     if (e.target.id === 'addPackModal') closeAddPackModal();
   });
@@ -2811,7 +3702,8 @@
       if (USER_LOCKED_PAGES[page]){
         if (users.length === 0){ openRequireUsersModal(USER_LOCKED_PAGES[page]); return; }
         if (page === 'licenses'){ showPage('licenses'); return; }
-        // Dashboard/Devices/Data no tienen página propia en este prototipo
+        if (page === 'data'){ showPage('data'); return; }
+        // Dashboard/Devices no tienen página propia en este prototipo
       }
     });
   });
@@ -2839,7 +3731,9 @@
     'Screenings (Barley)',
   ];
   const ROLES = ['Global Admin','Multisite Manager'];
-  let users = [];       // saved site users: { name, site, actions:[], nomad, status }
+  const DEVICES = ['Samsung','iPhone','Crosscall','Xiaomi','Motorola','Huawei'];
+  function randomDevice(){ return DEVICES[Math.floor(Math.random()*DEVICES.length)]; }
+  let users = [];       // saved site users: { name, site, actions:[], nomad, status, device }
   let managers = [];    // saved managers: { email, role, site, status }
   let usersTab = 'all'; // pestaña activa en la tabla de usuarios
 
@@ -2862,6 +3756,9 @@
       const raw = localStorage.getItem(USERS_KEY);
       if(raw){ const o = JSON.parse(raw); if(o){ users = o.users||[]; managers = o.managers||[]; } }
     }catch(e){}
+    let backfilled=false;
+    users.forEach(u=>{ if(!u.device){ u.device = randomDevice(); backfilled=true; } });
+    if(backfilled) persistUsers();
   }
 
   // Draft (edición dentro del modal)
@@ -2884,7 +3781,7 @@
   function actsLabel(n){ return n===0 ? '—' : n===U_ACTIONS.length ? `All (${n})` : `${n} / ${U_ACTIONS.length}`; }
 
   /* ---------- Página Users (solo lectura) ---------- */
-  const U_GRID = 'grid-template-columns:1.6fr 1fr 0.9fr 1.1fr 70px 44px 44px;';
+  const U_GRID = 'grid-template-columns:1.4fr 0.9fr 0.8fr 0.9fr 0.9fr 70px 44px 44px;';
   const toolIcoSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.5 4.7L3 17.2V21h3.8l6.2-6.2a4 4 0 0 0 4.7-5.5l-2.8 2.8-2.1-2.1z"/></svg>`;
   function renderUsers(){
     const card = document.getElementById('usersCard');
@@ -2930,6 +3827,7 @@
         ${u.nomad ? nomadBadge() : `<span class="u-site">${u.site}</span>`}
         <span><span class="role-badge">Site User</span></span>
         <span class="u-site">${actsLabel(u.actions.length)}</span>
+        <span class="u-site">${u.device||'—'}</span>
         <span class="u-site">${u.nomad?'Yes':'—'}</span>
         <span class="r"><button class="icon-btn" title="View details" onclick="viewUser('site',${i})">${eyeSvg}</button></span>
         <span class="r"><button class="icon-btn danger" title="Delete user" onclick="askDeleteUser('site',${i})">${trashSvg}</button></span>
@@ -2938,7 +3836,7 @@
     const uSection = (users.length && showSite) ? `
       <div class="u-sec-head">Site users <span class="cnt">${users.length}</span></div>
       <div class="table-head" style="${U_GRID}">
-        <div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Nomad</div><div class="r"></div><div class="r"></div>
+        <div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Device</div><div>Nomad</div><div class="r"></div><div class="r"></div>
       </div>
       ${uRows}` : '';
 
@@ -3784,6 +4682,7 @@
         <div class="ud-row"><span class="ud-k">Role</span><span class="ud-v"><span class="role-badge">Site User</span></span></div>
         <div class="ud-row"><span class="ud-k">Site</span><span class="ud-v">${u.nomad?'Nomad (all sites)':u.site}</span></div>
         <div class="ud-row"><span class="ud-k">Nomad</span><span class="ud-v">${u.nomad?'Yes':'No'}</span></div>
+        <div class="ud-row"><span class="ud-k">Device</span><span class="ud-v">${u.device||'—'}</span></div>
         <div class="ud-row"><span class="ud-k">Status</span><span class="ud-v">${statusBadge(u.status)}</span></div>
         <div class="ud-block"><div class="ud-k" style="margin-bottom:8px;">Actions</div>${acts}</div>`;
     } else {
@@ -4370,7 +5269,7 @@
   function closeReview(){ document.getElementById('reviewModal').classList.add('hidden'); }
   function reviewConfirm(){
     // Añadir los nuevos a los ya existentes
-    users = users.concat(dUsers.map(u=>({ name:u.name, site:u.site, actions:[...u.actions], nomad:u.nomad, status:'created' })));
+    users = users.concat(dUsers.map(u=>({ name:u.name, site:u.site, actions:[...u.actions], nomad:u.nomad, status:'created', device:randomDevice() })));
     managers = managers.concat(dMgrs.filter(mgrReady).map(m=>({ email:m.email.trim(), role:m.role, groups:m.groups||'', site:m.site, status:'created' })));
     persistUsers();
     closeReview();
@@ -4448,8 +5347,28 @@
     location.reload();
   }
 
+  const GROUPS_PANEL_KEY = 'fleetview_groups_panel_collapsed';
+  function applyGroupsPanelCollapsed(collapsed){
+    const panel = document.getElementById('siteGroups');
+    const btn = document.getElementById('groupsToggleBtn');
+    if (panel) panel.classList.toggle('collapsed', collapsed);
+    if (btn) btn.title = collapsed ? 'Expand site groups' : 'Collapse site groups';
+  }
+  function toggleGroupsPanel(){
+    const panel = document.getElementById('siteGroups');
+    const collapsed = !panel.classList.contains('collapsed');
+    try{ localStorage.setItem(GROUPS_PANEL_KEY, collapsed ? '1' : '0'); }catch(e){}
+    applyGroupsPanelCollapsed(collapsed);
+  }
+  function loadGroupsPanelState(){
+    let collapsed = false;
+    try{ collapsed = localStorage.getItem(GROUPS_PANEL_KEY) === '1'; }catch(e){}
+    applyGroupsPanelCollapsed(collapsed);
+  }
+
   loadTheme();
   loadSidebarState();
+  loadGroupsPanelState();
   loadSites();
   loadUsers();
   loadGroups();
