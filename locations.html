@@ -494,6 +494,63 @@
   .data-pager svg{width:16px;height:16px;}
   .rpp-select{border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--card);}
 
+  /* Data/Activity filter pills (Stripe-style: pill -> single-field popover, individual ×, clear all) */
+  .data-filter-bar-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:11px 6px 11px;}
+  .dfpp-trigger{display:inline-flex;align-items:center;gap:7px;}
+  .dfpp-trigger svg{width:14px;height:14px;color:var(--muted);}
+  .dfpp-badge{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 5px;border-radius:20px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;}
+  .dfp-chip{display:inline-flex;align-items:center;gap:6px;background:#eaf1ff;color:var(--blue);border:1px solid #cfe0ff;border-radius:20px;padding:6px 10px;font-size:12.5px;font-weight:600;}
+  [data-theme="dark"] .dfp-chip{background:#16233b;border-color:#2b3d5e;}
+  .dfp-x{display:inline-flex;padding:2px;border-radius:50%;cursor:pointer;}
+  .dfp-x:hover{background:rgba(47,107,255,.18);}
+  .dfp-x svg{width:10px;height:10px;}
+  .dfp-clear{display:inline-flex;align-items:center;gap:5px;border:none;background:none;color:var(--muted2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;padding:7px 4px;}
+  .dfp-clear:hover{color:var(--navy);}
+  .dfp-clear svg{width:11px;height:11px;}
+
+  /* Filter panel: 3-column layout (categories / options / selected summary) + footer */
+  #dataFilterPop{display:none;position:fixed;z-index:260;width:640px;max-width:calc(100vw - 16px);background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(20,29,51,.2);}
+  .dfpp{display:flex;}
+  .dfpp-col{padding:14px;}
+  .dfpp-cats{width:150px;flex-shrink:0;border-right:1px solid var(--border);}
+  .dfpp-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:10px;}
+  .dfpp-cat{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:9px 10px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--navy);cursor:pointer;}
+  .dfpp-cat:hover{background:var(--panel);}
+  .dfpp-cat.active{background:#eaf1ff;color:var(--blue);}
+  [data-theme="dark"] .dfpp-cat.active{background:#16233b;}
+  .dfpp-cat-count{font-size:10.5px;font-weight:700;background:var(--blue);color:#fff;border-radius:20px;padding:1px 7px;flex-shrink:0;}
+  .dfpp-mid{width:230px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;}
+  .dfpp-search input{width:100%;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);margin-bottom:6px;}
+  .dfpp-search input:focus{outline:none;border-color:var(--blue);}
+  .dfpp-opts{max-height:230px;overflow-y:auto;}
+  .dfpp-opt{display:flex;align-items:center;gap:9px;padding:7px 6px;border-radius:7px;font-size:13.5px;color:var(--navy);cursor:pointer;}
+  .dfpp-opt:hover{background:var(--panel);}
+  .dfpp-opt input{accent-color:var(--blue);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
+  .dfpp-selectall{border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px;font-weight:600;}
+  .dfpp-date-field{margin-bottom:14px;}
+  .dfpp-date-field label{display:block;font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+  .dfpp-date-field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);}
+  .dfpp-date-field input:focus{outline:none;border-color:var(--blue);}
+  [data-theme="dark"] .dfpp-date-field input::-webkit-calendar-picker-indicator{filter:invert(1);}
+  .dfpp-text-field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);}
+  .dfpp-text-field input:focus{outline:none;border-color:var(--blue);}
+  .dfpp-summary{width:220px;flex-shrink:0;}
+  .dfpp-sum-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;}
+  .dfpp-clear-all{font-size:12.5px;font-weight:600;color:var(--blue);cursor:pointer;}
+  .dfpp-sum-body{max-height:270px;overflow-y:auto;}
+  .dfpp-sum-group{margin-bottom:14px;}
+  .dfpp-sum-head{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+  .dfpp-sum-clear{color:var(--blue);text-transform:none;letter-spacing:0;cursor:pointer;font-weight:600;}
+  .dfpp-sum-item{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--navy);padding:5px 0;}
+  .dfpp-sum-item span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .dfpp-sum-x{display:inline-flex;cursor:pointer;color:var(--muted);padding:2px;border-radius:50%;flex-shrink:0;}
+  .dfpp-sum-x:hover{background:rgba(226,69,59,.14);color:#e2453b;}
+  .dfpp-sum-x svg{width:11px;height:11px;}
+  .dfpp-empty{padding:10px 4px;font-size:12.5px;color:var(--muted2);}
+  .dfpp-footer{display:flex;justify-content:flex-end;gap:10px;padding:12px 16px;border-top:1px solid var(--border);}
+  .dfpp-footer .btn{padding:9px 20px;font-size:13.5px;}
+  .dfpp-footer .btn-back{padding:9px 20px;font-size:13.5px;}
+
   /* Data action detail modal */
   .dad-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
   .dad-title{font-size:22px;font-weight:800;color:var(--navy);line-height:1.3;}
@@ -1167,6 +1224,7 @@
           <button class="u-tab active" onclick="setDataSection('data')" id="dataTabBtn-data">Data</button>
           <button class="u-tab" onclick="setDataSection('activity')" id="dataTabBtn-activity">Activity</button>
         </div>
+        <div id="dataFilterBar"></div>
         <div id="dataSectionBody"></div>
       </div>
     </div>
@@ -1789,6 +1847,7 @@
 <div id="siteGroupsTip"></div>
 <div id="licTip"></div>
 <div id="actChartTip"></div>
+<div id="dataFilterPop"></div>
 
 <!-- Snackbar -->
 <div id="snackbar"></div>
@@ -2505,6 +2564,12 @@
   let dataPage = 1;
   const DATA_PAGE_SIZE = 50;
   let cropDetailCrop = null; // crop selected in the "Distribution by variety" block
+  // Fixed filters shared by the Data and Activity tabs. Kept as discrete fields (not free-text
+  // search) so each one maps to a single indexable API query param at real scale.
+  // status/crop/site are multi-select (arrays); dateFrom/dateTo are a plain date range.
+  let dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'' };
+  let dataFiltersDraft = null;      // working copy while the filter panel is open; null when closed
+  let dataFilterActiveField = 'status'; // which left-column field the panel's middle list shows
 
   // Variedades y rangos de análisis por crop; el crop de cada action se deriva del
   // texto entre paréntesis del propio action name (p.ej. "Varieties (Barley)" -> Barley).
@@ -2607,11 +2672,12 @@
     if (!users.length){ showSnack('Add at least one user first'); return; }
     dataActions = generateMockDataActions(100);
     dataPage = 1;
+    dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'' };
     setDataSection('data');
   }
 
   function dataChangePage(delta){
-    const totalPages = Math.max(1, Math.ceil(dataActions.length / DATA_PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(getFilteredDataActions().length / DATA_PAGE_SIZE));
     dataPage = Math.min(totalPages, Math.max(1, dataPage + delta));
     renderDataPage();
   }
@@ -2625,6 +2691,333 @@
     renderDataPage();
   }
 
+  // Fixed-field filtering: every field maps to one query param a real API can index on its own
+  // (unlike the old cross-column free-text search). Username is the one string input — a single
+  // "username contains/starts with X" param, not a fuzzy search spanning multiple columns.
+  function getFilteredDataActions(){
+    const fromTs = dataFilters.dateFrom ? new Date(dataFilters.dateFrom+'T00:00:00').getTime() : null;
+    const toTs = dataFilters.dateTo ? new Date(dataFilters.dateTo+'T23:59:59.999').getTime() : null;
+    const uname = dataFilters.username.trim().toLowerCase();
+    return dataActions.filter(a=>{
+      if (dataFilters.status.length && !dataFilters.status.includes(a.statusKey)) return false;
+      if (dataFilters.crop.length && !dataFilters.crop.includes(a.crop)) return false;
+      if (dataFilters.site.length && !dataFilters.site.includes(a.site)) return false;
+      if (dataFilters.actionName.length && !dataFilters.actionName.includes(a.actionName)) return false;
+      if (dataFilters.variety.length && !dataFilters.variety.includes(a.variety)) return false;
+      if (uname && !a.username.toLowerCase().includes(uname)) return false;
+      const t = a.actionDate.getTime();
+      if (fromTs!==null && t < fromTs) return false;
+      if (toTs!==null && t > toTs) return false;
+      return true;
+    });
+  }
+
+  const DFP_X = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+  const DFP_FILTER_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg>`;
+  // status/crop/site are multi-select checklists; "date" is special-cased as a plain
+  // From/To date-range pair (see renderDataFilterPanel) rather than a discrete option list.
+  const DATA_FILTER_FIELDS = [
+    { key:'status', label:'Status', multi:true, options: () => ([
+        { value:'partial',    label:'Partially completed' },
+        { value:'incomplete', label:'Finished – incomplete' },
+        { value:'complete',   label:'Finished – complete' },
+      ]) },
+    { key:'crop', label:'Crop', multi:true, options: () =>
+        CROPS.filter(c => dataActions.some(a=>a.crop===c)).map(c => ({ value:c, label: CROP_DISPLAY_NAME[c]||c })) },
+    { key:'site', label:'Site', multi:true, options: () =>
+        [...new Set(dataActions.map(a=>a.site))].sort().map(s => ({ value:s, label:s })) },
+    { key:'actionName', label:'Action name', multi:true, options: () =>
+        [...new Set(dataActions.map(a=>a.actionName))].sort().map(v => ({ value:v, label:v })) },
+    { key:'variety', label:'Variety', multi:true, options: () =>
+        [...new Set(dataActions.map(a=>a.variety).filter(Boolean))].sort().map(v => ({ value:v, label:v })) },
+    { key:'username', label:'Username', special:'text' },
+    { key:'date', label:'Date', special:'date' },
+  ];
+
+  function escapeJsStr(str){
+    return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  }
+
+  function dataFilterFieldValues(f, source){
+    source = source || dataFilters;
+    return f.multi ? source[f.key] : [];
+  }
+
+  function dataDateRangeActive(source){
+    source = source || dataFilters;
+    return !!(source.dateFrom || source.dateTo);
+  }
+
+  function dataFilterDateRangeLabel(source){
+    source = source || dataFilters;
+    const fmt = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : null;
+    const from = fmt(source.dateFrom), to = fmt(source.dateTo);
+    if (from && to) return `${from} → ${to}`;
+    if (from) return `From ${from}`;
+    if (to) return `Until ${to}`;
+    return '';
+  }
+
+  function countActiveDataFilters(source){
+    source = source || dataFilters;
+    const n = DATA_FILTER_FIELDS.filter(f=>f.multi).reduce((n,f)=> n + source[f.key].length, 0);
+    return n + (dataDateRangeActive(source) ? 1 : 0) + (source.username ? 1 : 0);
+  }
+
+  // Chips + "Filters" trigger button, always visible above the tabs' content — shows the
+  // currently APPLIED selection (each chip removes instantly, no need to open the panel).
+  function dataFilterBarHtml(){
+    const n = countActiveDataFilters();
+    const chips = [];
+    DATA_FILTER_FIELDS.forEach(f=>{
+      if (f.special === 'date'){
+        if (dataDateRangeActive()) chips.push(`<span class="dfp-chip">Date: ${dataFilterDateRangeLabel()}<span class="dfp-x" onclick="removeAppliedDataFilterDate()">${DFP_X}</span></span>`);
+        return;
+      }
+      if (f.special === 'text'){
+        if (dataFilters[f.key]) chips.push(`<span class="dfp-chip">${f.label}: ${escapeAttr(dataFilters[f.key])}<span class="dfp-x" onclick="removeAppliedDataFilterText('${f.key}')">${DFP_X}</span></span>`);
+        return;
+      }
+      const optsMap = Object.fromEntries(f.options().map(o=>[o.value,o.label]));
+      dataFilterFieldValues(f).forEach(v=>{
+        chips.push(`<span class="dfp-chip">${f.label}: ${escapeAttr(optsMap[v]||v)}<span class="dfp-x" onclick="removeAppliedDataFilterValue('${f.key}','${escapeJsStr(v)}')">${DFP_X}</span></span>`);
+      });
+    });
+    return `
+      <div class="data-filter-bar-row">
+        <button class="filters-btn dfpp-trigger" onclick="openDataFilterPanel(event)">${DFP_FILTER_ICON}Filters${n?` <span class="dfpp-badge">${n}</span>`:''}</button>
+        ${chips.join('')}
+        ${n ? `<button class="dfp-clear" onclick="clearAppliedDataFilters()">${DFP_X} Clear filters</button>` : ''}
+      </div>`;
+  }
+
+  function removeAppliedDataFilterValue(key, value){
+    dataFilters[key] = dataFilters[key].filter(v=>v!==value);
+    dataPage = 1;
+    renderDataPage();
+  }
+
+  function removeAppliedDataFilterDate(){
+    dataFilters.dateFrom = '';
+    dataFilters.dateTo = '';
+    dataPage = 1;
+    renderDataPage();
+  }
+
+  function removeAppliedDataFilterText(key){
+    dataFilters[key] = '';
+    dataPage = 1;
+    renderDataPage();
+  }
+
+  function clearAppliedDataFilters(){
+    dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'' };
+    dataPage = 1;
+    renderDataPage();
+  }
+
+  // ---- Filter panel (draft state; Cancel discards, Apply commits) ----
+  function openDataFilterPanel(ev){
+    ev.stopPropagation();
+    dataFiltersDraft = { status:[...dataFilters.status], crop:[...dataFilters.crop], site:[...dataFilters.site], actionName:[...dataFilters.actionName], variety:[...dataFilters.variety], username:dataFilters.username, dateFrom:dataFilters.dateFrom, dateTo:dataFilters.dateTo };
+    dataFilterActiveField = 'status';
+    renderDataFilterPanel();
+    const pop = document.getElementById('dataFilterPop');
+    const r = ev.currentTarget.getBoundingClientRect();
+    pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 660)) + 'px';
+    pop.style.top = (r.bottom + 8) + 'px';
+    pop.style.display = 'block';
+    pop.dataset.key = 'panel';
+  }
+
+  function setDataFilterActiveField(key){
+    dataFilterActiveField = key;
+    renderDataFilterPanel();
+  }
+
+  function toggleDataFilterDraftOption(key, value){
+    const arr = dataFiltersDraft[key];
+    const i = arr.indexOf(value);
+    if (i>-1) arr.splice(i,1); else arr.push(value);
+    renderDataFilterPanel();
+  }
+
+  function toggleDataFilterSelectAll(checked){
+    const field = DATA_FILTER_FIELDS.find(f=>f.key===dataFilterActiveField);
+    dataFiltersDraft[field.key] = checked ? field.options().map(o=>o.value) : [];
+    renderDataFilterPanel();
+  }
+
+  function clearDataFilterDraftField(key){
+    dataFiltersDraft[key] = [];
+    renderDataFilterPanel();
+  }
+
+  function removeDataFilterDraftValue(key, value){
+    dataFiltersDraft[key] = dataFiltersDraft[key].filter(v=>v!==value);
+    renderDataFilterPanel();
+  }
+
+  function setDataFilterDraftDate(which, value){
+    if (which==='from') dataFiltersDraft.dateFrom = value;
+    else dataFiltersDraft.dateTo = value;
+    renderDataFilterPanel();
+  }
+
+  function clearDataFilterDraftDate(){
+    dataFiltersDraft.dateFrom = '';
+    dataFiltersDraft.dateTo = '';
+    renderDataFilterPanel();
+  }
+
+  function setDataFilterDraftText(key, value){
+    dataFiltersDraft[key] = value;
+    renderDataFilterPanel();
+  }
+
+  function clearDataFilterDraftText(key){
+    dataFiltersDraft[key] = '';
+    renderDataFilterPanel();
+  }
+
+  function clearAllDataFilterDraft(){
+    dataFiltersDraft = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'' };
+    renderDataFilterPanel();
+  }
+
+  function filterDataFilterOptions(q){
+    q = (q||'').toLowerCase();
+    document.querySelectorAll('#dfppOpts .dfpp-opt').forEach(el=>{
+      el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  function cancelDataFilterPanel(){
+    dataFiltersDraft = null;
+    hideDataFilterPopover();
+  }
+
+  function applyDataFilterPanel(){
+    dataFilters = dataFiltersDraft;
+    dataFiltersDraft = null;
+    dataPage = 1;
+    hideDataFilterPopover();
+    renderDataPage();
+  }
+
+  function hideDataFilterPopover(){
+    const pop = document.getElementById('dataFilterPop');
+    if (pop){ pop.style.display = 'none'; delete pop.dataset.key; }
+  }
+
+  function renderDataFilterPanel(){
+    const pop = document.getElementById('dataFilterPop');
+    if (!pop || !dataFiltersDraft) return;
+
+    const activeField = DATA_FILTER_FIELDS.find(f=>f.key===dataFilterActiveField);
+    const isDate = activeField.special === 'date';
+    const isText = activeField.special === 'text';
+    const isList = !isDate && !isText;
+    const opts = isList ? activeField.options() : [];
+    const selectedForField = isList ? dataFiltersDraft[activeField.key] : [];
+
+    const leftHtml = DATA_FILTER_FIELDS.map(f=>{
+      let n;
+      if (f.special === 'date') n = dataDateRangeActive(dataFiltersDraft) ? 1 : 0;
+      else if (f.special === 'text') n = dataFiltersDraft[f.key] ? 1 : 0;
+      else n = dataFiltersDraft[f.key].length;
+      return `<div class="dfpp-cat ${f.key===dataFilterActiveField?'active':''}" onclick="setDataFilterActiveField('${f.key}')">${f.label}${n?` <span class="dfpp-cat-count">${n}</span>`:''}</div>`;
+    }).join('');
+
+    let midHtml;
+    if (isDate){
+      midHtml = `
+        <div class="dfpp-date-field">
+          <label>From</label>
+          <input type="date" value="${dataFiltersDraft.dateFrom||''}" max="${dataFiltersDraft.dateTo||''}" onchange="setDataFilterDraftDate('from', this.value)">
+        </div>
+        <div class="dfpp-date-field">
+          <label>To</label>
+          <input type="date" value="${dataFiltersDraft.dateTo||''}" min="${dataFiltersDraft.dateFrom||''}" onchange="setDataFilterDraftDate('to', this.value)">
+        </div>`;
+    } else if (isText){
+      midHtml = `
+        <div class="dfpp-text-field">
+          <input type="text" placeholder="e.g. analyse.062@vivescia.com" value="${escapeAttr(dataFiltersDraft[activeField.key]||'')}" onchange="setDataFilterDraftText('${activeField.key}', this.value)">
+        </div>`;
+    } else {
+      midHtml = opts.length ? opts.map(o=>{
+        const checked = dataFiltersDraft[activeField.key].includes(o.value);
+        return `
+          <label class="dfpp-opt">
+            <input type="checkbox" ${checked?'checked':''} onchange="toggleDataFilterDraftOption('${activeField.key}','${escapeJsStr(o.value)}')">
+            <span>${escapeAttr(o.label)}</span>
+          </label>`;
+      }).join('') : `<div class="dfpp-empty">No options available</div>`;
+    }
+
+    const totalSelected = countActiveDataFilters(dataFiltersDraft);
+    const summaryHtml = DATA_FILTER_FIELDS.map(f=>{
+      if (f.special === 'date'){
+        if (!dataDateRangeActive(dataFiltersDraft)) return '';
+        return `
+          <div class="dfpp-sum-group">
+            <div class="dfpp-sum-head">Date <span class="dfpp-sum-clear" onclick="clearDataFilterDraftDate()">Clear</span></div>
+            <div class="dfpp-sum-item"><span>${dataFilterDateRangeLabel(dataFiltersDraft)}</span><span class="dfpp-sum-x" onclick="clearDataFilterDraftDate()">${DFP_X}</span></div>
+          </div>`;
+      }
+      if (f.special === 'text'){
+        if (!dataFiltersDraft[f.key]) return '';
+        return `
+          <div class="dfpp-sum-group">
+            <div class="dfpp-sum-head">${f.label} <span class="dfpp-sum-clear" onclick="clearDataFilterDraftText('${f.key}')">Clear</span></div>
+            <div class="dfpp-sum-item"><span>${escapeAttr(dataFiltersDraft[f.key])}</span><span class="dfpp-sum-x" onclick="clearDataFilterDraftText('${f.key}')">${DFP_X}</span></div>
+          </div>`;
+      }
+      const values = dataFiltersDraft[f.key];
+      if (!values.length) return '';
+      const optsMap = Object.fromEntries(f.options().map(o=>[o.value,o.label]));
+      return `
+        <div class="dfpp-sum-group">
+          <div class="dfpp-sum-head">${f.label} <span class="dfpp-sum-clear" onclick="clearDataFilterDraftField('${f.key}')">Clear</span></div>
+          ${values.map(v=>`<div class="dfpp-sum-item"><span>${escapeAttr(optsMap[v]||v)}</span><span class="dfpp-sum-x" onclick="removeDataFilterDraftValue('${f.key}','${escapeJsStr(v)}')">${DFP_X}</span></div>`).join('')}
+        </div>`;
+    }).join('') || `<div class="dfpp-empty">No filters selected</div>`;
+
+    pop.innerHTML = `
+      <div class="dfpp">
+        <div class="dfpp-col dfpp-cats">
+          <div class="dfpp-title">Filters</div>
+          ${leftHtml}
+        </div>
+        <div class="dfpp-col dfpp-mid">
+          ${isList ? `<div class="dfpp-search"><input type="text" placeholder="Search ${activeField.label.toLowerCase()}..." oninput="filterDataFilterOptions(this.value)"></div>` : ''}
+          ${(isList && opts.length) ? `<label class="dfpp-opt dfpp-selectall"><input type="checkbox" ${selectedForField.length===opts.length?'checked':''} onchange="toggleDataFilterSelectAll(this.checked)"><span>Select all</span></label>` : ''}
+          ${isList ? `<div class="dfpp-opts" id="dfppOpts">${midHtml}</div>` : midHtml}
+        </div>
+        <div class="dfpp-col dfpp-summary">
+          <div class="dfpp-sum-top"><span>${totalSelected} filter${totalSelected===1?'':'s'} selected</span>${totalSelected?`<span class="dfpp-clear-all" onclick="clearAllDataFilterDraft()">Clear all</span>`:''}</div>
+          <div class="dfpp-sum-body">${summaryHtml}</div>
+        </div>
+      </div>
+      <div class="dfpp-footer">
+        <button class="btn-back" onclick="cancelDataFilterPanel()">Cancel</button>
+        <button class="btn" onclick="applyDataFilterPanel()">Apply</button>
+      </div>`;
+  }
+
+  document.addEventListener('click', e=>{
+    const pop = document.getElementById('dataFilterPop');
+    if (pop && pop.style.display==='block' && !pop.contains(e.target)) cancelDataFilterPanel();
+  });
+  // Stop clicks inside the panel from ever reaching the listener above. Without this, a click on
+  // a checkbox/option re-renders the panel's innerHTML (renderDataFilterPanel) *before* the click
+  // finishes bubbling, so by the time it reaches document the original target has been replaced
+  // and is no longer a descendant of #dataFilterPop — pop.contains(e.target) reads false and the
+  // panel closes itself on every interaction. #dataFilterPop itself is never replaced, so binding
+  // here (instead of on its children) survives the re-render.
+  document.getElementById('dataFilterPop').addEventListener('click', e => e.stopPropagation());
+
   const DATA_GRID = 'grid-template-columns:52px 1.5fr 1fr 1fr 1.3fr 1.5fr 1.4fr 1.2fr 0.9fr;';
   function dataActionDate(a){
     return a.actionDate.toLocaleString('en-US',{month:'numeric',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
@@ -2632,15 +3025,24 @@
 
   function renderDataPage(){
     const body = document.getElementById('dataSectionBody');
+    const filterBar = document.getElementById('dataFilterBar');
     if (!body) return;
+
+    if (dataActions.length === 0){
+      if (filterBar) filterBar.innerHTML = '';
+      body.innerHTML = dataEmptyStateHtml();
+      return;
+    }
+    if (filterBar) filterBar.innerHTML = dataFilterBarHtml();
 
     if (dataSection === 'activity'){
       renderActivityTab(body);
       return;
     }
 
-    if (dataActions.length === 0){
-      body.innerHTML = dataEmptyStateHtml();
+    const filtered = getFilteredDataActions();
+    if (filtered.length === 0){
+      body.innerHTML = `<div class="draft-empty" style="padding:60px 20px;">No actions match the selected filters.</div>`;
       return;
     }
 
@@ -2660,16 +3062,16 @@
         <div class="data-th">Variety ${dotsSvg}</div>
       </div>`;
 
-    const totalPages = Math.max(1, Math.ceil(dataActions.length / DATA_PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(filtered.length / DATA_PAGE_SIZE));
     if (dataPage > totalPages) dataPage = totalPages;
     const startIdx = (dataPage-1) * DATA_PAGE_SIZE;
-    const pageItems = dataActions.slice(startIdx, startIdx + DATA_PAGE_SIZE);
+    const pageItems = filtered.slice(startIdx, startIdx + DATA_PAGE_SIZE);
 
-    const rows = pageItems.map((a,idx)=>{
-      const i = startIdx + idx;
+    const rows = pageItems.map((a)=>{
+      const i = dataActions.indexOf(a);
       const c = CROP_COLORS[a.crop] || CROP_COLOR_DEFAULT;
       return `
-      <div class="site-row" style="${DATA_GRID}" data-search="${(a.username+' '+a.site+' '+a.sampleId+' '+a.actionName+' '+a.variety).toLowerCase().replace(/"/g,'')}">
+      <div class="site-row" style="${DATA_GRID}">
         <span class="r"><button class="icon-btn" title="View details" onclick="viewDataAction(${i})">${eyeSvg}</button></span>
         <span>${statusPill(a.statusKey, a.statusLabel)}</span>
         <span><span class="ssc-crop-pill" style="background:${c.bg};color:${c.text};">${a.cropLabel}</span></span>
@@ -2682,11 +3084,11 @@
       </div>`;
     }).join('');
 
-    const rangeEnd = Math.min(startIdx + DATA_PAGE_SIZE, dataActions.length);
+    const rangeEnd = Math.min(startIdx + DATA_PAGE_SIZE, filtered.length);
     const footer = `
       <div class="table-footer">
         <span>Rows per page: <select class="rpp-select" disabled><option>${DATA_PAGE_SIZE}</option></select></span>
-        <span>${startIdx+1}–${rangeEnd} of ${dataActions.length}</span>
+        <span>${startIdx+1}–${rangeEnd} of ${filtered.length}</span>
         <span class="data-pager">
           <button ${dataPage<=1?'disabled':''} title="Previous page" onclick="dataChangePage(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
           <button ${dataPage>=totalPages?'disabled':''} title="Next page" onclick="dataChangePage(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -2694,20 +3096,9 @@
       </div>`;
 
     body.innerHTML = `
-      <div class="sites-toolbar" style="margin:14px 0;">
-        <div class="search"><input type="text" placeholder="Search by username, site or sample ID..." oninput="filterDataActions(this.value)"></div>
-        <div class="spacer"></div>
-      </div>
       ${head}
       <div id="dataRows">${rows}</div>
       ${footer}`;
-  }
-
-  function filterDataActions(q){
-    q = (q||'').toLowerCase().trim();
-    document.getElementById('dataRows').querySelectorAll('[data-search]').forEach(row=>{
-      row.style.display = row.dataset.search.includes(q) ? '' : 'none';
-    });
   }
 
   function dataEmptyStateHtml(){
@@ -2742,9 +3133,9 @@
   const CRD_VB_W = 1000, CRD_VB_H = 340;
   const CRD_PAD = { l:46, r:50, t:16, b:100 };
 
-  function activityBuildSeries(cropsPresent){
+  function activityBuildSeries(list, cropsPresent){
     const byDay = {};
-    dataActions.forEach(a=>{
+    list.forEach(a=>{
       const key = a.actionDate.toISOString().slice(0,10);
       if (!byDay[key]) byDay[key] = {};
       byDay[key][a.crop] = (byDay[key][a.crop]||0) + 1;
@@ -2754,9 +3145,9 @@
     return { days, series };
   }
 
-  function activityUsersRows(){
+  function activityUsersRows(list){
     const counts = {};
-    dataActions.forEach(a=>{
+    list.forEach(a=>{
       if (!counts[a.username]){
         const ru = users.find(u=>u.name===a.username);
         counts[a.username] = { name:a.username, site: ru ? (ru.nomad ? 'Nomad (all sites)' : ru.site) : a.site, total:0 };
@@ -2875,9 +3266,9 @@
 
   // Solo cuenta actions con resultado (partial se excluye), para que coincida con
   // la nota "Actions without results are excluded from this count".
-  function cropDistributionData(crop){
+  function cropDistributionData(list, crop){
     const varietyPool = DATA_VARIETIES[crop] || ['Non renseigné'];
-    const matches = dataActions.filter(a => a.crop===crop && a.statusKey!=='partial');
+    const matches = list.filter(a => a.crop===crop && a.statusKey!=='partial');
     const items = varietyPool.map(v=>{
       const rows = matches.filter(a=>a.variety===v);
       const count = rows.length;
@@ -2970,14 +3361,17 @@
   }
 
   function renderActivityTab(body){
-    if (dataActions.length === 0){
-      body.innerHTML = dataEmptyStateHtml();
+    const list = getFilteredDataActions();
+    if (list.length === 0){
+      body.innerHTML = dataActions.length === 0
+        ? dataEmptyStateHtml()
+        : `<div class="draft-empty" style="padding:60px 20px;">No actions match the selected filters.</div>`;
       return;
     }
 
-    const cropsPresent = CROPS.filter(c => dataActions.some(a=>a.crop===c));
-    const { days, series } = activityBuildSeries(cropsPresent);
-    const activeNames = new Set(dataActions.map(a=>a.username));
+    const cropsPresent = CROPS.filter(c => list.some(a=>a.crop===c));
+    const { days, series } = activityBuildSeries(list, cropsPresent);
+    const activeNames = new Set(list.map(a=>a.username));
     const totalUsers = users.length;
     const activeUsers = activeNames.size;
     const inactiveUsers = Math.max(0, totalUsers - activeUsers);
@@ -3003,7 +3397,7 @@
 
     const legendHtml = `<div class="act-legend">${series.map(s=>`<div class="act-legend-item"><span class="act-legend-swatch" style="background:var(${CROP_CHART_VAR[s.crop]});"></span>${s.crop}</div>`).join('')}</div>`;
 
-    const userRows = activityUsersRows();
+    const userRows = activityUsersRows(list);
     const gridCols = `2.2fr 0.55fr ${cropsPresent.map(()=>'0.5fr').join(' ')}`;
     const usersHead = `
       <div class="act-users-head" style="grid-template-columns:${gridCols};">
@@ -3020,7 +3414,7 @@
       </div>`).join('') || `<div class="draft-empty" style="padding:30px 2px;">No active users yet.</div>`;
 
     if (!cropDetailCrop || !cropsPresent.includes(cropDetailCrop)) cropDetailCrop = cropsPresent[0];
-    const { total: crdTotal, items: crdItems } = cropDistributionData(cropDetailCrop);
+    const { total: crdTotal, items: crdItems } = cropDistributionData(list, cropDetailCrop);
     const crdColor = CROP_VIVID[cropDetailCrop] || CROP_VIVID_DEFAULT;
     const crdTabsHtml = cropsPresent.map(c=>`<button class="crd-crop-btn ${c===cropDetailCrop?'active':''}" onclick="setCropDetailCrop('${c}')">${CROP_DISPLAY_NAME[c]||c}</button>`).join('');
     const crdChartCardHtml = crdTotal > 0 ? `
@@ -3064,7 +3458,7 @@
           ${usersHead}
           <div class="act-users-table">${usersRowsHtml}</div>
           <div class="act-users-footer">
-            <span>Total actions ${dataActions.length}</span>
+            <span>Total actions ${list.length}</span>
             <span style="display:flex;align-items:center;gap:10px;">
               <span>${userRows.length ? `1–${userRows.length} of ${userRows.length}` : '0 of 0'}</span>
               <span class="data-pager">
