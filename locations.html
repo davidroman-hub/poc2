@@ -178,6 +178,14 @@
   .line.l1{left:20%;right:50%;}
   .line.l2{left:50%;right:20%;}
 
+  /* Stepper collapse/expand (offered once every step is complete) */
+  .stepper-toggle-btn{display:none;align-items:center;gap:6px;margin-bottom:14px;background:none;border:none;padding:0;font:inherit;font-weight:700;font-size:13px;color:#1c8a4b;cursor:pointer;}
+  .stepper-toggle-btn.show{display:flex;}
+  .stepper-toggle-btn .chev{width:16px;height:16px;transition:transform .15s;flex:none;}
+  .stepper-toggle-btn.expanded .chev{transform:rotate(180deg);}
+  .stepper{overflow:hidden;max-height:200px;transition:max-height .18s ease,opacity .18s ease;opacity:1;}
+  .stepper.collapsed{max-height:0;opacity:0;}
+
   /* Sites card: tamaño fijo (llena el espacio disponible); si hay más filas
      de las que caben, solo #rows hace scroll interno, la tarjeta no crece. */
   .sites-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;flex:1;display:flex;flex-direction:column;min-height:0;}
@@ -505,6 +513,14 @@
   .ud-block{padding-top:14px;}
   .ud-block .rev-chip{display:inline-block;background:#f4f6fa;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:12px;color:var(--navy);margin:0 6px 6px 0;}
 
+  /* Mini mapa de localización en el modal de detalles de site */
+  .loc-map-wrap{padding-bottom:14px;margin-bottom:6px;border-bottom:1px solid #f0f2f8;}
+  .loc-map-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .loc-map-head .ud-k{margin:0;}
+  .loc-map{height:180px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--panel);}
+  [data-theme="dark"] .loc-map .leaflet-tile-pane{filter:saturate(2.2) brightness(1.15) contrast(0.95);}
+  .loc-map-empty{height:auto;border-radius:12px;border:1px dashed var(--border);background:var(--panel);color:var(--muted2);font-size:13px;padding:16px;text-align:center;}
+
   /* Add-users wizard */
   .wiz-top{text-align:center;color:var(--muted2);font-size:14px;margin-bottom:20px;}
   .site-pill{display:flex;align-items:center;gap:11px;background:#f2f6ff;border-radius:10px;padding:12px 15px;margin-bottom:22px;}
@@ -806,6 +822,10 @@
       <div class="content">
         <!-- Stepper -->
         <div class="stepper-card">
+          <button class="stepper-toggle-btn" onclick="toggleStepperCollapse()">
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            <span class="stepper-toggle-label">Hide steps</span>
+          </button>
           <div class="stepper" id="stepperSites"></div>
         </div>
 
@@ -899,6 +919,10 @@
 
     <div class="content" style="margin-top:22px;">
       <div class="stepper-card">
+        <button class="stepper-toggle-btn" onclick="toggleStepperCollapse()">
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          <span class="stepper-toggle-label">Hide steps</span>
+        </button>
         <div class="stepper" id="stepperUsers"></div>
       </div>
 
@@ -2335,6 +2359,7 @@
         }).join('')}</div>`
       : `<span class="ud-v" style="font-weight:500;color:var(--muted2);">No storage spaces yet</span>`;
     document.getElementById('siteDetailsBody').innerHTML = `
+      <div id="locMapWrap" class="loc-map-wrap"></div>
       <div class="ud-row"><span class="ud-k">Site name</span><span class="ud-v">${escapeAttr(s.name)}</span></div>
       <div class="ud-row"><span class="ud-k">Type</span><span class="ud-v">${siteTypeLabel(s)}</span></div>
       <div class="ud-row"><span class="ud-k">Localisation</span><span class="ud-v">${escapeAttr(s.localisation || '—')}</span></div>
@@ -2343,8 +2368,42 @@
       <div class="ud-row"><span class="ud-k">Capacity</span><span class="ud-v">${capacityLabel(s)}</span></div>
       <div class="ud-block"><div class="ud-k" style="margin-bottom:8px;">Storage spaces</div>${storagesHtml}</div>`;
     document.getElementById('siteDetailsModal').classList.remove('hidden');
+    renderLocMap(s);
   }
-  function closeSiteDetails(){ document.getElementById('siteDetailsModal').classList.add('hidden'); }
+  function closeSiteDetails(){
+    document.getElementById('siteDetailsModal').classList.add('hidden');
+    if (locMapInstance){ locMapInstance.remove(); locMapInstance = null; }
+  }
+
+  // Mini mapa de solo-lectura en el modal de "Site details": muestra dónde está el site,
+  // con el mismo pin (color + glifo) que el mapa principal según su tipo.
+  let locMapInstance = null;
+  function renderLocMap(s){
+    const wrap = document.getElementById('locMapWrap');
+    if (!wrap) return;
+    if (locMapInstance){ locMapInstance.remove(); locMapInstance = null; }
+    const coords = siteCoords(s);
+    if (!coords){
+      wrap.innerHTML = `<div class="loc-map-empty">No valid coordinates for this site</div>`;
+      return;
+    }
+    const typeKey = SITE_TYPES[s.type] ? s.type : DEFAULT_SITE_TYPE;
+    const t = SITE_TYPES[typeKey];
+    wrap.innerHTML = `
+      <div class="loc-map-head">
+        <span class="ud-k">Location</span>
+        <span class="site-type-pill"><span class="site-type-dot" style="background:${t.color}"></span>${t.label}</span>
+      </div>
+      <div id="locMap" class="loc-map"></div>`;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    locMapInstance = L.map('locMap', {
+      zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false,
+      doubleClickZoom:false, boxZoom:false, keyboard:false, touchZoom:false,
+    }).setView(coords, 13);
+    buildTileLayer(isDark).addTo(locMapInstance);
+    L.marker(coords, { icon: PIN_ICONS[typeKey] }).addTo(locMapInstance);
+    setTimeout(() => { if (locMapInstance) locMapInstance.invalidateSize(); }, 50);
+  }
 
   // Silueta de silo rellena hasta el % usado. Solo demo: el "used" real siempre es 0
   // salvo que se use el botón "Mock the storage (DEMO)" para forzar 25/50/75/100%.
@@ -2637,8 +2696,26 @@
 
   const LOCK = `<span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>`;
   const CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg>`;
+
+  // El timeline solo puede minimizarse/expandirse una vez que todos los pasos están completos
+  let stepperCollapsed = false;
+  function toggleStepperCollapse(){
+    stepperCollapsed = !stepperCollapsed;
+    applyStepperCollapse();
+  }
+  function applyStepperCollapse(){
+    document.querySelectorAll('.stepper').forEach(el => el.classList.toggle('collapsed', stepperCollapsed));
+    document.querySelectorAll('.stepper-toggle-btn').forEach(btn => {
+      btn.classList.toggle('expanded', !stepperCollapsed);
+      const lbl = btn.querySelector('.stepper-toggle-label');
+      if (lbl) lbl.textContent = stepperCollapsed ? 'Show steps' : 'Hide steps';
+    });
+  }
   function stepperHTML(hasSites, hasUsers){
     const lic = hasSites && hasUsers;
+    document.querySelectorAll('.stepper-toggle-btn').forEach(btn => btn.classList.toggle('show', lic));
+    if (!lic && stepperCollapsed) stepperCollapsed = false; // no ocultar pasos incompletos
+    applyStepperCollapse();
     return `
       <div class="line l1"></div>
       <div class="line l2"></div>
@@ -2807,7 +2884,7 @@
   function actsLabel(n){ return n===0 ? '—' : n===U_ACTIONS.length ? `All (${n})` : `${n} / ${U_ACTIONS.length}`; }
 
   /* ---------- Página Users (solo lectura) ---------- */
-  const U_GRID = 'grid-template-columns:1.6fr 1fr 0.9fr 1.1fr 70px 44px 44px 44px;';
+  const U_GRID = 'grid-template-columns:1.6fr 1fr 0.9fr 1.1fr 70px 44px 44px;';
   const toolIcoSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.5 4.7L3 17.2V21h3.8l6.2-6.2a4 4 0 0 0 4.7-5.5l-2.8 2.8-2.1-2.1z"/></svg>`;
   function renderUsers(){
     const card = document.getElementById('usersCard');
@@ -2846,7 +2923,6 @@
 
     const eyeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
     const trashSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>`;
-    const copySvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>`;
 
     const uRows = users.map((u,i)=>`
       <div class="u-row" style="${U_GRID}" data-search="${(u.name+' '+u.site).toLowerCase().replace(/"/g,'')}">
@@ -2856,14 +2932,13 @@
         <span class="u-site">${actsLabel(u.actions.length)}</span>
         <span class="u-site">${u.nomad?'Yes':'—'}</span>
         <span class="r"><button class="icon-btn" title="View details" onclick="viewUser('site',${i})">${eyeSvg}</button></span>
-        <span class="r"><button class="icon-btn" title="Duplicate user" onclick="duplicateUser(${i})">${copySvg}</button></span>
         <span class="r"><button class="icon-btn danger" title="Delete user" onclick="askDeleteUser('site',${i})">${trashSvg}</button></span>
       </div>`).join('');
 
     const uSection = (users.length && showSite) ? `
       <div class="u-sec-head">Site users <span class="cnt">${users.length}</span></div>
       <div class="table-head" style="${U_GRID}">
-        <div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Nomad</div><div class="r"></div><div class="r"></div><div class="r"></div>
+        <div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Nomad</div><div class="r"></div><div class="r"></div>
       </div>
       ${uRows}` : '';
 
@@ -3743,31 +3818,6 @@
     closeDeleteUser();
     renderUsers();
     showSnack('User deleted');
-  }
-
-  /* ---------- Duplicar usuario ya creado ---------- */
-  function duplicateUser(i){
-    const src = users[i]; if(!src) return;
-    const used = usedNames();
-    const parts = (src.name||'').split('_');
-    const numIdx = parts.findIndex(t=>/^\d+$/.test(t));
-    let newName;
-    if(numIdx>-1){
-      const len=parts[numIdx].length;
-      let num=parseInt(parts[numIdx],10);
-      do{
-        num++;
-        const p2=[...parts]; p2[numIdx]=String(num).padStart(len,'0');
-        newName=p2.join('_');
-      } while(used.has(newName.toLowerCase()));
-    } else {
-      let n=1;
-      do{ newName = n===1 ? `${src.name}_copy` : `${src.name}_copy${n}`; n++; } while(used.has(newName.toLowerCase()));
-    }
-    users.splice(i+1,0,{ name:newName, site:src.site, actions:[...src.actions], nomad:src.nomad, status:'created' });
-    persistUsers();
-    renderUsers();
-    showSnack('User duplicated');
   }
 
   /* ---------- Wizard: apertura ---------- */
