@@ -116,6 +116,7 @@
   .nav a.active{color:#4d8bff;font-weight:600;}
   .nav a svg{width:20px;height:20px;stroke-width:1.8;flex-shrink:0;}
   .nav-alert-dot{display:none;position:absolute;top:8px;left:22px;width:8px;height:8px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 2px var(--navy-dark);}
+  .nav-alert-dot.nav-alert-badge{width:auto;min-width:16px;height:16px;top:1px;left:18px;padding:0 4px;border-radius:20px;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;line-height:1;cursor:default;}
   .nav-bottom{display:flex;flex-direction:column;gap:4px;padding-top:12px;}
   .nav-bottom a{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:9px;color:#c9cfdb;text-decoration:none;font-size:15px;font-weight:500;white-space:nowrap;}
   .nav-bottom a:hover{background:#1f2a44;}
@@ -240,7 +241,7 @@
   .filters-btn{padding:9px 14px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;}
   .spacer{flex:1;}
 
-  .table-head{display:grid;grid-template-columns:1.2fr 0.9fr 1fr 1fr 1fr 0.6fr 0.6fr;padding:10px 6px 8px;border-bottom:1px solid var(--border);color:var(--navy);font-weight:700;font-size:14px;}
+  .table-head{display:grid;grid-template-columns:1.2fr 0.9fr 1fr 1fr 1fr 0.6fr 0.6fr;gap:8px;padding:10px 6px 8px;border-bottom:1px solid var(--border);color:var(--navy);font-weight:700;font-size:14px;}
   .table-head .r{text-align:center;}
 
   .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 20px;}
@@ -340,6 +341,10 @@
   .stat-label{font-size:13px;color:var(--muted2);margin-top:4px;}
   .stat-divider{border-top:1px solid var(--border);margin:18px 0 14px;}
   .stat-subhead{font-size:11.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;}
+  .stat-subhead-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+  .stat-subhead-toggle:hover{color:var(--blue);}
+  .stat-chevron-mini{width:14px;height:14px;flex-shrink:0;transition:transform .15s ease;}
+  .stat-chevron-mini.rotated{transform:rotate(90deg);}
   .lic-meter-wrap{display:flex;align-items:center;gap:10px;margin-top:14px;width:100%;}
   .lic-meter{flex:1;height:10px;border-radius:20px;background:#eaf1ff;overflow:hidden;}
   .lic-meter-fill{height:100%;border-radius:20px;background:var(--blue);transition:width .35s ease;}
@@ -481,6 +486,26 @@
   .badge-error{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#fdecec;color:#c0392b;border:1px solid #f6c9c4;}
   .badge-upcoming{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#f1ecfe;color:#7c4dff;border:1px solid #ddd0fb;}
   [data-theme="dark"] .badge-upcoming{background:#241c3a;border-color:#3a2c5c;color:#b49dff;}
+  .badge-unassigned{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#eaf1ff;color:#2f6bff;border:1px solid #cfe0ff;}
+  [data-theme="dark"] .badge-unassigned{background:#16233b;border-color:#2b3d5e;color:#7fa8ff;}
+  .filter-chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:9px 15px;border-radius:9px;background:#fff5e9;color:#c2740c;border:1px solid #f6dcb6;cursor:pointer;font-family:inherit;}
+  .filter-chip .tcount{font-size:12px;font-weight:700;background:#fff;color:#c2740c;padding:1px 8px;border-radius:20px;}
+  .filter-chip.active{background:#c2740c;color:#fff;border-color:#c2740c;}
+  .filter-chip.active .tcount{background:rgba(255,255,255,.28);color:#fff;}
+  [data-theme="dark"] .filter-chip{background:#2a2113;border-color:#4a3a1c;color:#e6a83c;}
+  [data-theme="dark"] .filter-chip .tcount{background:#1c2330;color:#e6a83c;}
+  [data-theme="dark"] .filter-chip.active{background:#e6a83c;color:#1a1400;border-color:#e6a83c;}
+  [data-theme="dark"] .filter-chip.active .tcount{background:rgba(0,0,0,.2);color:#1a1400;}
+  .filter-chip.expiring{background:#fdece0;color:#a8460a;border-color:#f5c49a;}
+  .filter-chip.expiring .tcount{color:#a8460a;}
+  .filter-chip.expiring.active{background:#a8460a;color:#fff;border-color:#a8460a;}
+  .filter-chip.expiring.active .tcount{color:#a8460a;}
+  [data-theme="dark"] .filter-chip.expiring{background:#2e1a0c;border-color:#5a3018;color:#e8935a;}
+  [data-theme="dark"] .filter-chip.expiring .tcount{background:#1c2330;color:#e8935a;}
+  [data-theme="dark"] .filter-chip.expiring.active{background:#e8935a;color:#1a0e04;border-color:#e8935a;}
+  [data-theme="dark"] .filter-chip.expiring.active .tcount{color:#e8935a;}
+  .badge-expiring{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#fdece0;color:#a8460a;border:1px solid #f5c49a;}
+  [data-theme="dark"] .badge-expiring{background:#2e1a0c;border-color:#5a3018;color:#e8935a;}
 
   /* Data page: status pills + table cells */
   .status-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;white-space:nowrap;}
@@ -969,8 +994,8 @@
       <a href="#" id="navMap" data-page="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3Z"/><path d="M9 3v15M15 6v15"/></svg><span class="lbl-text">Map</span></a>
       <a href="#" class="active" id="navSites" data-page="sites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg><span class="lbl-text">Sites</span></a>
       <a href="#" id="navUsers" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.5-1-4-3-4.6"/></svg><span class="lbl-text">Users</span></a>
-      <a href="#" id="navLicenses" data-page="licenses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg><span class="lbl-text">Licenses</span></a>
-      <a href="#" id="navDevices" data-page="devices"><span class="nav-alert-dot" id="navDevicesAlert"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg><span class="lbl-text">Devices</span></a>
+      <a href="#" id="navLicenses" data-page="licenses"><span class="nav-alert-dot nav-alert-badge" id="navLicensesAlert" onmouseenter="showLicenseAlertsTip(event)" onmouseleave="hideLicTip()"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg><span class="lbl-text">Licenses</span></a>
+      <a href="#" id="navDevices" data-page="devices"><span class="nav-alert-dot nav-alert-badge" id="navDevicesAlert" onmouseenter="showDeviceAlertsTip(event)" onmouseleave="hideLicTip()"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg><span class="lbl-text">Devices</span></a>
     </nav>
     <div class="nav-bottom">
       <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark">
@@ -1169,10 +1194,14 @@
             <span class="lic-meter-pct" id="creditsMeterPct">0%</span>
           </div>
           <div class="stat-divider"></div>
-          <div class="stat-subhead">By country</div>
-          <div id="creditsByCountryChart"></div>
+          <div class="stat-subhead stat-subhead-toggle" onclick="toggleCreditsByCountry(event)">
+            <span>By country</span>
+            <svg class="stat-chevron-mini" id="creditsByCountryChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+          <div id="creditsByCountryChart" style="display:none;"></div>
         </div>
       </div>
+      <div id="licenseQuickFiltersWrap" style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;"></div>
       <div class="sites-card" id="licensesCard"></div>
     </div>
    </div><!-- /page-licenses -->
@@ -4219,6 +4248,9 @@
   let users = [];       // saved site users: { name, site, actions:[], nomad, status, device }
   let managers = [];    // saved managers: { email, role, site, status }
   let usersTab = 'all'; // pestaña activa en la tabla de usuarios
+  let usersSearch = '';
+  let usersPage = 1;
+  const USERS_PAGE_SIZE = 25;
 
   // Licencias: 5 licencias, cada una puede contener paquetes de créditos y
   // puede estar asignada a un usuario. Los paquetes empiezan como un pool
@@ -4304,8 +4336,22 @@
     const eyeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
     const trashSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>`;
 
-    const uRows = users.map((u,i)=>`
-      <div class="u-row" style="${U_GRID}" data-search="${(u.name+' '+u.site).toLowerCase().replace(/"/g,'')}">
+    const filteredUsers = users
+      .map((u,i)=>({u,i}))
+      .filter(({u}) => !usersSearch || (u.name+' '+u.site).toLowerCase().includes(usersSearch));
+    const filteredManagers = managers
+      .map((m,i)=>({m,i}))
+      .filter(({m}) => !usersSearch || ((m.email||'')+' '+(m.role||'')+' '+(m.site||'')).toLowerCase().includes(usersSearch));
+
+    const totalPages = Math.max(1, Math.ceil(filteredUsers.length / USERS_PAGE_SIZE));
+    if (usersPage > totalPages) usersPage = totalPages;
+    if (usersPage < 1) usersPage = 1;
+    const startIdx = (usersPage-1) * USERS_PAGE_SIZE;
+    const pageUsers = filteredUsers.slice(startIdx, startIdx + USERS_PAGE_SIZE);
+    const rangeEnd = Math.min(startIdx + USERS_PAGE_SIZE, filteredUsers.length);
+
+    const uRows = pageUsers.map(({u,i})=>`
+      <div class="u-row" style="${U_GRID}">
         <span class="name" style="font-weight:600;">${u.name}</span>
         ${u.nomad ? nomadBadge() : `<span class="u-site">${u.site}</span>`}
         <span><span class="role-badge">Site User</span></span>
@@ -4314,27 +4360,35 @@
         <span class="u-site">${u.nomad?'Yes':'—'}</span>
         <span class="r"><button class="icon-btn" title="View details" onclick="viewUser('site',${i})">${eyeSvg}</button></span>
         <span class="r"><button class="icon-btn danger" title="Delete user" onclick="askDeleteUser('site',${i})">${trashSvg}</button></span>
-      </div>`).join('');
+      </div>`).join('') || (usersSearch ? `<div class="draft-empty" style="padding:44px;">No site users match "${usersSearch}".</div>` : '');
 
     const uSection = (users.length && showSite) ? `
-      <div class="u-sec-head">Site users <span class="cnt">${users.length}</span></div>
+      <div class="u-sec-head">Site users <span class="cnt">${filteredUsers.length}</span></div>
       <div class="table-head" style="${U_GRID}">
         <div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Device</div><div>Nomad</div><div class="r"></div><div class="r"></div>
       </div>
-      ${uRows}` : '';
+      ${uRows}
+      <div class="table-footer">
+        <span>Rows per page: ${USERS_PAGE_SIZE}</span>
+        <span>${filteredUsers.length ? startIdx+1 : 0}–${rangeEnd} of ${filteredUsers.length}</span>
+        <span class="data-pager">
+          <button ${usersPage<=1?'disabled':''} title="Previous page" onclick="usersChangePage(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <button ${usersPage>=totalPages?'disabled':''} title="Next page" onclick="usersChangePage(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        </span>
+      </div>` : '';
 
     const M_GRID = 'grid-template-columns:1.8fr 1.1fr 1fr 44px 44px;';
-    const mRows = managers.map((m,i)=>`
-      <div class="m-row" style="${M_GRID}" data-search="${((m.email||'')+' '+(m.role||'')+' '+(m.site||'')).toLowerCase().replace(/"/g,'')}">
+    const mRows = filteredManagers.map(({m,i})=>`
+      <div class="m-row" style="${M_GRID}">
         <span class="m-email">${m.email}</span>
         <span><span class="role-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg> ${m.role}</span></span>
         <span class="u-site">${m.site || '—'}</span>
         <span class="r"><button class="icon-btn" title="View details" onclick="viewUser('admin',${i})">${eyeSvg}</button></span>
         <span class="r"><button class="icon-btn danger" title="Delete user" onclick="askDeleteUser('admin',${i})">${trashSvg}</button></span>
-      </div>`).join('');
+      </div>`).join('') || (usersSearch ? `<div class="draft-empty" style="padding:44px;">No admin users match "${usersSearch}".</div>` : '');
 
     const mSection = (managers.length && showAdmin) ? `
-      <div class="u-sec-head">Admin users <span class="cnt">${managers.length}</span></div>
+      <div class="u-sec-head">Admin users <span class="cnt">${filteredManagers.length}</span></div>
       <div class="table-head m-row" style="${M_GRID}">
         <div>E-mail</div><div>Role</div><div>Site</div><div class="r"></div><div class="r"></div>
       </div>
@@ -4354,6 +4408,11 @@
       body = `<div class="draft-empty" style="padding:44px;">No ${what} yet.</div>`;
     }
 
+    // Un search input dentro de un card que se re-renderiza entero pierde el foco
+    // en cada tecla; se guarda posición del cursor antes y se restaura después.
+    const searchFocused = document.activeElement && document.activeElement.id === 'usersSearchInput';
+    const caret = searchFocused ? document.activeElement.selectionStart : null;
+
     card.innerHTML = `
       <div class="u-tabs">
         <button class="u-tab ${usersTab==='all'?'active':''}" onclick="setUsersTab('all')">All users <span class="tcount">${users.length+managers.length}</span></button>
@@ -4363,16 +4422,20 @@
       </div>
       ${showTools ? '' : `
       <div class="sites-toolbar">
-        <div class="search"><input type="text" placeholder="Search by username or site..." oninput="filterUsers(this.value)"></div>
+        <div class="search"><input type="text" id="usersSearchInput" placeholder="Search by username or site..." value="${usersSearch.replace(/"/g,'&quot;')}" oninput="setUsersSearch(this.value)"></div>
         <div class="spacer"></div>
       </div>`}
-      ${body}
-      <div class="table-footer">
-        <span>${users.length} site user${users.length!==1?'s':''} · ${managers.length} admin user${managers.length!==1?'s':''}</span>
-      </div>`;
+      ${body}`;
+
+    if (searchFocused){
+      const el = document.getElementById('usersSearchInput');
+      if (el){ el.focus(); el.setSelectionRange(caret, caret); }
+    }
   }
 
-  function setUsersTab(t){ usersTab=t; renderUsers(); }
+  function setUsersTab(t){ usersTab=t; usersPage=1; renderUsers(); }
+  function setUsersSearch(q){ usersSearch = (q||'').toLowerCase().trim(); usersPage = 1; renderUsers(); }
+  function usersChangePage(delta){ usersPage += delta; renderUsers(); }
 
   /* ---------- Licenses ---------- */
   function fmtDate(iso){
@@ -4405,18 +4468,27 @@
     return lic.packs.find(p=>packStatus(p)==='current') || lic.packs[0];
   }
 
-  function licenseStatus(lic){
-    if (!lic.packs.length) return 'unassigned';
+  // Estado del/de los pack(s) en sí, sin importar si hay un usuario asignado
+  // (usado para reglas de negocio sobre el pack, como bloquear "Add pack" si ya venció).
+  function licensePackStatus(lic){
+    if (!lic.packs.length) return 'nopacks';
     const statuses = lic.packs.map(packStatus);
     if (statuses.includes('current')) return 'active';
     if (statuses.every(s=>s==='expired')) return 'expired';
     return 'upcoming';
   }
+  // Una licencia sin usuario no puede estar "active"/"expired"/"upcoming": esos estados
+  // describen el pack, pero sin nadie usándolo la licencia está simplemente 'unassigned'.
+  function licenseStatus(lic){
+    if (lic.userIndex === null) return 'unassigned';
+    return licensePackStatus(lic);
+  }
   function licenseStatusBadge(status){
     if (status==='active') return `<span class="badge-created">active</span>`;
     if (status==='expired') return `<span class="badge-error">expired</span>`;
     if (status==='upcoming') return `<span class="badge-upcoming">upcoming</span>`;
-    return `<span class="badge-empty">unassigned</span>`;
+    if (status==='unassigned') return `<span class="badge-unassigned">not assigned</span>`;
+    return `<span class="badge-empty">no packs</span>`;
   }
 
   function assignLicense(licenseId, userIndexStr){
@@ -4483,7 +4555,7 @@
     const lic = licenses.find(l=>l.id===licenseId);
     const tip = document.getElementById('licTip');
     if (!lic || !tip) return;
-    tip.innerHTML = type==='consumed' ? consumedTipHTML(lic) : type==='remaining' ? remainingTipHTML(lic) : packsTipHTML(lic);
+    tip.innerHTML = type==='consumed' ? consumedTipHTML(lic) : type==='remaining' ? remainingTipHTML(lic) : type==='runninglow' ? runningLowTipHTML(lic) : type==='expiringsoon' ? expiringSoonTipHTML(lic) : packsTipHTML(lic);
     const r = ev.currentTarget.getBoundingClientRect();
     tip.style.left = (r.left + r.width/2) + 'px';
     tip.style.top = (r.bottom + 8) + 'px';
@@ -4547,11 +4619,33 @@
     tip.style.transform = 'translateX(-50%)';
     tip.style.display = 'block';
   }
+  function toggleCreditsByCountry(ev){
+    ev.stopPropagation();
+    const open = document.getElementById('creditsByCountryChart').style.display === 'block';
+    document.getElementById('creditsByCountryChart').style.display = open ? 'none' : 'block';
+    document.getElementById('creditsByCountryChevron').classList.toggle('rotated', !open);
+  }
   document.addEventListener('click', e=>{
     const tip = document.getElementById('licTip');
     if (tip && tip.style.display==='block' && tip.dataset.mode==='credits' && !tip.contains(e.target)) hideLicTip();
   });
 
+  function runningLowTipHTML(lic){
+    const s = licenseStats(lic);
+    const pct = s.total ? Math.round(s.remaining/s.total*100) : 0;
+    return `<div class="lic-tip-title">Running low</div>
+      <div class="lic-tip-sub" style="margin-bottom:8px;">10% or less of the total purchased credits are left on this license.</div>
+      <div class="lic-tip-line"><span>Credits remaining</span><span>${s.remaining}</span></div>
+      <div class="lic-tip-line"><span>Total credits purchased</span><span>${s.total}</span></div>
+      <div class="lic-tip-total"><span>Remaining</span><span>= ${pct}%</span></div>`;
+  }
+  function expiringSoonTipHTML(lic){
+    const dates = licenseDates(lic);
+    const days = daysUntil(dates.expiration);
+    return `<div class="lic-tip-title">Expiring soon</div>
+      <div class="lic-tip-line"><span>Expires in</span><span>${days} day${days===1?'':'s'}</span></div>
+      <div class="lic-tip-sub">On ${fmtDate(dates.expiration)}</div>`;
+  }
   function remainingTipHTML(lic){
     const current = lic.packs.find(p=>packStatus(p)==='current');
     const upcoming = lic.packs.filter(p=>packStatus(p)==='pending');
@@ -4592,6 +4686,97 @@
 
   let licensesCountry = 'all'; // all | one of LICENSE_COUNTRIES
   function setLicensesCountry(v){ licensesCountry=v; renderLicenses(); }
+
+  function daysUntil(iso){
+    return Math.ceil((new Date(iso) - Date.now()) / 86400000);
+  }
+
+  // "Running low" = licencias cuyos créditos restantes son <=10% del total comprado.
+  let licensesRunningLowOnly = false;
+  function isLicenseRunningLow(lic){
+    const s = licenseStats(lic);
+    return s.total>0 && (s.remaining/s.total) <= 0.10;
+  }
+  function toggleRunningLowFilter(){
+    licensesRunningLowOnly = !licensesRunningLowOnly;
+    renderLicenses();
+  }
+  const runningLowSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.5 22 20H2L12 3.5Z"/><path d="M12 10v4.5M12 17.5v.01"/></svg>`;
+
+  // "Expiring soon" = licencias activas cuyo pack en curso vence dentro de los próximos 30 días.
+  const EXPIRING_SOON_DAYS = 30;
+  let licensesExpiringSoonOnly = false;
+  function isLicenseExpiringSoon(lic){
+    if (licenseStatus(lic)!=='active') return false;
+    const dates = licenseDates(lic);
+    if (!dates) return false;
+    const days = daysUntil(dates.expiration);
+    return days>=0 && days<=EXPIRING_SOON_DAYS;
+  }
+  function toggleExpiringSoonFilter(){
+    licensesExpiringSoonOnly = !licensesExpiringSoonOnly;
+    renderLicenses();
+  }
+  const expiringSoonSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>`;
+
+  function renderLicenseQuickFilters(){
+    const wrap = document.getElementById('licenseQuickFiltersWrap');
+    if (!wrap) return;
+
+    const lowCount = licenses.filter(isLicenseRunningLow).length;
+    if (!lowCount) licensesRunningLowOnly = false;
+    const soonCount = licenses.filter(isLicenseExpiringSoon).length;
+    if (!soonCount) licensesExpiringSoonOnly = false;
+
+    let html = '';
+    if (lowCount) html += `
+      <button class="filter-chip ${licensesRunningLowOnly?'active':''}" onclick="toggleRunningLowFilter()" title="Licenses with 10% or less of their total credits remaining">
+        ${runningLowSvg} Running low <span class="tcount">${lowCount}</span>
+      </button>`;
+    if (soonCount) html += `
+      <button class="filter-chip expiring ${licensesExpiringSoonOnly?'active':''}" onclick="toggleExpiringSoonFilter()" title="Licenses expiring within ${EXPIRING_SOON_DAYS} days">
+        ${expiringSoonSvg} Expiring soon <span class="tcount">${soonCount}</span>
+      </button>`;
+    wrap.innerHTML = html;
+  }
+
+  function licenseAlertCounts(){
+    return {
+      low: licenses.filter(isLicenseRunningLow).length,
+      soon: licenses.filter(isLicenseExpiringSoon).length,
+      expired: licenses.filter(l=>licenseStatus(l)==='expired').length,
+    };
+  }
+  // Mismo punto rojo que updateDevicesAlert() en el ítem del sidebar, pero con el número
+  // total de problemas dentro y el detalle en un tooltip enriquecido (showLicTip) al hover.
+  function updateLicensesAlert(){
+    const badge = document.getElementById('navLicensesAlert');
+    if (!badge) return;
+    const c = licenseAlertCounts();
+    const total = c.low + c.soon + c.expired;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+    badge.textContent = total;
+  }
+  function licenseAlertsTipHTML(){
+    const c = licenseAlertCounts();
+    const lines = [];
+    if (c.low) lines.push(`<div class="lic-tip-line"><span>Running low</span><span>${c.low}</span></div>`);
+    if (c.soon) lines.push(`<div class="lic-tip-line"><span>Expiring soon</span><span>${c.soon}</span></div>`);
+    if (c.expired) lines.push(`<div class="lic-tip-line"><span>Expired</span><span>${c.expired}</span></div>`);
+    return `<div class="lic-tip-title">Some licenses need your attention</div>${lines.join('')}`;
+  }
+  function showLicenseAlertsTip(ev){
+    const tip = document.getElementById('licTip');
+    if (!tip) return;
+    tip.innerHTML = licenseAlertsTipHTML();
+    // El badge vive pegado al borde izquierdo del sidebar: centrar el tooltip debajo
+    // lo corta contra el borde de la ventana, así que se ancla a su derecha en su lugar.
+    const r = ev.currentTarget.getBoundingClientRect();
+    tip.style.left = (r.right + 12) + 'px';
+    tip.style.top = (r.top + r.height/2) + 'px';
+    tip.style.transform = 'translateY(-50%)';
+    tip.style.display = 'block';
+  }
 
   // Selección para el bulk-assign de la tab "Users without a license" (índices en `users`).
   let nolicenseSelected = new Set();
@@ -4700,7 +4885,9 @@
   // escenarios realistas (botón "Mock licenses (DEMO)"): algunas activas con consumo
   // parcial, algunas que ya se les acabó el pack anterior y se les asignó otro,
   // algunas totalmente expiradas, algunas con un pack "upcoming" (activación futura),
-  // y algunas sin ningún pack (unassigned). No toca el pool ni el usuario asignado.
+  // y algunas sin ningún pack todavía. Las dos primeras licencias se fuerzan a
+  // "running low" y "expiring soon" para que esos filtros siempre tengan datos que
+  // mostrar al usar el botón demo; el resto se sortea. No toca el pool ni el usuario asignado.
   function mockLicenses(){
     const day = 86400000;
 
@@ -4723,10 +4910,23 @@
       expiration: new Date(Date.now() + expDays*day).toISOString(),
     };
 
-    licenses.forEach(lic=>{
+    licenses.forEach((lic, idx)=>{
+      if (idx === 0){
+        // running low: pack en curso con 92%-99% de los créditos ya consumidos
+        const p = enrich(takePack(), -60, 300, 0.92 + Math.random()*0.07);
+        if (p) lic.packs.push(p);
+        return;
+      }
+      if (idx === 1){
+        // expiring soon: pack en curso que vence dentro de los próximos EXPIRING_SOON_DAYS días
+        const p = enrich(takePack(), -300, 3 + Math.floor(Math.random()*(EXPIRING_SOON_DAYS-5)), Math.random()*0.7);
+        if (p) lic.packs.push(p);
+        return;
+      }
+
       const roll = Math.random();
       if (roll < 0.15){
-        // unassigned: sin packs todavía
+        // sin packs todavía
       } else if (roll < 0.40){
         // active: un solo pack en curso, con consumo parcial al azar
         const p = enrich(takePack(), -30, 335, Math.random());
@@ -4750,10 +4950,15 @@
 
     // Repartir usuarios reales entre las licencias, dejando algunas sin asignar
     // (así se siguen poblando las tabs "No user assigned" / "Users without a license").
+    // Las licencias forzadas a "running low" (idx 0) y "expiring soon" (idx 1) siempre
+    // reciben usuario: sin usuario no pueden estar "active", y esos filtros dejarían de
+    // tener datos que mostrar.
     const shuffledUsers = users.map((_,i)=>i).sort(()=>Math.random()-0.5);
     let cursor = 0;
-    licenses.forEach(lic=>{
-      if (shuffledUsers.length && Math.random() < 0.8){
+    licenses.forEach((lic, idx)=>{
+      if (!shuffledUsers.length) return;
+      const forceAssign = idx === 0 || idx === 1;
+      if (forceAssign || Math.random() < 0.8){
         lic.userIndex = shuffledUsers[cursor % shuffledUsers.length];
         cursor++;
       }
@@ -4765,6 +4970,9 @@
   function renderLicenses(){
     const card = document.getElementById('licensesCard');
     if (!card) return;
+
+    renderLicenseQuickFilters();
+    updateLicensesAlert();
 
     const counts = {
       all: licenses.length,
@@ -4820,6 +5028,8 @@
     else if (licensesTab==='expired') filtered = licenses.filter(l=>licenseStatus(l)==='expired');
     else if (licensesTab==='unassigned') filtered = licenses.filter(l=>l.userIndex===null);
     if (licensesCountry!=='all') filtered = filtered.filter(l=>l.location===licensesCountry);
+    if (licensesRunningLowOnly) filtered = filtered.filter(isLicenseRunningLow);
+    if (licensesExpiringSoonOnly) filtered = filtered.filter(isLicenseExpiringSoon);
 
     const L_GRID = 'grid-template-columns:1fr 100px 100px 100px 130px 150px 140px 150px 110px 110px 44px 44px;min-width:1560px;';
     const rows = filtered.map(lic => {
@@ -4841,13 +5051,13 @@
         <span class="name" style="font-weight:600;">License #${lic.id}</span>
         <span class="u-site">${lic.location}</span>
         <span>${licenseStatusBadge(status)}</span>
-        <span class="u-site">${stats.remaining} ${infoIco('remaining',lic.id)}</span>
+        <span class="u-site">${isLicenseRunningLow(lic) ? `<span class="badge-pending" onmouseenter="showLicTip(event,'runninglow',${lic.id})" onmouseleave="hideLicTip()" style="cursor:default;">${stats.remaining}</span>` : stats.remaining} ${infoIco('remaining',lic.id)}</span>
         <span class="u-site">${stats.consumed} ${infoIco('consumed',lic.id)}</span>
         <span class="u-site">${stats.total} ${infoIco('packs',lic.id)}</span>
         <span class="u-site">${lic.packs.length ? 'Classic credit pack' : '—'}</span>
         <span class="u-site">${dates ? fmtDate(dates.activation) : '—'}</span>
-        <span class="u-site">${dates ? fmtDate(dates.expiration) : '—'}</span>
-        <span class="r">${status==='expired' ? `<button class="icon-btn" title="Expired licenses can't get new packs" disabled style="opacity:.35;cursor:not-allowed;">${plusSvg}</button>` : `<button class="icon-btn" title="Add pack" onclick="openAddPackModal(${lic.id})">${plusSvg}</button>`}</span>
+        <span class="u-site">${dates ? (isLicenseExpiringSoon(lic) ? `<span class="badge-expiring" onmouseenter="showLicTip(event,'expiringsoon',${lic.id})" onmouseleave="hideLicTip()" style="cursor:default;">${fmtDate(dates.expiration)}</span>` : fmtDate(dates.expiration)) : '—'}</span>
+        <span class="r">${licensePackStatus(lic)==='expired' ? `<button class="icon-btn" title="Expired licenses can't get new packs" disabled style="opacity:.35;cursor:not-allowed;">${plusSvg}</button>` : `<button class="icon-btn" title="Add pack" onclick="openAddPackModal(${lic.id})">${plusSvg}</button>`}</span>
         <span class="r">${assignedUser ? (canChangeAssignment ? `<button class="icon-btn danger" title="Unassign user" onclick="unassignLicense(${lic.id})">${trashSvg}</button>` : `<button class="icon-btn danger" title="Expired licenses can't be unassigned" disabled style="opacity:.35;cursor:not-allowed;">${trashSvg}</button>`) : ''}</span>
       </div>`;
     }).join('') || `<div class="draft-empty" style="padding:44px;">No licenses in this category.</div>`;
@@ -4931,13 +5141,36 @@
       : (u.device || '—');
     return bare ? content : `<span class="u-site">${content}</span>`;
   }
+  function deviceAlertCounts(){
+    return {
+      inactive: devices.filter(d => deviceActivityStatus(d)==='inactive').length,
+      stale: devices.filter(d => deviceActivityStatus(d)==='stale').length,
+    };
+  }
   function updateDevicesAlert(){
     const badge = document.getElementById('navDevicesAlert');
     if (!badge) return;
-    const staleCount = devices.filter(d => deviceActivityStatus(d)==='stale').length;
-    badge.style.display = staleCount > 0 ? 'block' : 'none';
-    const link = document.getElementById('navDevices');
-    if (link) link.title = staleCount > 0 ? `${staleCount} device${staleCount>1?'s':''} need attention` : '';
+    const c = deviceAlertCounts();
+    const total = c.inactive + c.stale;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+    badge.textContent = total;
+  }
+  function deviceAlertsTipHTML(){
+    const c = deviceAlertCounts();
+    const lines = [];
+    if (c.inactive) lines.push(`<div class="lic-tip-line"><span>Inactive</span><span>${c.inactive}</span></div>`);
+    if (c.stale) lines.push(`<div class="lic-tip-line"><span>Stale</span><span>${c.stale}</span></div>`);
+    return `<div class="lic-tip-title">Some devices need your attention</div>${lines.join('')}`;
+  }
+  function showDeviceAlertsTip(ev){
+    const tip = document.getElementById('licTip');
+    if (!tip) return;
+    tip.innerHTML = deviceAlertsTipHTML();
+    const r = ev.currentTarget.getBoundingClientRect();
+    tip.style.left = (r.right + 12) + 'px';
+    tip.style.top = (r.top + r.height/2) + 'px';
+    tip.style.transform = 'translateY(-50%)';
+    tip.style.display = 'block';
   }
   function allotedUserLabel(u){
     if (!u) return '—';
@@ -5113,7 +5346,7 @@
         <div class="spacer"></div>
       </div>
       <div class="table-head" style="${D_GRID}">
-        <div>Device</div><div>Model</div><div>App version</div><div>Assigned user</div><div>Site</div><div>Last update</div><div>Status</div><div class="r"></div>
+        <div>Device</div><div>Model</div><div>Pocketlab version</div><div>Assigned user</div><div>Site</div><div>Last update</div><div>Status</div><div class="r"></div>
       </div>
       <div id="devicesRows" style="max-height:480px;overflow-y:auto;">${rows}</div>
       <div class="table-footer">
@@ -5142,7 +5375,7 @@
       <div class="ud-row"><span class="ud-k">Status</span><span class="ud-v">${deviceStatusBadge(status)}</span></div>
       <div class="ud-row"><span class="ud-k">Org internal ID</span><span class="ud-v">${d.orgInternalId}</span></div>
       <div class="ud-row"><span class="ud-k">Model</span><span class="ud-v">${deviceModelLabel(d)}</span></div>
-      <div class="ud-row"><span class="ud-k">App version</span><span class="ud-v">${d.lastAppVersion || '—'}</span></div>
+      <div class="ud-row"><span class="ud-k">Pocketlab version</span><span class="ud-v">${d.lastAppVersion || '—'}</span></div>
       <div class="ud-row"><span class="ud-k">Assigned user</span><span class="ud-v">${allotedUserLabel(d.lastAllotedUser)}${d.lastAllotedUser ? ` (${d.lastAllotedUser.email})` : ''}</span></div>
       <div class="ud-row"><span class="ud-k">Site</span><span class="ud-v">${siteNameByGeoPointId(d.geoPointId)}</span></div>
       <div class="ud-row"><span class="ud-k">Last update</span><span class="ud-v">${fmtDate(d.updatedAt)}</span></div>
@@ -5406,13 +5639,6 @@
   document.getElementById('actionsTemplateModal').addEventListener('click', e => {
     if (e.target.id === 'actionsTemplateModal') closeActionsTemplate();
   });
-  function filterUsers(q){
-    q=(q||'').toLowerCase().trim();
-    document.getElementById('usersCard').querySelectorAll('[data-search]').forEach(row=>{
-      row.style.display = row.dataset.search.includes(q) ? '' : 'none';
-    });
-  }
-
   /* ---------- Detalles de usuario (ojo) ---------- */
   function viewUser(type,i){
     const body=document.getElementById('userDetailsBody');
