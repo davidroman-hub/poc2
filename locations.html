@@ -145,6 +145,9 @@
   .btn:hover{background:var(--blue-hover);}
   .btn svg{width:16px;height:16px;}
   .btn-lg{padding:12px 20px;font-size:15px;}
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .btn-spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .6s linear infinite;flex-shrink:0;}
+  .btn:disabled{opacity:.75;cursor:default;}
   .btn-export{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);padding:9px 16px;border-radius:10px;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;}
   .btn-export:hover{background:#f6f7fb;}
   .btn-export svg{width:16px;height:16px;}
@@ -236,7 +239,7 @@
   .sites-toolbar{display:flex;align-items:center;gap:12px;}
   .sites-toolbar .all{font-size:15px;font-weight:700;color:var(--navy);}
   .search{flex:1;max-width:420px;}
-  .search input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:#fbfcfe;}
+  .search input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:var(--input-bg);}
   .search input::placeholder{color:var(--muted);}
   .filters-btn{padding:9px 14px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;}
   .spacer{flex:1;}
@@ -480,7 +483,7 @@
   .mgr-lock{border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-size:12px;color:#c0c8d8;background:#f6f7fb;}
   .mgr-lock-hint{font-size:10px;color:#c0c8d8;display:flex;align-items:center;gap:4px;margin-top:3px;}
   .mgr-lock-hint svg{width:10px;height:10px;}
-  .di.err{border-color:#e2453b;background:#fff6f6;}
+  .di.err{border-color:#e2453b;background:rgba(226,69,59,.12);}
   .mgr-hint{font-size:10px;color:#e2453b;display:flex;align-items:center;gap:4px;margin-top:3px;min-height:12px;}
   .badge-empty{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#f2f4f8;color:#8a94a6;border:1px solid #e3e7ee;}
   .badge-error{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#fdecec;color:#c0392b;border:1px solid #f6c9c4;}
@@ -600,6 +603,7 @@
   [data-theme="dark"] .dad-share:hover{background:var(--panel);}
   .dad-grid{display:grid;grid-template-columns:1fr 1.35fr;gap:24px;margin-top:26px;align-items:start;}
   .dad-h2{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:12px;}
+  .dad-h2-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
   .dad-ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .dad-ico svg{width:22px;height:22px;}
   .dad-origin-top{display:flex;gap:14px;align-items:flex-start;}
@@ -649,6 +653,10 @@
   .act-tip-key{display:flex;align-items:center;gap:6px;color:var(--muted2);}
   .act-tip-line{width:14px;height:2px;border-radius:2px;flex-shrink:0;}
   .act-tip-val{font-weight:700;color:var(--navy);}
+  .dev-rate-cell{display:flex;align-items:center;gap:8px;}
+  .dev-rate-track{flex:1;height:6px;border-radius:4px;background:var(--border);overflow:hidden;min-width:40px;}
+  .dev-rate-fill{display:block;height:100%;border-radius:4px;}
+  .dev-rate-pct{font-size:12px;font-weight:700;min-width:32px;text-align:right;font-variant-numeric:tabular-nums;}
 
   /* Crop distribution (by variety) block, appended below the Activity tab */
   .crd-crop-tabs{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
@@ -665,7 +673,7 @@
   .crd-hoverband{opacity:0;pointer-events:none;}
   .crd-hit{cursor:default;}
   .mgr-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 32px;gap:10px;align-items:center;margin-bottom:10px;}
-  .mgr-row input,.mgr-row select{border:1px solid var(--border);border-radius:8px;padding:10px 11px;font-size:13px;font-family:inherit;outline:none;width:100%;color:var(--navy);background:#fff;}
+  .mgr-row input,.mgr-row select{border:1px solid var(--border);border-radius:8px;padding:10px 11px;font-size:13px;font-family:inherit;outline:none;width:100%;color:var(--navy);background:var(--input-bg);}
   .mgr-row input:focus,.mgr-row select:focus{border-color:var(--blue);}
   .mgr-row .u-del{justify-self:center;}
   .mgr-empty{color:var(--muted2);font-size:13px;padding:10px 2px;}
@@ -700,13 +708,13 @@
   .draft-empty{padding:22px 12px;text-align:center;color:var(--muted2);font-size:13px;}
   .di-act{position:relative;}
   .di-act .u-actions-btn{padding:8px 26px 8px 10px;font-size:12px;}
-  .draft-row input.di.dup{border-color:#e2453b;background:#fff6f6;}
+  .draft-row input.di.dup{border-color:#e2453b;background:rgba(226,69,59,.12);}
   .draft-cb{accent-color:var(--blue);width:15px;height:15px;cursor:pointer;}
   .dup-warn{display:flex;align-items:center;gap:8px;background:#fdecec;color:#c0392b;border:1px solid #f6c9c4;border-radius:9px;padding:10px 14px;font-size:13px;margin:14px 0 0;}
   .dup-warn svg{width:16px;height:16px;flex-shrink:0;}
   .bulk-bar{display:flex;align-items:center;gap:12px;background:#1b2a4a;border-radius:10px;padding:10px 14px;margin-top:14px;flex-wrap:wrap;}
   .bulk-bar .bc{color:#fff;font-weight:600;font-size:13px;}
-  .bulk-bar select{border:none;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;background:#fff;color:var(--navy);}
+  .bulk-bar select{border:none;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;background:var(--input-bg);color:var(--navy);}
   .bulk-bar .bbtn{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
   .bulk-bar .bbtn:hover{background:rgba(255,255,255,.24);}
   .bulk-bar input{border:none;border-radius:7px;padding:7px 9px;font-size:12px;font-family:inherit;width:78px;color:var(--navy);}
@@ -740,6 +748,7 @@
   .loc-map-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
   .loc-map-head .ud-k{margin:0;}
   .loc-map{height:180px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--card);}
+  #dadLocMap{height:140px;}
   [data-theme="dark"] .loc-map .leaflet-tile-pane{filter:saturate(2.2) brightness(1.15) contrast(0.95);}
   .loc-map-empty{height:auto;border-radius:12px;border:1px dashed var(--border);background:var(--panel);color:var(--muted2);font-size:13px;padding:16px;text-align:center;}
 
@@ -821,7 +830,7 @@
     color:var(--text);background:#fff;font-family:inherit;margin-bottom:20px;}
   .fld::placeholder{color:var(--muted);}
   .fld:focus{outline:none;border-color:var(--blue);}
-  .fld.err{border-color:#e2453b;background:#fff6f6;}
+  .fld.err{border-color:#e2453b;background:rgba(226,69,59,.12);}
   .fld.err:focus{border-color:#e2453b;}
   .fld-err{color:#e2453b;font-size:12.5px;font-weight:600;margin:-14px 0 16px;min-height:15px;}
   .addr-hint{font-size:12.5px;color:var(--muted2);margin:-14px 0 16px;display:flex;align-items:center;gap:6px;}
@@ -1784,6 +1793,40 @@
   </div>
 </div>
 
+<!-- Modal: bulk "Add/Modify actions" sobre varios site users a la vez (tabla Users) -->
+<div class="modal-overlay hidden" id="bulkUserActionsModal">
+  <div class="pack-modal">
+    <div class="storage-scroll">
+      <h3 class="storage-title">Add / modify actions</h3>
+      <p class="storage-sub">The actions you select below will replace any actions already assigned to each of the <span id="buaUserCount">0</span> selected users.</p>
+      <div class="ud-block">
+        <div class="ud-k" style="margin-bottom:8px;">Users being modified</div>
+        <div id="buaUsers"></div>
+      </div>
+      <div class="ud-block" id="buaTemplatesBlock" style="margin-top:18px;display:none;">
+        <div class="ud-k" style="margin-bottom:8px;">Apply from template</div>
+        <div id="buaTemplatesList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+      <div class="ud-block" style="margin-top:18px;">
+        <div class="ud-k" style="margin-bottom:8px;">Actions</div>
+        <div class="search" style="max-width:none;margin-bottom:8px;"><input type="text" id="buaActionSearch" placeholder="Search actions…" oninput="buaFilterActions()"></div>
+        <label style="display:flex;align-items:center;gap:9px;padding:8px 6px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;border-bottom:1px solid var(--border);margin-bottom:4px;">
+          <input type="checkbox" id="buaSelectAll" onchange="buaToggleAll(this.checked)"> Select all
+        </label>
+        <div id="buaActionsList" style="max-height:220px;overflow-y:auto;"></div>
+      </div>
+    </div>
+    <div class="storage-footer">
+      <button class="btn-back" id="buaCancelBtn" onclick="closeBulkUserActionsModal()">Cancel</button>
+      <button class="btn" id="buaConfirmBtn" onclick="confirmBulkUserActions()">
+        <span id="buaConfirmSpinner" class="btn-spinner" style="display:none;"></span>
+        <span id="buaConfirmIdleLabel">Replace actions for <span id="buaConfirmCount">0</span> users</span>
+        <span id="buaConfirmLoadingLabel" style="display:none;">Applying…</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: buscar y asignar un usuario a una licencia -->
 <div class="modal-overlay hidden" id="assignUserModal">
   <div class="pack-modal">
@@ -2730,7 +2773,9 @@
       const actionPool = (u.actions && u.actions.length) ? u.actions : U_ACTIONS;
       const actionName = dataPick(actionPool);
       const { key: cropKey, label: cropLabel } = dataCropFromAction(actionName);
-      const siteName = u.nomad && sites.length ? dataPick(sites).name : (u.site || (sites.length ? dataPick(sites).name : 'Unknown site'));
+      // Pick from every created site, not just this user's assigned home site — otherwise
+      // sites with no users directly assigned would never show up in the Activity mock data.
+      const siteName = sites.length ? dataPick(sites).name : (u.site || 'Unknown site');
       const status = dataPickStatus();
       const hasResult = status.key !== 'partial';
       const date = new Date(now - Math.random()*10*86400000);
@@ -3249,6 +3294,21 @@
   const CRD_VB_W = 1000, CRD_VB_H = 340;
   const CRD_PAD = { l:46, r:50, t:16, b:100 };
 
+  // "Data quality over time" block: same status colors as the status-pill CSS classes,
+  // so a user reading the pills elsewhere recognizes the same color meaning here.
+  const STATUS_ORDER = ['complete','incomplete','partial'];
+  const STATUS_COLOR = { complete:'#1c8a4b', incomplete:'#2f6bff', partial:'#8a94a6' };
+  const STATUS_LABEL = { complete:'Finished – complete', incomplete:'Finished – incomplete', partial:'Partially completed' };
+  const SITE_CHART_MAX_BARS = 8; // beyond this, remaining sites collapse into "Other sites"
+
+  // "Device usage" partial-rate meter: reuses the app's existing amber/red accents
+  // (badge-pending / badge-error) rather than inventing a new palette.
+  function deviceRateColor(pct){
+    if (pct >= 45) return '#c0392b';
+    if (pct >= 25) return '#c2740c';
+    return '#1c8a4b';
+  }
+
   function activityBuildSeries(list, cropsPresent){
     const byDay = {};
     list.forEach(a=>{
@@ -3476,6 +3536,171 @@
     });
   }
 
+  function completionByDay(list){
+    const byDay = {};
+    list.forEach(a=>{
+      const key = a.actionDate.toISOString().slice(0,10);
+      if (!byDay[key]) byDay[key] = { complete:0, incomplete:0, partial:0 };
+      byDay[key][a.statusKey]++;
+    });
+    const days = Object.keys(byDay).sort();
+    return { days, byDay };
+  }
+
+  // 100%-stacked bars: shows the completion *mix* each day, independent of volume
+  // (volume is already visible in the per-species chart and the users table).
+  function completionChartSvg(days, byDay){
+    const plotW = ACT_VB_W - ACT_PAD.l - ACT_PAD.r;
+    const plotH = ACT_VB_H - ACT_PAD.t - ACT_PAD.b;
+    const n = days.length || 1;
+    const bandW = plotW / n;
+    const barW = Math.min(28, bandW*0.6);
+    const baseline = ACT_PAD.t + plotH;
+
+    let gridSvg = '';
+    [0,25,50,75,100].forEach(p=>{
+      const y = ACT_PAD.t + plotH - plotH*p/100;
+      gridSvg += `<line x1="${ACT_PAD.l}" y1="${y}" x2="${ACT_VB_W-ACT_PAD.r}" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
+      gridSvg += `<text x="${ACT_PAD.l-8}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)">${p}%</text>`;
+    });
+
+    const labelEvery = Math.max(1, Math.ceil(days.length/8));
+    let xLabelsSvg = '';
+    days.forEach((d,i)=>{
+      if (i % labelEvery !== 0 && i !== days.length-1) return;
+      const dt = new Date(d+'T00:00:00');
+      const label = dt.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'});
+      xLabelsSvg += `<text x="${ACT_PAD.l+bandW*(i+0.5)}" y="${ACT_VB_H-ACT_PAD.b+18}" text-anchor="middle" font-size="10" fill="var(--muted)">${label}</text>`;
+    });
+
+    let barsSvg = '', hitSvg = '';
+    days.forEach((d,i)=>{
+      const counts = byDay[d];
+      const total = counts.complete + counts.incomplete + counts.partial;
+      const cx = ACT_PAD.l + bandW*(i+0.5);
+      const x = cx - barW/2;
+      let y = baseline;
+      STATUS_ORDER.forEach(key=>{
+        const pct = total ? counts[key]/total*100 : 0;
+        const h = plotH * pct/100;
+        y -= h;
+        barsSvg += `<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(0,h)}" fill="${STATUS_COLOR[key]}"/>`;
+      });
+      hitSvg += `<rect class="comp-hit" data-i="${i}" x="${ACT_PAD.l+bandW*i}" y="${ACT_PAD.t}" width="${bandW}" height="${plotH}" fill="transparent"/>`;
+    });
+
+    return `
+      <svg viewBox="0 0 ${ACT_VB_W} ${ACT_VB_H}" preserveAspectRatio="xMidYMid meet">
+        ${gridSvg}
+        <line x1="${ACT_PAD.l}" y1="${baseline}" x2="${ACT_VB_W-ACT_PAD.r}" y2="${baseline}" stroke="var(--muted)" stroke-width="1"/>
+        ${barsSvg}
+        ${xLabelsSvg}
+        ${hitSvg}
+      </svg>`;
+  }
+
+  function initCompletionHover(days, byDay){
+    const wrap = document.getElementById('completionChartWrap');
+    const svg = wrap && wrap.querySelector('svg');
+    if (!svg || !days.length) return;
+    svg.querySelectorAll('.comp-hit').forEach(hit=>{
+      const i = parseInt(hit.dataset.i, 10);
+      const d = days[i];
+      const counts = byDay[d];
+      const total = counts.complete + counts.incomplete + counts.partial;
+      hit.addEventListener('pointermove', ev=>{
+        const dt = new Date(d+'T00:00:00');
+        const dateLabel = dt.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'});
+        const rowsHtml = STATUS_ORDER.map(key=>{
+          const val = counts[key];
+          const pct = total ? Math.round(val/total*100) : 0;
+          return `<div class="act-tip-row"><span class="act-tip-key"><span class="act-tip-line" style="background:${STATUS_COLOR[key]};"></span>${STATUS_LABEL[key]}</span><span class="act-tip-val">${val} (${pct}%)</span></div>`;
+        }).join('');
+        const tip = document.getElementById('actChartTip');
+        tip.innerHTML = `<div class="act-tip-date">${dateLabel}</div>${rowsHtml}<div class="act-tip-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px;"><span class="act-tip-key">Total</span><span class="act-tip-val">${total}</span></div>`;
+        tip.style.left = (ev.clientX + 14) + 'px';
+        tip.style.top = (ev.clientY + 14) + 'px';
+        tip.style.display = 'block';
+      });
+      hit.addEventListener('pointerleave', ()=>{
+        const tip = document.getElementById('actChartTip');
+        if (tip) tip.style.display = 'none';
+      });
+    });
+  }
+
+  // Sites are user-defined and can grow without bound; cap the bars so the chart
+  // never overflows its card, folding the long tail into a single "Other sites" bucket.
+  function activitySiteData(list){
+    const counts = {};
+    list.forEach(a=>{ const site = a.site || 'Unknown site'; counts[site] = (counts[site]||0)+1; });
+    const sorted = Object.entries(counts).map(([site,count])=>({site,count})).sort((a,b)=>b.count-a.count);
+    if (sorted.length <= SITE_CHART_MAX_BARS) return sorted;
+    const head = sorted.slice(0, SITE_CHART_MAX_BARS-1);
+    const rest = sorted.slice(SITE_CHART_MAX_BARS-1);
+    const otherCount = rest.reduce((s,d)=>s+d.count,0);
+    head.push({ site:`Other sites (${rest.length})`, count: otherCount });
+    return head;
+  }
+
+  function siteChartHtml(data){
+    const total = data.reduce((s,d)=>s+d.count,0);
+    const max = Math.max(1, ...data.map(d=>d.count));
+    const BAR_MAX_PX = 78;
+    const bars = data.map(d=>{
+      const pct = total ? Math.round(d.count/total*100) : 0;
+      const barPx = Math.max(4, Math.round(d.count/max*BAR_MAX_PX));
+      return `
+      <div class="col-chart-item">
+        <span class="col-chart-value"><b>${d.count}</b><span class="col-chart-pct">${pct}%</span></span>
+        <div class="col-chart-bar" style="height:${barPx}px;"></div>
+      </div>`;
+    }).join('');
+    const labels = data.map(d=>`<span class="col-chart-label" title="${d.site}">${d.site}</span>`).join('');
+    return `<div class="col-chart">${bars}</div><div class="col-chart-labels">${labels}</div>`;
+  }
+
+  // `a.device` is stored as "<model> of <username> (<n>)"; strip that suffix to group by model.
+  function deviceModel(deviceStr){
+    const idx = deviceStr.indexOf(' of ');
+    return idx > -1 ? deviceStr.slice(0, idx) : deviceStr;
+  }
+
+  function deviceUsageData(list){
+    const byDevice = {};
+    list.forEach(a=>{
+      const model = deviceModel(a.device);
+      if (!byDevice[model]) byDevice[model] = { total:0, partial:0 };
+      byDevice[model].total++;
+      if (a.statusKey==='partial') byDevice[model].partial++;
+    });
+    return Object.entries(byDevice)
+      .map(([model,c]) => ({ model, total:c.total, partialRate: c.total ? c.partial/c.total*100 : 0 }))
+      .sort((a,b)=> b.total - a.total);
+  }
+
+  function deviceUsageHtml(rows){
+    if (!rows.length) return `<div class="draft-empty" style="padding:30px 2px;">No device data yet.</div>`;
+    const cols = '1.6fr 0.6fr 1.3fr';
+    const head = `
+      <div class="act-users-head" style="grid-template-columns:${cols};min-height:auto;">
+        <div>Device</div><div class="act-num">Actions</div><div>Partial rate</div>
+      </div>`;
+    const rowsHtml = rows.map(r=>{
+      const color = deviceRateColor(r.partialRate);
+      return `
+      <div class="act-users-row" style="grid-template-columns:${cols};">
+        <div class="act-user-name" title="${r.model}">${r.model}</div>
+        <div class="act-num">${r.total}</div>
+        <div class="dev-rate-cell">
+          <span class="dev-rate-track"><span class="dev-rate-fill" style="width:${Math.min(100,r.partialRate)}%;background:${color};"></span></span>
+          <span class="dev-rate-pct" style="color:${color};">${Math.round(r.partialRate)}%</span>
+        </div>
+      </div>`;
+    }).join('');
+    return head + rowsHtml;
+  }
+
   function renderActivityTab(body){
     const list = getFilteredDataActions();
     if (list.length === 0){
@@ -3487,6 +3712,9 @@
 
     const cropsPresent = CROPS.filter(c => list.some(a=>a.crop===c));
     const { days, series } = activityBuildSeries(list, cropsPresent);
+    const { days: compDays, byDay: compByDay } = completionByDay(list);
+    const siteData = activitySiteData(list);
+    const deviceRows = deviceUsageData(list);
     const activeNames = new Set(list.map(a=>a.username));
     const totalUsers = users.length;
     const activeUsers = activeNames.size;
@@ -3585,9 +3813,25 @@
           </div>
         </div>
       </div>
+      <div class="act-grid" style="margin-top:18px;">
+        <div class="act-chart-card">
+          <div class="act-card-title">Data quality over time <span title="Share of complete / incomplete / partial actions logged per day">${infoSvg}</span></div>
+          <div class="act-chart-wrap" id="completionChartWrap">${completionChartSvg(compDays, compByDay)}</div>
+          <div class="act-legend">${STATUS_ORDER.map(key=>`<div class="act-legend-item"><span class="act-legend-swatch" style="background:${STATUS_COLOR[key]};"></span>${STATUS_LABEL[key]}</div>`).join('')}</div>
+        </div>
+        <div class="act-chart-card">
+          <div class="act-card-title">Actions by site <span title="Where actions were logged from, in this filtered data set">${infoSvg}</span></div>
+          ${siteChartHtml(siteData)}
+        </div>
+        <div class="act-chart-card">
+          <div class="act-card-title">Device usage <span title="Actions per device model, with the share that ended up Partially completed — useful to spot a model driving support issues">${infoSvg}</span></div>
+          <div style="margin-top:14px;">${deviceUsageHtml(deviceRows)}</div>
+        </div>
+      </div>
       ${crdSectionHtml}`;
 
     initActivityChartHover(days, series);
+    initCompletionHover(compDays, compByDay);
     if (crdTotal > 0) initCropDistHover(crdItems, crdColor);
   }
 
@@ -3645,6 +3889,63 @@
     if (!a.photoCount) return `<div class="sd-card"><div class="draft-empty" style="padding:6px 2px;">No photos yet.</div></div>`;
     const imgs = [DAD_PHOTO_GRAIN, DAD_PHOTO_SCREEN].slice(0, a.photoCount);
     return `<div class="sd-card"><div class="dad-photos">${imgs.map(svg=>`<div class="dad-photo">${svg}</div>`).join('')}</div></div>`;
+  }
+
+  // Location block: collapsible, open by default. Reuses the same read-only mini-map
+  // (loc-map-wrap/loc-map/PIN_ICONS) as the Site details modal, keyed off a.site's name
+  // since actions only carry the site *name*, not a direct reference to the site object.
+  let dadLocMapInstance = null;
+  function dadLocationSectionHtml(a){
+    const site = sites.find(s => s.name === a.site);
+    const hasLocation = !!(a.site && a.site !== 'Unknown site' && site);
+    return `
+      <h2 class="dad-h2 ${hasLocation ? 'dad-h2-toggle' : ''}" style="margin-top:22px;" ${hasLocation ? 'onclick="toggleActionLocation(event)"' : ''}>
+        <span>Location</span>
+        ${hasLocation ? `<svg class="stat-chevron-mini rotated" id="dadLocChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>` : ''}
+      </h2>
+      <div id="dadLocSection">
+        ${hasLocation
+          ? `<div class="loc-map-wrap" style="margin-bottom:0;"><div id="dadLocWrap"></div></div>`
+          : `<div class="sd-card"><div class="draft-empty" style="padding:6px 2px;">No location associated with this action.</div></div>`}
+      </div>`;
+  }
+
+  function renderDadLocationMap(a){
+    const wrap = document.getElementById('dadLocWrap');
+    if (dadLocMapInstance){ dadLocMapInstance.remove(); dadLocMapInstance = null; }
+    if (!wrap) return; // no location section rendered for this action
+    const site = sites.find(s => s.name === a.site);
+    if (!site) return;
+    const coords = siteCoords(site);
+    const typeKey = SITE_TYPES[site.type] ? site.type : DEFAULT_SITE_TYPE;
+    const t = SITE_TYPES[typeKey];
+    wrap.innerHTML = `
+      <div class="loc-map-head">
+        <span class="ud-k">${escapeAttr(site.name)}</span>
+        <span class="site-type-pill"><span class="site-type-dot" style="background:${t.color}"></span>${t.label}</span>
+      </div>
+      ${coords ? `<div id="dadLocMap" class="loc-map"></div>` : `<div class="loc-map-empty">No valid coordinates for this site</div>`}
+      <div class="dad-row" style="margin-top:10px;"><span>Localisation</span><span>${escapeAttr(site.localisation || '—')}</span></div>`;
+    if (!coords) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    dadLocMapInstance = L.map('dadLocMap', {
+      zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false,
+      doubleClickZoom:false, boxZoom:false, keyboard:false, touchZoom:false,
+    }).setView(coords, 13);
+    buildTileLayer(isDark).addTo(dadLocMapInstance);
+    L.marker(coords, { icon: PIN_ICONS[typeKey] }).addTo(dadLocMapInstance);
+    setTimeout(() => { if (dadLocMapInstance) dadLocMapInstance.invalidateSize(); }, 50);
+  }
+
+  function toggleActionLocation(ev){
+    ev.stopPropagation();
+    const body = document.getElementById('dadLocSection');
+    const chev = document.getElementById('dadLocChevron');
+    if (!body) return;
+    const opening = body.style.display === 'none';
+    body.style.display = opening ? 'block' : 'none';
+    if (chev) chev.classList.toggle('rotated', opening);
+    if (opening && dadLocMapInstance) setTimeout(()=> dadLocMapInstance.invalidateSize(), 30);
   }
 
   function dadGrainTrackerCard(a){
@@ -3708,6 +4009,7 @@
         </div>
         <button class="dad-share" onclick="showSnack('Link copied to clipboard')">${DAD_ICON_SHARE} Share</button>
       </div>
+      ${dadLocationSectionHtml(a)}
       <div class="dad-grid">
         <div>
           <h2 class="dad-h2">Origin</h2>
@@ -3722,8 +4024,12 @@
       </div>
       ${annotationsHtml}`;
     document.getElementById('dataActionModal').classList.remove('hidden');
+    renderDadLocationMap(a);
   }
-  function closeDataActionModal(){ document.getElementById('dataActionModal').classList.add('hidden'); }
+  function closeDataActionModal(){
+    document.getElementById('dataActionModal').classList.add('hidden');
+    if (dadLocMapInstance){ dadLocMapInstance.remove(); dadLocMapInstance = null; }
+  }
 
   // Modal de detalles de site (icono del ojo en la tabla). Solo se cierra con el botón Close.
   function openSiteDetails(i){
@@ -4196,6 +4502,9 @@
   document.getElementById('bulkAssignModal').addEventListener('click', e => {
     if (e.target.id === 'bulkAssignModal') closeBulkAssignModal();
   });
+  document.getElementById('bulkUserActionsModal').addEventListener('click', e => {
+    if (e.target.id === 'bulkUserActionsModal') closeBulkUserActionsModal();
+  });
 
   // Navegación del menú
   document.querySelectorAll('.nav a, .nav-bottom a').forEach(link => {
@@ -4296,7 +4605,17 @@
   function actsLabel(n){ return n===0 ? '—' : n===U_ACTIONS.length ? `All (${n})` : `${n} / ${U_ACTIONS.length}`; }
 
   /* ---------- Página Users (solo lectura) ---------- */
-  const U_GRID = 'grid-template-columns:1.4fr 0.9fr 0.8fr 0.9fr 0.9fr 70px 44px 44px;';
+  const U_GRID = 'grid-template-columns:36px 1.4fr 0.9fr 0.8fr 0.9fr 0.9fr 70px 44px 44px;';
+  // Selección para bulk actions sobre la tabla de site users (índices en `users`).
+  let siteUsersSelected = new Set();
+  function toggleSiteUserSelect(i, checked){
+    if (checked) siteUsersSelected.add(i); else siteUsersSelected.delete(i);
+    renderUsers();
+  }
+  function clearSiteUsersSelection(){
+    siteUsersSelected.clear();
+    renderUsers();
+  }
   const toolIcoSvg = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.5 4.7L3 17.2V21h3.8l6.2-6.2a4 4 0 0 0 4.7-5.5l-2.8 2.8-2.1-2.1z"/></svg>`;
   function renderUsers(){
     const card = document.getElementById('usersCard');
@@ -4350,8 +4669,12 @@
     const pageUsers = filteredUsers.slice(startIdx, startIdx + USERS_PAGE_SIZE);
     const rangeEnd = Math.min(startIdx + USERS_PAGE_SIZE, filteredUsers.length);
 
+    // Podar selección de bulk actions contra los índices válidos actuales de `users`.
+    Array.from(siteUsersSelected).forEach(i=>{ if (i<0 || i>=users.length) siteUsersSelected.delete(i); });
+
     const uRows = pageUsers.map(({u,i})=>`
       <div class="u-row" style="${U_GRID}">
+        <span><input type="checkbox" ${siteUsersSelected.has(i)?'checked':''} onchange="toggleSiteUserSelect(${i},this.checked)"></span>
         <span class="name" style="font-weight:600;">${u.name}</span>
         ${u.nomad ? nomadBadge() : `<span class="u-site">${u.site}</span>`}
         <span><span class="role-badge">Site User</span></span>
@@ -4364,8 +4687,17 @@
 
     const uSection = (users.length && showSite) ? `
       <div class="u-sec-head">Site users <span class="cnt">${filteredUsers.length}</span></div>
+      ${siteUsersSelected.size>0 ? `
+      <div class="bulk-bar" style="display:flex;">
+        <span class="bc">${siteUsersSelected.size} selected</span>
+        <select onchange="if(this.value==='actions'){openBulkUserActionsModal();} this.value='';">
+          <option value="">With selected...</option>
+          <option value="actions">Add/Modify actions</option>
+        </select>
+        <button class="bbtn bclear" onclick="clearSiteUsersSelection()">Clear</button>
+      </div>` : ''}
       <div class="table-head" style="${U_GRID}">
-        <div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Device</div><div>Nomad</div><div class="r"></div><div class="r"></div>
+        <div></div><div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Device</div><div>Nomad</div><div class="r"></div><div class="r"></div>
       </div>
       ${uRows}
       <div class="table-footer">
@@ -4436,6 +4768,136 @@
   function setUsersTab(t){ usersTab=t; usersPage=1; renderUsers(); }
   function setUsersSearch(q){ usersSearch = (q||'').toLowerCase().trim(); usersPage = 1; renderUsers(); }
   function usersChangePage(delta){ usersPage += delta; renderUsers(); }
+
+  /* ---------- Bulk "Add/Modify actions" (tabla de Users) ----------
+     Reemplaza — no combina — las actions de cada usuario seleccionado por la selección
+     hecha en el modal, así que arranca vacío: no hay un único "estado actual" coherente
+     cuando los usuarios seleccionados ya traían distintas actions cada uno. */
+  let buaSelectedActions = [];
+  let buaSelectedTemplate = null; // índice en `actionTemplates` aplicado actualmente, o null
+
+  function openBulkUserActionsModal(){
+    if (!siteUsersSelected.size) return;
+    buaSelectedActions = [];
+    buaSelectedTemplate = null;
+    const searchEl = document.getElementById('buaActionSearch');
+    if (searchEl) searchEl.value = '';
+    renderBulkUserActionsUsers();
+    renderBuaTemplates();
+    renderBulkUserActionsList('');
+    document.getElementById('bulkUserActionsModal').classList.remove('hidden');
+  }
+  // Chips de "Apply from template" — reutiliza actionTemplates (Tools > Actions template) y el
+  // tooltip fixed compartido #atTplTip (no el .role-tip absoluto anidado, que se corta con el
+  // scroll de este modal). Solo se muestra el bloque si ya existe al menos un template.
+  function renderBuaTemplates(){
+    const block = document.getElementById('buaTemplatesBlock');
+    const box = document.getElementById('buaTemplatesList');
+    if (!block || !box) return;
+    if (!actionTemplates.length){ block.style.display = 'none'; return; }
+    block.style.display = 'block';
+    box.innerHTML = actionTemplates.map((t,i)=>`
+      <span class="role-chip2 ${buaSelectedTemplate===i?'selected':''}" style="cursor:pointer;" onclick="buaApplyTemplate(${i})" onmouseenter="atShowTplTip(event, ${i})" onmouseleave="atHideTplTip()">
+        <span class="rc-ico">${toolIcoSvg}</span>
+        ${t.name}
+      </span>`).join('');
+  }
+  // Un click aplica el template (reemplaza la selección actual); si ya estaba aplicado, el
+  // siguiente click lo quita. Misma UX que genApplyTemplate en el wizard de "Add users".
+  function buaApplyTemplate(i){
+    const t = actionTemplates[i];
+    if (!t) return;
+    atHideTplTip();
+    if (buaSelectedTemplate === i){
+      buaSelectedActions = [];
+      buaSelectedTemplate = null;
+      showSnack(`Removed "${t.name}" template`);
+    } else {
+      buaSelectedActions = [...t.actions];
+      buaSelectedTemplate = i;
+      showSnack(`Applied "${t.name}" template`);
+    }
+    renderBulkUserActionsList(document.getElementById('buaActionSearch').value);
+    renderBuaTemplates();
+  }
+  function closeBulkUserActionsModal(){
+    document.getElementById('bulkUserActionsModal').classList.add('hidden');
+  }
+  function renderBulkUserActionsUsers(){
+    const box = document.getElementById('buaUsers');
+    if (!box) return;
+    document.getElementById('buaUserCount').textContent = siteUsersSelected.size;
+    document.getElementById('buaConfirmCount').textContent = siteUsersSelected.size;
+    const rows = Array.from(siteUsersSelected).map(i=>{
+      const u = users[i];
+      if (!u) return '';
+      const site = u.nomad ? 'Nomad (all sites)' : (u.site || '—');
+      return `<span class="rev-chip">${escapeAttr(u.name)} <span style="color:var(--muted2);font-weight:400;">— ${escapeAttr(site)}</span></span>`;
+    }).join('');
+    box.innerHTML = rows || `<span class="rev-empty">No users selected</span>`;
+  }
+  function renderBulkUserActionsList(filter){
+    const box = document.getElementById('buaActionsList');
+    if (!box) return;
+    const f = (filter||'').trim().toLowerCase();
+    const matches = U_ACTIONS.filter(a=>!f || a.toLowerCase().includes(f));
+    box.innerHTML = matches.length
+      ? matches.map(a=>`
+        <label style="display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13px;color:var(--navy);cursor:pointer;">
+          <input type="checkbox" ${buaSelectedActions.includes(a)?'checked':''} onchange="buaToggleAction('${a.replace(/'/g,"\\'")}')"> ${a}
+        </label>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;padding:6px 2px;margin:0;">No matching actions.</p>`;
+    const selectAll = document.getElementById('buaSelectAll');
+    if (selectAll) selectAll.checked = buaSelectedActions.length === U_ACTIONS.length;
+  }
+  function buaFilterActions(){
+    renderBulkUserActionsList(document.getElementById('buaActionSearch').value);
+  }
+  function buaToggleAction(name){
+    const pos = buaSelectedActions.indexOf(name);
+    if (pos > -1) buaSelectedActions.splice(pos, 1); else buaSelectedActions.push(name);
+    buaSelectedTemplate = null; // la selección manual ya no coincide necesariamente con el template aplicado
+    renderBulkUserActionsList(document.getElementById('buaActionSearch').value);
+    renderBuaTemplates();
+  }
+  function buaToggleAll(checked){
+    buaSelectedActions = checked ? [...U_ACTIONS] : [];
+    buaSelectedTemplate = null;
+    renderBulkUserActionsList(document.getElementById('buaActionSearch').value);
+    renderBuaTemplates();
+  }
+  // Fake latency so a bulk edit affecting several users doesn't feel instantaneous/unsafe —
+  // matches the "this is really applying something" expectation for a destructive replace.
+  function confirmBulkUserActions(){
+    const count = siteUsersSelected.size;
+    if (!count) return;
+    const btn = document.getElementById('buaConfirmBtn');
+    const cancelBtn = document.getElementById('buaCancelBtn');
+    document.getElementById('buaConfirmSpinner').style.display = 'inline-block';
+    document.getElementById('buaConfirmIdleLabel').style.display = 'none';
+    document.getElementById('buaConfirmLoadingLabel').style.display = 'inline';
+    btn.disabled = true;
+    if (cancelBtn) cancelBtn.disabled = true;
+
+    setTimeout(()=>{
+      siteUsersSelected.forEach(i=>{
+        const u = users[i];
+        if (u) u.actions = [...buaSelectedActions];
+      });
+      persistUsers();
+      siteUsersSelected.clear();
+      closeBulkUserActionsModal();
+      renderUsers();
+
+      document.getElementById('buaConfirmSpinner').style.display = 'none';
+      document.getElementById('buaConfirmIdleLabel').style.display = 'inline';
+      document.getElementById('buaConfirmLoadingLabel').style.display = 'none';
+      btn.disabled = false;
+      if (cancelBtn) cancelBtn.disabled = false;
+
+      showSnack(`Actions updated for ${count} user${count===1?'':'s'}`);
+    }, 700);
+  }
 
   /* ---------- Licenses ---------- */
   function fmtDate(iso){
@@ -5085,7 +5547,7 @@
       <div class="sites-toolbar">
         <span class="all">${filtered.length} of ${licenses.length} licenses</span>
         <div class="spacer"></div>
-        <select style="border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:14px;color:var(--navy);background:#fff;" onchange="setLicensesCountry(this.value)">
+        <select style="border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:14px;color:var(--navy);background:var(--input-bg);" onchange="setLicensesCountry(this.value)">
           <option value="all" ${licensesCountry==='all'?'selected':''}>All countries</option>
           ${LICENSE_COUNTRIES.map(c=>`<option value="${c}" ${licensesCountry===c?'selected':''}>${c}</option>`).join('')}
         </select>
