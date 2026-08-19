@@ -1201,7 +1201,11 @@
         <h1 class="page-title">Licenses</h1>
         <p class="page-sub">Assign licenses to your users.</p>
       </div>
-      <div style="display:flex;align-items:center;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn-export" id="licensesExportBtn" style="display:none;" onclick="exportLicenses()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          Export
+        </button>
         <button class="sd-demo-btn" onclick="mockLicenses()">Mock licenses (DEMO)</button>
       </div>
     </div>
@@ -2937,9 +2941,9 @@
         `<td style="${tdStyle}${zebra}white-space:nowrap;">${xlsEscape(dataActionDate(a))}</td>`,
         `<td style="${tdStyle}${zebra}">${xlsEscape(a.variety || '')}</td>`,
         `<td style="${tdStyle}${zebra}">${xlsEscape(a.device)}</td>`,
-        `<td style="${tdStyle}${zebra}text-align:right;" x:num="1">${a.humidity ?? ''}</td>`,
-        `<td style="${tdStyle}${zebra}text-align:right;" x:num="1">${a.testWeight ?? ''}</td>`,
-        `<td style="${tdStyle}${zebra}text-align:right;" x:num="1">${a.protein ?? ''}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;">${a.humidity ?? ''}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;">${a.testWeight ?? ''}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;">${a.protein ?? ''}</td>`,
         `<td style="${tdStyle}${zebra}">${xlsEscape(a.actionId)}</td>`,
       ];
       return `<tr>${cells.join('')}</tr>`;
@@ -4904,6 +4908,9 @@
   let creditPacks = Array.from({length:20}, (_,i)=>({ id:i+1, credits: PACK_SIZES[Math.floor(Math.random()*PACK_SIZES.length)] })); // pool sin asignar
   const LICENSE_COUNTRIES = ['France','Spain','Italy'];
   let licenses = Array.from({length:11}, (_,i)=>({ id:i+1, packs:[], userIndex:null, location:LICENSE_COUNTRIES[i%3] })); // userIndex -> índice en `users`
+  // El botón Export solo tiene sentido una vez que hay datos de consumo generados por el
+  // botón "Mock licenses (DEMO)" — antes de eso las licencias no tienen packs ni fechas.
+  let licensesMocked = false;
 
   // Persistencia de usuarios y managers
   const USERS_KEY = 'fleetview_users_v1';
@@ -5769,6 +5776,7 @@
   // "running low" y "expiring soon" para que esos filtros siempre tengan datos que
   // mostrar al usar el botón demo; el resto se sortea. No toca el pool ni el usuario asignado.
   function mockLicenses(){
+    licensesMocked = true;
     const day = 86400000;
 
     // Primero, devolver al pool todos los packs que ya estén en licencias, para
@@ -5853,6 +5861,9 @@
 
     renderLicenseQuickFilters();
     updateLicensesAlert();
+
+    const exportBtn = document.getElementById('licensesExportBtn');
+    if (exportBtn) exportBtn.style.display = licensesMocked ? 'inline-flex' : 'none';
 
     const counts = {
       all: licenses.length,
@@ -5980,6 +5991,85 @@
         <span>${licenses.filter(l=>l.userIndex!==null).length} of ${licenses.length} licenses assigned</span>
         <span><b>${licenses.reduce((s,l)=>s+licenseStats(l).consumed,0)}</b> credits consumed in total</span>
       </div>`;
+  }
+
+  // Exporta siempre el listado completo de licencias (sin aplicar los filtros de la
+  // vista) — misma técnica que exportDataActions(): tabla HTML con estilos inline
+  // como .xls, sin librerías externas.
+  const LIC_XLS_COLS = [
+    { label:'Assigned user',     width:180 },
+    { label:'License',           width:100 },
+    { label:'Location',          width:100 },
+    { label:'Status',            width:110 },
+    { label:'Credits remaining', width:130 },
+    { label:'Credits consumed',  width:130 },
+    { label:'Total purchased',   width:130 },
+    { label:'Plan',              width:160 },
+    { label:'Activation',        width:110 },
+    { label:'Expiration',        width:110 },
+  ];
+  const LIC_STATUS_XLS_COLORS = {
+    active:     { bg:'#EEFAF1', color:'#1C8A4B' },
+    expired:    { bg:'#FBEAEA', color:'#C0392B' },
+    upcoming:   { bg:'#EAF1FF', color:'#2F6BFF' },
+    unassigned: { bg:'#F2F4F8', color:'#6B7688' },
+    nopacks:    { bg:'#F2F4F8', color:'#6B7688' },
+  };
+  function exportLicenses(){
+    const filtered = licenses; // exporta siempre el listado completo, sin aplicar los filtros de la vista
+    if (!filtered.length){ showSnack('No licenses to export'); return; }
+
+    const thStyle = 'background:#1B2A4E;color:#FFFFFF;font-weight:bold;font-size:12px;padding:7px 9px;border:1px solid #12203D;text-align:left;white-space:nowrap;';
+    const tdStyle = 'font-size:12px;padding:5px 9px;border:1px solid #E3E7EE;';
+
+    const colgroup = LIC_XLS_COLS.map(c=>`<col style="width:${c.width}px;">`).join('');
+    const headRow = `<tr>${LIC_XLS_COLS.map(c=>`<th style="${thStyle}">${xlsEscape(c.label)}</th>`).join('')}</tr>`;
+
+    const bodyRows = filtered.map((lic,idx)=>{
+      const zebra = idx % 2 === 1 ? 'background:#F8F9FC;' : 'background:#FFFFFF;';
+      const stats = licenseStats(lic);
+      const dates = licenseDates(lic);
+      const status = licenseStatus(lic);
+      const sc = LIC_STATUS_XLS_COLORS[status] || LIC_STATUS_XLS_COLORS.unassigned;
+      const assignedUser = lic.userIndex!==null ? users[lic.userIndex] : null;
+      const cells = [
+        `<td style="${tdStyle}${zebra}">${xlsEscape(assignedUser ? assignedUser.name : '')}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape('License #'+lic.id)}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(lic.location)}</td>`,
+        `<td style="${tdStyle}background:${sc.bg};color:${sc.color};font-weight:bold;">${xlsEscape(status)}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;">${stats.remaining}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;">${stats.consumed}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;">${stats.total}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(lic.packs.length ? 'Classic credit pack' : '')}</td>`,
+        `<td style="${tdStyle}${zebra}white-space:nowrap;">${xlsEscape(dates ? fmtDate(dates.activation) : '')}</td>`,
+        `<td style="${tdStyle}${zebra}white-space:nowrap;">${xlsEscape(dates ? fmtDate(dates.expiration) : '')}</td>`,
+      ];
+      return `<tr>${cells.join('')}</tr>`;
+    }).join('');
+
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8">
+<!--[if gte mso 9]><xml>
+<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+<x:Name>Licenses export</x:Name>
+<x:WorksheetOptions>
+<x:FreezePanes/><x:FrozenNoSplit/><x:SplitHorizontal>1</x:SplitHorizontal><x:TopRowBottomPane>1</x:TopRowBottomPane><x:ActivePane>2</x:ActivePane>
+</x:WorksheetOptions>
+</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+<body>
+<table style="border-collapse:collapse;font-family:Calibri,Arial,sans-serif;">
+<colgroup>${colgroup}</colgroup>
+<tbody>${headRow}${bodyRows}</tbody>
+</table>
+</body></html>`;
+
+    const blob = new Blob(['﻿'+html], { type:'application/vnd.ms-excel;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    downloadUrl(url, `licenses-export-${new Date().toISOString().slice(0,10)}.xls`);
+    URL.revokeObjectURL(url);
+    showSnack(`Exported ${filtered.length} license${filtered.length===1?'':'s'}`);
   }
 
   /* ================= DEVICES ================= */
