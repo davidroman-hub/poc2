@@ -226,7 +226,7 @@
      de las que caben, solo #rows hace scroll interno, la tarjeta no crece. */
   .sites-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;flex:1;display:flex;flex-direction:column;min-height:0;}
   #rows{flex:1;overflow-y:auto;min-height:400px;}
-  #usersCard{overflow-y:auto;}
+  #usersCard{overflow-y:auto;min-height:200px;}
   #dataRows{max-height:480px;overflow-y:auto;}
 
   /* Scrollbar de color propio en las zonas con scroll interno, para que se
@@ -363,6 +363,11 @@
   .col-chart-labels{display:flex;gap:24px;padding-top:10px;}
   .col-chart-label{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted2);}
   .col-chart-sub{font-size:10.5px;font-weight:500;color:var(--muted);}
+  .col-chart-item.clickable,.col-chart-label.clickable{cursor:pointer;}
+  .col-chart-item.clickable:hover .col-chart-bar{filter:brightness(0.9);}
+  .col-chart-label.clickable:hover{color:var(--navy);}
+  .col-chart-item.active .col-chart-bar{outline:2px solid var(--navy);outline-offset:2px;}
+  .col-chart-label.active{color:var(--navy);}
   .icon-btn.danger:hover{background:#fdecec;color:#e2453b;}
   .site-row .name{font-weight:600;color:var(--navy);}
   .site-row .r{text-align:center;color:var(--muted2);}
@@ -375,6 +380,19 @@
   .u-row{display:grid;grid-template-columns:1.7fr 1.1fr 1.3fr 90px 110px 44px;padding:8px 6px;border-bottom:1px solid var(--border);font-size:13.5px;align-items:center;gap:8px;}
   .u-name-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;color:var(--navy);font-weight:600;outline:none;}
   .u-name-input:focus{border-color:var(--blue);}
+  .u-name-cell{display:flex;align-items:center;gap:6px;min-width:0;}
+  .u-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .u-edit-btn{opacity:0;flex-shrink:0;padding:3px;}
+  .u-edit-btn svg{width:14px;height:14px;}
+  .u-row:hover .u-edit-btn,.u-edit-btn:focus-visible{opacity:1;}
+  .u-name-edit{position:relative;display:flex;align-items:center;gap:4px;min-width:0;}
+  .u-name-edit .u-name-input{padding:6px 9px;font-size:13px;}
+  .u-name-edit .u-name-input.err{border-color:#e2453b;}
+  .u-name-edit .icon-btn{flex-shrink:0;padding:4px;}
+  .u-name-edit .icon-btn svg{width:15px;height:15px;}
+  .u-name-edit .btn-spinner{flex-shrink:0;}
+  .u-name-err{position:absolute;top:calc(100% + 4px);left:0;font-size:11.5px;font-weight:600;color:#e2453b;background:#fff;white-space:nowrap;z-index:5;}
+  [data-theme="dark"] .u-name-err{background:var(--card);}
   .u-site{color:var(--muted2);font-size:13px;}
   .nomad-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#eefaf1;color:#1c8a4b;border:1px solid #c4ecd1;}
   .u-actions-btn{width:100%;text-align:left;border:1px solid var(--border);border-radius:8px;padding:9px 30px 9px 11px;font-size:13px;background:#fff;cursor:pointer;font-family:inherit;color:var(--muted2);position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -631,6 +649,14 @@
   .act-chart-card{flex:1.6;min-width:380px;border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--card);}
   .act-users-card{flex:1;min-width:340px;border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--card);display:flex;flex-direction:column;}
   .act-card-title{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:700;color:var(--navy);}
+  /* Tooltip CSS puro (sin JS, sin delay) para íconos ⓘ — más confiable que el title= nativo,
+     que puede tardar en aparecer o no dispararse según el navegador. */
+  .info-hover{position:relative;display:inline-flex;align-items:center;cursor:default;}
+  .info-hover-tip{display:none;position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);
+    width:250px;background:var(--card);border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 10px 26px rgba(20,29,51,.18);padding:10px 12px;font-size:12.5px;font-weight:500;
+    color:var(--navy);line-height:1.5;z-index:80;text-align:left;white-space:normal;}
+  .info-hover:hover .info-hover-tip,.info-hover:focus-within .info-hover-tip{display:block;}
   .act-card-title svg{width:15px;height:15px;color:var(--muted);cursor:default;flex-shrink:0;}
   .act-chart-wrap{position:relative;margin-top:14px;}
   .act-chart-wrap svg{width:100%;height:auto;display:block;overflow:visible;}
@@ -1227,7 +1253,7 @@
       </div>
     </div>
     <div class="content" style="margin-top:22px;">
-      <div class="stat-row">
+      <div class="stat-row" style="grid-template-columns:repeat(3,1fr);">
         <div class="stat-card" onclick="setDevicesTab('all')" title="Show all devices">
           <div class="stat-card-top">
             <div class="stat-ico stat-ico-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg></div>
@@ -1249,6 +1275,10 @@
           <div class="stat-count" id="devicesAttentionCount">0</div>
           <div class="stat-label">Need attention (inactive 7+ days or stale 30+ days)</div>
         </div>
+      </div>
+      <div class="act-chart-card" style="flex:none;min-width:0;margin-bottom:16px;">
+        <div class="act-card-title">Device usage <span class="info-hover" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v5.5M12 8v.01"/></svg><span class="info-hover-tip">Bar height &amp; number: how many registered devices use that model. Color &amp; %: the share of those devices that are inactive or stale — useful to spot a model driving support issues.</span></span></div>
+        <div class="act-chart-wrap" id="deviceUsageCard"></div>
       </div>
       <div class="sites-card" id="devicesCard"></div>
     </div>
@@ -2852,6 +2882,305 @@
 
   const DFP_X = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
   const DFP_FILTER_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg>`;
+  const DFP_EXPORT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>`;
+
+  // Exporta las filas actualmente filtradas (respeta los filtros aplicados en ambas pestañas,
+  // Data y Activity, ya que Activity es solo una vista agregada del mismo set) como .xls: una
+  // tabla HTML con estilos inline, que Excel/Numbers/Sheets abren como hoja de cálculo formateada
+  // (header en negrita, fila congelada, colores por status/crop, zebra striping) sin depender
+  // de ninguna librería externa.
+  const XLS_COLS = [
+    { label:'Status',      width:150 },
+    { label:'Crop',        width:100 },
+    { label:'Sample ID',   width:110 },
+    { label:'Username',    width:140 },
+    { label:'Site',        width:140 },
+    { label:'Action name', width:220 },
+    { label:'Action date', width:130 },
+    { label:'Variety',     width:150 },
+    { label:'Device',      width:210 },
+    { label:'Humidity',    width:85  },
+    { label:'Test weight', width:90  },
+    { label:'Protein',     width:80  },
+    { label:'Action ID',   width:230 },
+  ];
+  const XLS_STATUS_COLORS = {
+    partial:    { bg:'#F2F4F8', color:'#6B7688' },
+    incomplete: { bg:'#EAF1FF', color:'#2F6BFF' },
+    complete:   { bg:'#EEFAF1', color:'#1C8A4B' },
+  };
+  function xlsEscape(v){
+    const s = v===null || v===undefined ? '' : String(v);
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function exportDataActions(){
+    const filtered = getFilteredDataActions();
+    if (!filtered.length){ showSnack('No data to export'); return; }
+
+    const thStyle = 'background:#1B2A4E;color:#FFFFFF;font-weight:bold;font-size:12px;padding:7px 9px;border:1px solid #12203D;text-align:left;white-space:nowrap;';
+    const tdStyle = 'font-size:12px;padding:5px 9px;border:1px solid #E3E7EE;';
+
+    const colgroup = XLS_COLS.map(c=>`<col style="width:${c.width}px;">`).join('');
+    const headRow = `<tr>${XLS_COLS.map(c=>`<th style="${thStyle}">${xlsEscape(c.label)}</th>`).join('')}</tr>`;
+
+    const bodyRows = filtered.map((a,idx)=>{
+      const zebra = idx % 2 === 1 ? 'background:#F8F9FC;' : 'background:#FFFFFF;';
+      const sc = XLS_STATUS_COLORS[a.statusKey] || XLS_STATUS_COLORS.partial;
+      const cc = CROP_COLORS[a.crop] || CROP_COLOR_DEFAULT;
+      const cells = [
+        `<td style="${tdStyle}background:${sc.bg};color:${sc.color};font-weight:bold;">${xlsEscape(a.statusLabel)}</td>`,
+        `<td style="${tdStyle}background:${cc.bg};color:${cc.text};font-weight:bold;">${xlsEscape(a.cropLabel)}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(a.sampleId || '')}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(a.username)}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(a.site)}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(a.actionName)}</td>`,
+        `<td style="${tdStyle}${zebra}white-space:nowrap;">${xlsEscape(dataActionDate(a))}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(a.variety || '')}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(a.device)}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;" x:num="1">${a.humidity ?? ''}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;" x:num="1">${a.testWeight ?? ''}</td>`,
+        `<td style="${tdStyle}${zebra}text-align:right;" x:num="1">${a.protein ?? ''}</td>`,
+        `<td style="${tdStyle}${zebra}">${xlsEscape(a.actionId)}</td>`,
+      ];
+      return `<tr>${cells.join('')}</tr>`;
+    }).join('');
+
+    // La pestaña Activity es puramente visual (charts sobre el mismo set filtrado); si se
+    // exporta desde ahí, el PNG de esos charts (redibujados en <canvas>, ver más abajo) se
+    // incrusta como imagen en una celda combinada al principio de la MISMA hoja, antes del
+    // header — así el chart queda dentro del propio .xls en vez de en un archivo aparte.
+    let chartRowsHtml = '';
+    let headerRowIndex = 1; // fila (1-based) donde cae el header, para congelar los paneles hasta ahí
+    if (dataSection === 'activity'){
+      const chart = buildActivityChartsImage(filtered);
+      if (chart){
+        chartRowsHtml = `
+<tr><td colspan="${XLS_COLS.length}" style="border:none;padding:0 0 6px;line-height:0;"><img src="${chart.url}" width="${chart.width}" height="${chart.height}" alt="Activity charts"></td></tr>
+<tr><td colspan="${XLS_COLS.length}" style="border:none;height:8px;line-height:8px;font-size:1px;">&nbsp;</td></tr>`;
+        headerRowIndex = 3;
+      }
+    }
+
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8">
+<!--[if gte mso 9]><xml>
+<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+<x:Name>Data export</x:Name>
+<x:WorksheetOptions>
+<x:FreezePanes/><x:FrozenNoSplit/><x:SplitHorizontal>${headerRowIndex}</x:SplitHorizontal><x:TopRowBottomPane>${headerRowIndex}</x:TopRowBottomPane><x:ActivePane>2</x:ActivePane>
+</x:WorksheetOptions>
+</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+<body>
+<table style="border-collapse:collapse;font-family:Calibri,Arial,sans-serif;">
+<colgroup>${colgroup}</colgroup>
+<tbody>${chartRowsHtml}${headRow}${bodyRows}</tbody>
+</table>
+</body></html>`;
+
+    const blob = new Blob(['﻿'+html], { type:'application/vnd.ms-excel;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    downloadUrl(url, `data-export-${new Date().toISOString().slice(0,10)}.xls`);
+    URL.revokeObjectURL(url);
+    showSnack(`Exported ${filtered.length} row${filtered.length===1?'':'s'}${chartRowsHtml ? ' + charts' : ''}`);
+  }
+  function downloadUrl(url, filename){
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /* ---------- Activity charts snapshot: redibuja los charts de la pestaña Activity en
+     <canvas> (a partir de los mismos datos que sus versiones SVG/CSS) para poder exportarlos
+     como imagen — un <canvas> no puede leer custom properties CSS, así que aquí se usan los
+     valores hex planos en lugar de var(--...). ---------- */
+  const CHART_CROP_HEX = { Barley:'#2a78d6', Wheat:'#eb6834', Corn:'#1baf7a', Rice:'#eda100', Soybean:'#e87ba4', Oats:'#008300' };
+  function chartText(ctx, text, x, y, opts){
+    opts = opts || {};
+    ctx.fillStyle = opts.color || '#6b7688';
+    ctx.font = (opts.bold ? 'bold ' : '') + (opts.size || 10) + 'px Arial, sans-serif';
+    ctx.textAlign = opts.align || 'left';
+    ctx.textBaseline = opts.baseline || 'alphabetic';
+    ctx.fillText(text, x, y);
+  }
+  function chartEmptyNote(ctx, x, y, w, h){
+    chartText(ctx, 'No data', x + w/2, y + h/2, { align:'center', size:12, color:'#8a94a6' });
+  }
+  function drawSpeciesChart(ctx, x, y, w, h, days, series){
+    const padL=42, padR=10, padT=10, padB=24;
+    const plotW = w-padL-padR, plotH = h-padT-padB;
+    const maxVal = Math.max(1, ...series.flatMap(s=>s.values));
+    const yMax = niceMax(maxVal);
+    const xAt = i => days.length<=1 ? x+padL+plotW/2 : x+padL+plotW*(i/(days.length-1));
+    const yAt = v => y+padT+plotH-(plotH*v/yMax);
+    ctx.strokeStyle = '#e3e7ee'; ctx.lineWidth = 1;
+    for (let t=0;t<=4;t++){
+      const val = Math.round(yMax*t/4), yy = yAt(val);
+      ctx.beginPath(); ctx.moveTo(x+padL,yy); ctx.lineTo(x+w-padR,yy); ctx.stroke();
+      chartText(ctx, String(val), x+padL-6, yy+3, { align:'right', size:9 });
+    }
+    const labelEvery = Math.max(1, Math.ceil(days.length/6));
+    days.forEach((d,i)=>{
+      if (i%labelEvery!==0 && i!==days.length-1) return;
+      const label = new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
+      chartText(ctx, label, xAt(i), y+h-6, { align:'center', size:9 });
+    });
+    series.forEach(s=>{
+      const color = CHART_CROP_HEX[s.crop] || '#2a78d6';
+      const pts = s.values.map((v,i)=>[xAt(i), yAt(v)]);
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], yAt(0));
+      pts.forEach(p=>ctx.lineTo(p[0],p[1]));
+      ctx.lineTo(pts[pts.length-1][0], yAt(0));
+      ctx.closePath();
+      ctx.fillStyle = color + '22';
+      ctx.fill();
+      ctx.beginPath();
+      pts.forEach((p,i)=> i===0 ? ctx.moveTo(p[0],p[1]) : ctx.lineTo(p[0],p[1]));
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+    });
+  }
+  function drawCompletionChart(ctx, x, y, w, h, days, byDay){
+    const padL=32, padR=10, padT=10, padB=24;
+    const plotW = w-padL-padR, plotH = h-padT-padB;
+    const n = days.length||1, bandW = plotW/n;
+    const barW = Math.min(24, bandW*0.6);
+    const baseline = y+padT+plotH;
+    ctx.strokeStyle = '#e3e7ee'; ctx.lineWidth = 1;
+    [0,25,50,75,100].forEach(p=>{
+      const yy = y+padT+plotH-plotH*p/100;
+      ctx.beginPath(); ctx.moveTo(x+padL,yy); ctx.lineTo(x+w-padR,yy); ctx.stroke();
+      chartText(ctx, p+'%', x+padL-6, yy+3, { align:'right', size:9 });
+    });
+    days.forEach((d,i)=>{
+      const counts = byDay[d];
+      const total = counts.complete+counts.incomplete+counts.partial;
+      const bx = x+padL+bandW*(i+0.5)-barW/2;
+      let yCur = baseline;
+      STATUS_ORDER.forEach(key=>{
+        const pct = total ? counts[key]/total*100 : 0;
+        const hh = plotH*pct/100;
+        yCur -= hh;
+        ctx.fillStyle = STATUS_COLOR[key];
+        ctx.fillRect(bx, yCur, barW, Math.max(0,hh));
+      });
+    });
+    const labelEvery = Math.max(1, Math.ceil(days.length/8));
+    days.forEach((d,i)=>{
+      if (i%labelEvery!==0 && i!==days.length-1) return;
+      const label = new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
+      chartText(ctx, label, x+padL+bandW*(i+0.5), y+h-6, { align:'center', size:9 });
+    });
+  }
+  function drawSiteBarChart(ctx, x, y, w, h, data){
+    const padL=10, padR=10, padT=14, padB=36;
+    const plotW = w-padL-padR, plotH = h-padT-padB;
+    const n = data.length||1;
+    const total = data.reduce((s,d)=>s+d.count,0);
+    const max = Math.max(1, ...data.map(d=>d.count));
+    const gap = 14;
+    const barW = Math.min(50, (plotW-gap*(n-1))/n);
+    const baseline = y+padT+plotH;
+    data.forEach((d,i)=>{
+      const bx = x+padL+i*(barW+gap);
+      const barH = Math.max(3, plotH*d.count/max);
+      ctx.fillStyle = '#2f6bff';
+      ctx.fillRect(bx, baseline-barH, barW, barH);
+      const pct = total ? Math.round(d.count/total*100) : 0;
+      chartText(ctx, String(d.count), bx+barW/2, baseline-barH-14, { align:'center', size:10, bold:true, color:'#141d33' });
+      chartText(ctx, pct+'%', bx+barW/2, baseline-barH-4, { align:'center', size:9 });
+      let label = d.site.length>11 ? d.site.slice(0,10)+'…' : d.site;
+      chartText(ctx, label, bx+barW/2, baseline+16, { align:'center', size:9 });
+    });
+  }
+  function drawVarietyChart(ctx, x, y, w, h, items, countColor){
+    const padL=32, padR=32, padT=10, padB=54;
+    const plotW = w-padL-padR, plotH = h-padT-padB;
+    const n = items.length||1, groupW = plotW/n;
+    const barW = Math.min(18, groupW*0.4);
+    const proteinMax = niceMax(Math.max(1, ...items.map(it=>it.protein)));
+    const countMax = niceMax(Math.max(1, ...items.map(it=>it.count)));
+    const baseline = y+padT+plotH;
+    const yC = v => y+padT+plotH-plotH*v/countMax;
+    const yP = v => y+padT+plotH-plotH*v/proteinMax;
+    ctx.strokeStyle = '#e3e7ee'; ctx.lineWidth = 1;
+    for (let t=0;t<=3;t++){
+      const val = Math.round(countMax*t/3), yy = yC(val);
+      ctx.beginPath(); ctx.moveTo(x+padL,yy); ctx.lineTo(x+w-padR,yy); ctx.stroke();
+      chartText(ctx, String(val), x+padL-6, yy+3, { align:'right', size:9 });
+    }
+    const centers = [];
+    items.forEach((it,i)=>{
+      const cx = x+padL+groupW*(i+0.5);
+      centers.push(cx);
+      const barH = Math.max(0, baseline-yC(it.count));
+      ctx.fillStyle = countColor;
+      ctx.fillRect(cx-barW/2, yC(it.count), barW, barH);
+      let label = it.variety.length>10 ? it.variety.slice(0,9)+'…' : it.variety;
+      ctx.save();
+      ctx.translate(cx, baseline+8);
+      ctx.rotate(-Math.PI/4);
+      chartText(ctx, label, 0, 0, { align:'right', size:9 });
+      ctx.restore();
+    });
+    ctx.beginPath();
+    items.forEach((it,i)=>{
+      const py = yP(it.protein);
+      i===0 ? ctx.moveTo(centers[i],py) : ctx.lineTo(centers[i],py);
+    });
+    ctx.strokeStyle = PROTEIN_BAR_COLOR; ctx.lineWidth = 2; ctx.stroke();
+    items.forEach((it,i)=>{
+      ctx.beginPath(); ctx.arc(centers[i], yP(it.protein), 3, 0, Math.PI*2);
+      ctx.fillStyle = PROTEIN_BAR_COLOR; ctx.fill();
+    });
+  }
+  // Compone los 4 charts de Activity en un único PNG (grid 2x2), a partir del mismo set
+  // filtrado y del mismo crop seleccionado en "Distribution by variety" que ve el usuario.
+  function buildActivityChartsImage(list){
+    if (!list.length) return null;
+    const cropsPresent = CROPS.filter(c => list.some(a=>a.crop===c));
+    const { days, series } = activityBuildSeries(list, cropsPresent);
+    const { days: compDays, byDay: compByDay } = completionByDay(list);
+    const siteData = activitySiteData(list);
+    const crop = (cropDetailCrop && cropsPresent.includes(cropDetailCrop)) ? cropDetailCrop : cropsPresent[0];
+    const crdItems = crop ? cropDistributionData(list, crop).items.filter(it=>it.count>0) : [];
+    const crdColor = CROP_VIVID[crop] || CROP_VIVID_DEFAULT;
+
+    const PANEL_W = 560, PANEL_H = 230, TITLE_H = 24, GAP = 24, PAD = 20;
+    const W = PAD*2 + 2*PANEL_W + GAP;
+    const H = PAD*2 + 2*(PANEL_H+TITLE_H) + GAP;
+
+    const canvas = document.createElement('canvas');
+    const dpr = 2;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr,dpr);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,W,H);
+
+    const panels = [
+      { title:'Number of actions per species', draw:(x,y,w,h)=> series.length ? drawSpeciesChart(ctx,x,y,w,h,days,series) : chartEmptyNote(ctx,x,y,w,h) },
+      { title:'Data quality over time',        draw:(x,y,w,h)=> compDays.length ? drawCompletionChart(ctx,x,y,w,h,compDays,compByDay) : chartEmptyNote(ctx,x,y,w,h) },
+      { title:'Actions by site',                draw:(x,y,w,h)=> siteData.length ? drawSiteBarChart(ctx,x,y,w,h,siteData) : chartEmptyNote(ctx,x,y,w,h) },
+      { title:`Distribution by variety${crop ? ' — '+(CROP_DISPLAY_NAME[crop]||crop) : ''}`, draw:(x,y,w,h)=> crdItems.length ? drawVarietyChart(ctx,x,y,w,h,crdItems,crdColor) : chartEmptyNote(ctx,x,y,w,h) },
+    ];
+
+    panels.forEach((p,idx)=>{
+      const col = idx % 2, row = Math.floor(idx/2);
+      const x = PAD + col*(PANEL_W+GAP);
+      const y = PAD + row*(PANEL_H+TITLE_H+GAP);
+      chartText(ctx, p.title, x, y, { align:'left', baseline:'top', size:14, bold:true, color:'#141d33' });
+      ctx.strokeStyle = '#e3e7ee';
+      ctx.strokeRect(x, y+TITLE_H, PANEL_W, PANEL_H);
+      p.draw(x, y+TITLE_H, PANEL_W, PANEL_H);
+    });
+
+    return { url: canvas.toDataURL('image/png'), width: W, height: H };
+  }
   const DATA_DATE_PRESETS = [
     { label:'7 days',   days:7 },
     { label:'14 days',  days:14 },
@@ -2930,6 +3259,7 @@
     return `
       <div class="data-filter-bar-row">
         <button class="filters-btn dfpp-trigger" onclick="openDataFilterPanel(event)">${DFP_FILTER_ICON}Filters${n?` <span class="dfpp-badge">${n}</span>`:''}</button>
+        <button class="filters-btn dfpp-trigger" onclick="exportDataActions()">${DFP_EXPORT_ICON}Export</button>
         ${chips.join('')}
         ${n ? `<button class="dfp-clear" onclick="clearAppliedDataFilters()">${DFP_X} Clear filters</button>` : ''}
       </div>`;
@@ -3661,15 +3991,15 @@
   }
 
   // `a.device` is stored as "<model> of <username> (<n>)"; strip that suffix to group by model.
-  function deviceModel(deviceStr){
+  function actDeviceModel(deviceStr){
     const idx = deviceStr.indexOf(' of ');
     return idx > -1 ? deviceStr.slice(0, idx) : deviceStr;
   }
 
-  function deviceUsageData(list){
+  function actDeviceUsageData(list){
     const byDevice = {};
     list.forEach(a=>{
-      const model = deviceModel(a.device);
+      const model = actDeviceModel(a.device);
       if (!byDevice[model]) byDevice[model] = { total:0, partial:0 };
       byDevice[model].total++;
       if (a.statusKey==='partial') byDevice[model].partial++;
@@ -3679,7 +4009,7 @@
       .sort((a,b)=> b.total - a.total);
   }
 
-  function deviceUsageHtml(rows){
+  function actDeviceUsageHtml(rows){
     if (!rows.length) return `<div class="draft-empty" style="padding:30px 2px;">No device data yet.</div>`;
     const cols = '1.6fr 0.6fr 1.3fr';
     const head = `
@@ -3714,7 +4044,7 @@
     const { days, series } = activityBuildSeries(list, cropsPresent);
     const { days: compDays, byDay: compByDay } = completionByDay(list);
     const siteData = activitySiteData(list);
-    const deviceRows = deviceUsageData(list);
+    const deviceRows = actDeviceUsageData(list);
     const activeNames = new Set(list.map(a=>a.username));
     const totalUsers = users.length;
     const activeUsers = activeNames.size;
@@ -3730,11 +4060,11 @@
           <div class="act-stat-value blue">${totalUsers}</div>
         </div>
         <div class="act-stat">
-          <div class="act-stat-label">Active users <span title="Users who performed at least one action in this data set">${infoSvg}</span></div>
+          <div class="act-stat-label">Active users <span class="info-hover" tabindex="0">${infoSvg}<span class="info-hover-tip">Users who performed at least one action in this data set.</span></span></div>
           <div class="act-stat-value green">${activeUsers}</div>
         </div>
         <div class="act-stat">
-          <div class="act-stat-label">Inactive users <span title="Users who haven't performed any action yet">${warnSvg}</span></div>
+          <div class="act-stat-label">Inactive users <span class="info-hover" tabindex="0">${warnSvg}<span class="info-hover-tip">Users who haven't performed any action yet.</span></span></div>
           <div class="act-stat-value muted">${inactiveUsers}</div>
         </div>
       </div>`;
@@ -3815,17 +4145,17 @@
       </div>
       <div class="act-grid" style="margin-top:18px;">
         <div class="act-chart-card">
-          <div class="act-card-title">Data quality over time <span title="Share of complete / incomplete / partial actions logged per day">${infoSvg}</span></div>
+          <div class="act-card-title">Data quality over time <span class="info-hover" tabindex="0">${infoSvg}<span class="info-hover-tip">Share of complete / incomplete / partial actions logged per day.</span></span></div>
           <div class="act-chart-wrap" id="completionChartWrap">${completionChartSvg(compDays, compByDay)}</div>
           <div class="act-legend">${STATUS_ORDER.map(key=>`<div class="act-legend-item"><span class="act-legend-swatch" style="background:${STATUS_COLOR[key]};"></span>${STATUS_LABEL[key]}</div>`).join('')}</div>
         </div>
         <div class="act-chart-card">
-          <div class="act-card-title">Actions by site <span title="Where actions were logged from, in this filtered data set">${infoSvg}</span></div>
+          <div class="act-card-title">Actions by site <span class="info-hover" tabindex="0">${infoSvg}<span class="info-hover-tip">Where actions were logged from, in this filtered data set.</span></span></div>
           ${siteChartHtml(siteData)}
         </div>
         <div class="act-chart-card">
-          <div class="act-card-title">Device usage <span title="Actions per device model, with the share that ended up Partially completed — useful to spot a model driving support issues">${infoSvg}</span></div>
-          <div style="margin-top:14px;">${deviceUsageHtml(deviceRows)}</div>
+          <div class="act-card-title">Device usage <span class="info-hover" tabindex="0">${infoSvg}<span class="info-hover-tip">Actions: how many actions were logged from that device model. Partial rate: the share of those actions left Partially completed — useful to spot a model driving support issues.</span></span></div>
+          <div style="margin-top:14px;">${actDeviceUsageHtml(deviceRows)}</div>
         </div>
       </div>
       ${crdSectionHtml}`;
@@ -4560,6 +4890,11 @@
   let usersSearch = '';
   let usersPage = 1;
   const USERS_PAGE_SIZE = 25;
+  // Edición inline del username (tabla de site users)
+  let editingUserIndex = null; // índice en `users` que se está editando, o null
+  let editingUserValue = '';
+  let editingUserError = '';
+  let editingUserSaving = false;
 
   // Licencias: 5 licencias, cada una puede contener paquetes de créditos y
   // puede estar asignada a un usuario. Los paquetes empiezan como un pool
@@ -4654,6 +4989,9 @@
 
     const eyeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
     const trashSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>`;
+    const pencilSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`;
+    const checkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg>`;
+    const xSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
     const filteredUsers = users
       .map((u,i)=>({u,i}))
@@ -4675,7 +5013,22 @@
     const uRows = pageUsers.map(({u,i})=>`
       <div class="u-row" style="${U_GRID}">
         <span><input type="checkbox" ${siteUsersSelected.has(i)?'checked':''} onchange="toggleSiteUserSelect(${i},this.checked)"></span>
-        <span class="name" style="font-weight:600;">${u.name}</span>
+        ${editingUserIndex===i ? `
+        <span class="u-name-edit">
+          <input type="text" class="u-name-input ${editingUserError?'err':''}" id="uNameInput-${i}" value="${escapeAttr(editingUserValue)}"
+            oninput="setEditingUserValue(this.value)"
+            onkeydown="if(event.key==='Enter')saveUsername(${i});else if(event.key==='Escape')cancelEditUsername();"
+            ${editingUserSaving?'disabled':''}>
+          ${editingUserSaving
+            ? `<span class="btn-spinner" style="border-top-color:var(--blue);border-color:rgba(43,91,255,.25);"></span>`
+            : `<button class="icon-btn" title="Save" onclick="saveUsername(${i})">${checkSvg}</button>
+               <button class="icon-btn" title="Cancel" onclick="cancelEditUsername()">${xSvg}</button>`}
+          ${editingUserError ? `<span class="u-name-err">${editingUserError}</span>` : ''}
+        </span>` : `
+        <span class="name u-name-cell" style="font-weight:600;">
+          <span class="u-name-text">${u.name}</span>
+          <button class="icon-btn u-edit-btn" title="Edit username" onclick="startEditUsername(${i})">${pencilSvg}</button>
+        </span>`}
         ${u.nomad ? nomadBadge() : `<span class="u-site">${u.site}</span>`}
         <span><span class="role-badge">Site User</span></span>
         <span class="u-site">${actsLabel(u.actions.length)}</span>
@@ -4768,6 +5121,71 @@
   function setUsersTab(t){ usersTab=t; usersPage=1; renderUsers(); }
   function setUsersSearch(q){ usersSearch = (q||'').toLowerCase().trim(); usersPage = 1; renderUsers(); }
   function usersChangePage(delta){ usersPage += delta; renderUsers(); }
+
+  /* ---------- Edición inline del username (tabla de site users) ---------- */
+  function startEditUsername(i){
+    const u = users[i]; if (!u) return;
+    editingUserIndex = i;
+    editingUserValue = u.name;
+    editingUserError = '';
+    editingUserSaving = false;
+    renderUsers();
+    const el = document.getElementById('uNameInput-'+i);
+    if (el){ el.focus(); el.select(); }
+  }
+  // Actualiza el valor en memoria y limpia el error inline sin re-renderizar
+  // (re-renderizar en cada tecla perdería el foco/cursor del input, igual que el buscador).
+  function setEditingUserValue(v){
+    editingUserValue = v;
+    if (!editingUserError) return;
+    editingUserError = '';
+    const input = document.getElementById('uNameInput-'+editingUserIndex);
+    if (input) input.classList.remove('err');
+    const err = document.getElementById('uNameErr-'+editingUserIndex);
+    if (err) err.remove();
+  }
+  function cancelEditUsername(){
+    if (editingUserSaving) return;
+    editingUserIndex = null;
+    editingUserValue = '';
+    editingUserError = '';
+    renderUsers();
+  }
+  function saveUsername(i){
+    if (editingUserSaving) return;
+    const u = users[i]; if (!u) return;
+    const name = editingUserValue.trim();
+    if (!name){
+      editingUserError = 'Username is required';
+      renderUsers();
+      focusEditUsernameInput(i);
+      return;
+    }
+    const taken = users.some((x,idx)=> idx!==i && (x.name||'').trim().toLowerCase()===name.toLowerCase());
+    if (taken){
+      editingUserError = 'This username already exists';
+      renderUsers();
+      focusEditUsernameInput(i);
+      return;
+    }
+    // Fake latency, para que el guardado no se sienta instantáneo/inseguro (mismo patrón que confirmBulkUserActions).
+    editingUserSaving = true;
+    editingUserError = '';
+    renderUsers();
+    setTimeout(()=>{
+      u.name = name;
+      persistUsers();
+      editingUserIndex = null;
+      editingUserValue = '';
+      editingUserSaving = false;
+      renderUsers();
+      showSnack(`Username updated to "${name}"`);
+    }, 700);
+  }
+  function focusEditUsernameInput(i){
+    const el = document.getElementById('uNameInput-'+i);
+    if (el){ el.focus(); const p = el.value.length; el.setSelectionRange(p,p); }
+  }
 
   /* ---------- Bulk "Add/Modify actions" (tabla de Users) ----------
      Reemplaza — no combina — las actions de cada usuario seleccionado por la selección
@@ -5470,16 +5888,16 @@
       card.innerHTML = `
         ${tabsHTML}
         ${availableLicenses===0 && withoutLicense.length ? `<div class="draft-empty" style="padding:10px 2px;text-align:left;">No unassigned licenses available right now.</div>` : ''}
-        <div class="table-head" style="${NL_GRID}">
-          <div></div><div>User</div><div>Site</div><div>License status</div>
-        </div>
-        ${nlRows}
         ${nolicenseSelected.size>0 ? `
         <div class="bulk-bar" style="display:flex;">
           <span class="bc">${nolicenseSelected.size} of ${availableLicenses} available licenses selected</span>
           <button class="bbtn" onclick="openBulkAssignModal()">Assign</button>
           <button class="bbtn bclear" onclick="clearNolicenseSelection()">Clear</button>
         </div>` : ''}
+        <div class="table-head" style="${NL_GRID}">
+          <div></div><div>User</div><div>Site</div><div>License status</div>
+        </div>
+        ${nlRows}
         <div class="table-footer"><span>${counts.nolicense} of ${users.length} users without a license</span></div>`;
       return;
     }
@@ -5656,6 +6074,67 @@
     return `<span class="badge-error">Stale</span>`;
   }
 
+  // "Device usage" card on the Devices page: groups the registered devices (Devices page
+  // mock, not Data actions) by model, using the same activity-health signal already shown
+  // elsewhere on this page (deviceActivityStatus).
+  function deviceUsageData(deviceList){
+    const byModel = {};
+    deviceList.forEach(d=>{
+      const model = deviceModelLabel(d);
+      if (!byModel[model]) byModel[model] = { total:0, attention:0 };
+      byModel[model].total++;
+      if (deviceActivityStatus(d) !== 'active') byModel[model].attention++;
+    });
+    return Object.entries(byModel)
+      .map(([model,c]) => ({ model, total:c.total, attentionRate: c.total ? c.attention/c.total*100 : 0 }))
+      .sort((a,b)=> b.total - a.total);
+  }
+
+  // Bar height/number = how many devices use that model; bar color/% = share needing
+  // attention — kept as two separate signals so a taller bar always reads as "more
+  // devices", never as "worse health".
+  function deviceUsageChartHtml(rows){
+    if (!rows.length) return `<div class="draft-empty" style="padding:30px 2px;">No devices yet.</div>`;
+    const total = rows.reduce((s,r)=>s+r.total,0);
+    const max = Math.max(1, ...rows.map(r=>r.total));
+    const BAR_MAX_PX = 78;
+    const bars = rows.map(r=>{
+      const pct = total ? Math.round(r.total/total*100) : 0;
+      const barPx = Math.max(4, Math.round(r.total/max*BAR_MAX_PX));
+      const color = deviceRateColor(r.attentionRate);
+      const isActive = devicesSearch === r.model.toLowerCase().trim();
+      const arg = r.model.replace(/'/g,"\\'");
+      return `
+      <div class="col-chart-item clickable${isActive?' active':''}" onclick="toggleDeviceModelFilter('${arg}')">
+        <span class="col-chart-value"><b>${r.total}</b><span class="col-chart-pct">${pct}%</span></span>
+        <div class="col-chart-bar" style="height:${barPx}px;background:${color};" title="${r.model}: ${r.total} device${r.total!==1?'s':''}, ${Math.round(r.attentionRate)}% need attention — click to filter the table below"></div>
+      </div>`;
+    }).join('');
+    const labels = rows.map(r=>{
+      const color = deviceRateColor(r.attentionRate);
+      const isActive = devicesSearch === r.model.toLowerCase().trim();
+      const arg = r.model.replace(/'/g,"\\'");
+      return `<span class="col-chart-label clickable${isActive?' active':''}" title="${r.model}" onclick="toggleDeviceModelFilter('${arg}')">${r.model}<span class="col-chart-sub" style="color:${color};font-weight:700;">${Math.round(r.attentionRate)}% attention</span></span>`;
+    }).join('');
+    return `<div class="col-chart">${bars}</div><div class="col-chart-labels">${labels}</div>`;
+  }
+
+  // Clicking a "Device usage" bar/label filters the devices table below by that model
+  // (reuses the existing text search, which already matches on model); clicking the
+  // same one again clears it.
+  function toggleDeviceModelFilter(model){
+    const q = model.toLowerCase().trim();
+    setDevicesSearch(devicesSearch === q ? '' : model);
+  }
+
+  // Fills the "Device usage" card on the Devices page, sourced from the registered devices
+  // (Mock devices), not from Data actions.
+  function renderDeviceUsageCard(){
+    const box = document.getElementById('deviceUsageCard');
+    if (!box) return;
+    box.innerHTML = deviceUsageChartHtml(deviceUsageData(devices));
+  }
+
   function mockAllotedUser(u, idx){
     if (!u) return null;
     const [firstname, ...rest] = (u.name || 'Field User').split(' ');
@@ -5671,13 +6150,24 @@
     };
   }
 
+  // Sesgado a "mayormente activos" (a diferencia de un random uniforme, que dejaba ~85% de los
+  // devices en inactive/stale) para que "Need attention" y el chart de Device usage muestren una
+  // minoría real necesitando atención, no casi todo en rojo.
+  function mockDeviceUpdatedAt(){
+    const day = 86400000;
+    const roll = Math.random();
+    if (roll < 0.65) return new Date(Date.now() - Math.random()*7*day).toISOString();          // active: 0-7d
+    if (roll < 0.85) return new Date(Date.now() - (7 + Math.random()*23)*day).toISOString();    // inactive: 7-30d
+    return new Date(Date.now() - (30 + Math.random()*30)*day).toISOString();                    // stale: 30-60d
+  }
+
   function mockDevices(){
     const day = 86400000;
     devicesPage = 1;
     devices = users.map((u, i) => {
       const model = dataPick(DEVICE_EXIF_MODELS);
       const site = !u.nomad && sites.length ? dataPick(sites) : null;
-      const updatedAt = new Date(Date.now() - Math.random()*45*day).toISOString();
+      const updatedAt = mockDeviceUpdatedAt();
       return {
         id: `dev_${String(i+1).padStart(4,'0')}`,
         createdAt: new Date(Date.now() - (90 + Math.random()*270)*day).toISOString(),
@@ -5747,6 +6237,7 @@
     if (totalEl) totalEl.textContent = devices.length;
     if (activeEl) activeEl.textContent = devices.filter(d=>deviceActivityStatus(d)==='active').length;
     if (attnEl) attnEl.textContent = devices.filter(d=>deviceActivityStatus(d)!=='active').length;
+    renderDeviceUsageCard();
 
     if (devices.length === 0){
       card.innerHTML = devicesEmptyStateHtml();
