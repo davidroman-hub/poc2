@@ -8,6 +8,11 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<!-- Epilogue: una de las dos fuentes reales de inarix.com (junto con Graphik, que es de pago
+     y no tengo el archivo — no se incluye). Usada por la opción "Inarix" del tool "Change font". -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#1b2a4a;
@@ -32,6 +37,16 @@
     --viz-5:#e87ba4;
     --viz-6:#008300;
     --crd-hoverband:#eef1ff;
+    /* Motion tokens — mismos nombres/valores que se llevarían a React (CSS vars o theme.js),
+       para que las animaciones se puedan portar 1:1 sin reinventar timings. */
+    --ease-out:cubic-bezier(.16,1,.3,1);
+    --ease-spring:cubic-bezier(.34,1.56,.64,1);
+    --dur-fast:140ms;
+    --dur-med:220ms;
+    --dur-slow:360ms;
+    /* Tool "Change font" (mockup): system stack de siempre por default; la otra opción
+       (Epilogue) la pisa el JS vía document.documentElement.style.setProperty(...). */
+    --app-font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   }
   :root[data-theme="dark"]{
     --navy:#e9e9ec;
@@ -99,7 +114,7 @@
 
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  body{font-family:var(--app-font);background:var(--bg);color:var(--text);}
   .app{display:flex;height:100vh;}
 
   /* Sidebar: alto fijo al viewport y con scroll propio, para que nunca
@@ -872,6 +887,16 @@
   [data-theme="dark"] .asc-ico{background:#16233b;}
   .asc-title{font-size:15px;font-weight:700;color:var(--navy);}
   .asc-desc{font-size:12.5px;color:var(--muted2);line-height:1.45;}
+
+  /* Tool "Change font": reusa .asc-card (misma cuadrícula/hover que "Add new site") sumando
+     una muestra grande "Aa" en la fuente en cuestión y un check de "seleccionado". */
+  .font-opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
+  .font-opt{position:relative;}
+  .font-opt.active{border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,107,255,.14);}
+  .font-opt-check{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;display:none;align-items:center;justify-content:center;}
+  .font-opt-check svg{width:12px;height:12px;}
+  .font-opt.active .font-opt-check{display:flex;}
+  .font-opt-sample{font-size:36px;font-weight:700;color:var(--navy);line-height:1;margin-bottom:6px;}
   .form-card{border:1px solid var(--border);border-radius:14px;padding:24px 26px;margin-bottom:20px;}
   .form-card h4{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:20px;}
   .fld-label{display:block;font-size:14px;font-weight:700;color:var(--navy);margin:0 0 9px;}
@@ -1043,7 +1068,279 @@
   .mp-details-btn:hover{filter:brightness(1.08);}
   .mp-actions{margin-top:9px;padding-top:9px;border-top:1px solid var(--border);display:flex;gap:6px;}
   .site-cluster{background:transparent;border:none;}
-  .cluster-bubble{width:38px;height:38px;border-radius:50%;background:#f2b21e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 3px 10px rgba(242,178,30,.5);border:3px solid #fff;}
+  .cluster-bubble{width:38px;height:38px;border-radius:50%;background:#f2b21e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 3px 10px rgba(242,178,30,.5);border:3px solid #fff;transition:transform var(--dur-fast) var(--ease-out);}
+  .cluster-bubble:hover{transform:scale(1.12);}
+
+  /* ============================================================
+     MOTION — hover/click/entrada. Capa aditiva al final de la hoja:
+     extiende los selectores ya existentes (mismos nombres de clase)
+     en vez de tocar cada regla base, para no arriesgar layout ya
+     probado. Todo es CSS puro (transition/transform/@keyframes) con
+     los tokens --dur- y --ease- de :root — se porta 1:1 a React
+     (CSS Modules/styled-components/Tailwind config), sin timers de
+     JS ni nada atado a cómo este archivo maneja el DOM. Respeta
+     prefers-reduced-motion como cualquier sistema de motion serio. */
+
+  /* Botones: lift sutil al hover, "press" al click */
+  .btn,.btn-lg,.btn-outline,.btn-back,.bbtn,.u-add-single,.mp-details-btn,.mp-edit-btn,
+  .btn-danger,.link-danger,.btn-reset{
+    transition:transform var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),
+      filter var(--dur-fast) var(--ease-out);
+  }
+  .btn:hover,.btn-lg:hover{transform:translateY(-1.5px);box-shadow:0 8px 20px rgba(47,107,255,.32);}
+  .btn:active,.btn-lg:active{transform:translateY(0) scale(.97);box-shadow:0 2px 6px rgba(47,107,255,.3);}
+  .btn-outline:hover,.btn-back:hover{transform:translateY(-1.5px);}
+  .btn-outline:active,.btn-back:active{transform:translateY(0) scale(.97);}
+  .bbtn:hover{transform:translateY(-1px);}
+  .bbtn:active{transform:translateY(0) scale(.95);}
+  .u-add-single:hover{transform:translateY(-1px);}
+  .u-add-single:active{transform:scale(.98);}
+  .asc-card .asc-title,.asc-card .asc-desc{transition:transform var(--dur-fast) var(--ease-out);}
+
+  /* Icon buttons: scale + un toque de rotación en los destructivos.
+     .grp-del ya traía su propio transition (opacity, para el hover-reveal del group-item);
+     va aparte para sumarle transform sin perder esa. */
+  .icon-btn,.mp-storages-edit,.u-copy,.u-del{
+    transition:transform var(--dur-fast) var(--ease-spring),background-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);
+  }
+  .grp-del{transition:opacity var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-spring),background-color var(--dur-fast) var(--ease-out);}
+  .icon-btn:hover,.mp-storages-edit:hover,.u-copy:hover{transform:scale(1.14);}
+  .icon-btn:active,.mp-storages-edit:active,.u-copy:active{transform:scale(.88);}
+  .icon-btn.danger:hover,.u-del:hover,.grp-del:hover{transform:scale(1.14) rotate(-6deg);}
+  .icon-btn.danger:active,.u-del:active{transform:scale(.88) rotate(0deg);}
+
+  /* Cards clicables: lift + sombra más presente al hover */
+  .asc-card,.tool-card,.site-storage-card,.form-card{
+    transition:transform var(--dur-med) var(--ease-out),box-shadow var(--dur-med) var(--ease-out),border-color var(--dur-med) var(--ease-out);
+  }
+  .asc-card:hover,.tool-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(20,29,51,.12);}
+  .asc-card:active,.tool-card:active{transform:translateY(-1px) scale(.99);}
+  .site-storage-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(20,29,51,.1);}
+  [data-theme="dark"] .asc-card:hover,[data-theme="dark"] .tool-card:hover,[data-theme="dark"] .site-storage-card:hover{box-shadow:0 10px 26px rgba(0,0,0,.35);}
+
+  /* Filas de tabla: highlight suave, no solo instantáneo */
+  .u-row,.site-row,.m-row,.sp-item,.draft-row,.addr-item,.pack-row{
+    transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);
+  }
+  .u-row:hover,.site-row:hover,.m-row:hover{background:rgba(47,107,255,.045);}
+  [data-theme="dark"] .u-row:hover,[data-theme="dark"] .site-row:hover,[data-theme="dark"] .m-row:hover{background:rgba(77,139,255,.08);}
+  .pack-row:hover{border-color:var(--blue);transform:translateX(2px);}
+  .sp-item:hover{transform:translateX(2px);}
+
+  /* Inputs/selects: glow de foco animado en vez de aparecer de golpe */
+  .fld,.di,.u-name-input,.stepper-num input,input[type="text"],input[type="number"],select{
+    transition:border-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .fld:focus,.di:focus,.u-name-input:focus{box-shadow:0 0 0 3px rgba(47,107,255,.16);}
+  [data-theme="dark"] .fld:focus,[data-theme="dark"] .di:focus{box-shadow:0 0 0 3px rgba(77,139,255,.22);}
+
+  /* Tabs: el underline se desliza en vez de saltar */
+  .u-tab,.wiz-tab{position:relative;transition:color var(--dur-fast) var(--ease-out);}
+  .u-tab::after,.wiz-tab::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2.5px;
+    background:var(--blue);border-radius:2px;transform:scaleX(0);transition:transform var(--dur-med) var(--ease-out);}
+  .u-tab.active::after,.wiz-tab.active::after{transform:scaleX(1);}
+  .u-tab,.wiz-tab{border-bottom-color:transparent !important;}
+
+  /* Toggle switches: easing con un poco de "spring" en vez de linear */
+  .sw span,.sw span::before{transition:background-color var(--dur-med) var(--ease-spring),transform var(--dur-med) var(--ease-spring);}
+
+  /* Warnings (dup-warn/loc-warn): son nodos persistentes cuyo display se alterna por JS
+     al cambiar el estado real (no se recrean en cada tecla), así que animarlos con @keyframes
+     es seguro — se reproduce solo cuando de verdad aparecen/reaparecen.
+     OJO: .bulk-bar y los badges (.badge-pending, .role-badge, etc.) sí se recrean en cada
+     render de la tabla — incluso al escribir en el buscador — así que a propósito NO llevan
+     "animation": con innerHTML reemplazándolos constantemente, reventaría en un parpadeo
+     constante en vez de una animación de entrada. Ahí solo aplican transitions vía :hover. */
+  @keyframes slideDownFade{0%{opacity:0;transform:translateY(-6px);}100%{opacity:1;transform:translateY(0);}}
+  .dup-warn,.loc-warn{animation:slideDownFade var(--dur-med) var(--ease-out);}
+
+  /* Snackbar: easing con más carácter que el linear original */
+  #snackbar{transition:opacity var(--dur-med) var(--ease-spring),transform var(--dur-med) var(--ease-spring);}
+
+  /* Modales: fade del overlay + scale-in del contenido, en vez de aparecer de golpe.
+     Se dispara solo por CSS al perder .hidden (display:none pasa a flex, lo que reinicia la animación),
+     así que en React basta el mismo patrón: render condicional + estas mismas clases/keyframes. */
+  @keyframes overlayFadeIn{0%{opacity:0;}100%{opacity:1;}}
+  @keyframes modalScaleIn{0%{opacity:0;transform:scale(.95) translateY(10px);}100%{opacity:1;transform:scale(1) translateY(0);}}
+  .modal-overlay:not(.hidden){animation:overlayFadeIn var(--dur-med) var(--ease-out);}
+  .modal-overlay:not(.hidden) > *{animation:modalScaleIn var(--dur-med) var(--ease-out);}
+
+  /* Autocomplete/dropdowns flotantes: mismo trato que los modales, más rápido por ser más chicos */
+  @keyframes popIn{0%{opacity:0;transform:scale(.97) translateY(-4px);}100%{opacity:1;transform:scale(1) translateY(0);}}
+  .autocomplete-pop,.u-pop{animation:popIn var(--dur-fast) var(--ease-out);transform-origin:top left;}
+
+  /* Pines del mapa: el propio marker de Leaflet ya usa transform para su posición —
+     solo se anima el contenido interno (el svg del pin), nunca el wrapper posicionado. */
+  .site-pin svg{transition:transform var(--dur-fast) var(--ease-spring),filter var(--dur-fast) var(--ease-out);transform-origin:bottom center;}
+  .leaflet-marker-icon:hover .site-pin svg{transform:scale(1.16) translateY(-2px);filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));}
+
+  /* ============================================================
+     MOTION — resto de secciones (sidebar, filtros, pills, chips,
+     links sueltos) que quedaron fuera de la primera pasada. Mismos
+     tokens/patrón: solo :hover/:active, nada atado a la frecuencia
+     de re-render de cada sección. */
+
+  /* Sidebar: nav links, theme toggle, collapse, group items */
+  .nav a{transition:background-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);}
+  .nav a:hover{transform:translateX(2px);}
+  .nav a svg{transition:transform var(--dur-fast) var(--ease-spring);}
+  .nav a:hover svg{transform:scale(1.1);}
+  .theme-toggle{transition:background-color var(--dur-fast) var(--ease-out);}
+  .theme-toggle:hover{background:#1f2a44;}
+  .collapse{transition:transform var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);}
+  .collapse:hover{transform:scale(1.15);color:#c9cfdb;}
+  .collapse:active{transform:scale(.9);}
+  .group-item,.groups-toggle-btn{transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out);}
+  .groups-toggle-btn:hover{transform:rotate(90deg);border-color:var(--blue);color:var(--blue);}
+  .group-item:hover{transform:translateX(2px);}
+
+  /* Botones/pills sueltos: mismo lift que .btn, timing más rápido por ser más chicos */
+  .btn-export,.filters-btn,.filter-chip,.dfpp-preset-btn,.crd-crop-btn,.dad-share,.map-pill,.u-actions-btn{
+    transition:transform var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out);
+  }
+  .btn-export:hover,.filters-btn:hover,.filter-chip:hover,.dfpp-preset-btn:hover,.crd-crop-btn:hover,.dad-share:hover,.u-actions-btn:hover{
+    transform:translateY(-1px);border-color:var(--blue);
+  }
+  .btn-export:active,.filters-btn:active,.filter-chip:active,.dfpp-preset-btn:active,.crd-crop-btn:active,.dad-share:active,.u-actions-btn:active{transform:translateY(0) scale(.97);}
+  .map-pill:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(20,29,51,.22);}
+  .map-pill:active{transform:translateY(0) scale(.97);}
+
+  /* Chips/links de texto pequeños (filtros de Data, popover de actions, etc.) */
+  .dfp-x,.dfp-clear,.dfpp-clear-all,.dfpp-sum-clear,.dfpp-sum-x,.mini-link,.sp-skip,.dfpp-opt,.dfpp-cat{
+    transition:background-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-spring);
+  }
+  .dfp-x:hover,.dfpp-sum-x:hover{transform:scale(1.15) rotate(90deg);background:rgba(138,148,166,.16);}
+  .mini-link:hover{transform:translateY(-1px);}
+  .dfpp-opt:hover,.dfpp-cat:hover{transform:translateX(2px);}
+  .stepper-toggle-btn,.dad-h2-toggle{transition:color var(--dur-fast) var(--ease-out);}
+  .stepper-toggle-btn:hover{opacity:.8;}
+
+  /* Silos a medio llenar: la superficie del grano/líquido "ondea" en vez de quedar plana.
+     Dos capas a distinta velocidad/dirección (back más lenta e invertida, front más rápida)
+     para que no se vea como un solo bloque deslizando, sino como agua/grano real. Se genera
+     solo cuando 0 &lt; pct &lt; 100 (siloFillSvg), así que nunca corre en un silo vacío o lleno. */
+  /* Cada capa loopea sobre su propia longitud de onda (22 y 16, ver siloWavePath en JS) —
+     si compartieran el mismo keyframe con distinto wavelength, el tile pegaría un salto
+     visible al reiniciar la animación en vez de loopear sin costura. */
+  @keyframes siloWaveDriftBack{ to{ transform:translateX(-22px); } }
+  @keyframes siloWaveDriftFront{ to{ transform:translateX(-16px); } }
+  .silo-wave-back{ animation:siloWaveDriftBack 4s linear infinite reverse; }
+  .silo-wave-front{ animation:siloWaveDriftFront 1.7s linear infinite; }
+
+  /* ============================================================
+     LOGIN (mockup) — solo para mostrar cómo se vería, no autentica de
+     verdad. El grano flotando (grain-wheat.png, foto real) + aro
+     girando "analizándolo" + cortina de escaneo + mosaico de píxeles
+     de las muestras (estos sí aproximados, sin foto de referencia
+     para esos crops). */
+  .login-hero{
+    display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:40px;
+    min-height:600px;padding:64px 72px;border-radius:22px;overflow:hidden;position:relative;
+    background:linear-gradient(120deg,#ffffff 0%,#eef3ff 55%,#e3ebff 100%);
+    border:1px solid var(--border);margin:0 32px 32px;
+  }
+  [data-theme="dark"] .login-hero{background:linear-gradient(120deg,#1c2033 0%,#161a2c 55%,#12141f 100%);}
+  .login-hero-copy{max-width:380px;}
+  /* Icono de marca del login: el logo (inarix-epi-signature.png) tal cual, con un fondo
+     negro redondeado detrás, estilo app icon. */
+  .login-hero-icon{width:66px;height:66px;margin-bottom:26px;border-radius:17px;background:#0c0c0d;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(12,12,13,.28);}
+  .login-hero-icon img{width:60%;height:auto;display:block;}
+  .login-hero-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:14px;}
+  .login-hero-copy h2{font-size:32px;font-weight:800;color:var(--navy);line-height:1.2;margin-bottom:12px;}
+  .login-hero-copy p{color:var(--muted2);font-size:14.5px;line-height:1.55;}
+  .login-hero-form{display:flex;flex-direction:column;gap:2px;margin-top:26px;}
+  .login-hero-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;margin-top:-8px;}
+  .login-hero-row a{color:var(--blue);font-weight:600;text-decoration:none;}
+  .login-hero-form .btn{justify-content:center;margin-top:4px;padding:13px 16px;font-size:15px;}
+  .login-hero-sub{color:var(--muted2);font-size:13px;margin-top:18px;text-align:center;}
+  .login-hero-sub a{color:var(--blue);font-weight:600;text-decoration:none;}
+
+  .grain-stage{position:relative;width:100%;height:500px;display:flex;align-items:center;justify-content:center;}
+  /* .grain-ring y .grain-ring-arc-wrap comparten exactamente el mismo tamaño (340x340) y el
+     mismo truco de centrado (top/left 50% + translate -50%/-50%) en vez de depender del
+     centrado por flex del contenedor (inconsistente para hijos position:absolute entre
+     navegadores) — así el arco azul queda siempre concéntrico con el aro, nunca desalineado.
+     La rotación va en un elemento hijo aparte (.grain-ring-arc) para no pisar ese transform
+     de centrado con el de la animación. */
+  .grain-ring,.grain-ring-arc-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:340px;height:340px;}
+  .grain-ring{border-radius:50%;border:1.5px solid rgba(120,140,190,.35);}
+  [data-theme="dark"] .grain-ring{border-color:rgba(120,140,190,.25);}
+  .grain-ring-arc{width:100%;height:100%;animation:grainRingSpin 7s linear infinite;}
+  .grain-ring-arc svg{width:100%;height:100%;overflow:visible;display:block;}
+  @keyframes grainRingSpin{ to{ transform:rotate(360deg); } }
+
+  .grain-float-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;animation:grainFloat 4.4s ease-in-out infinite;}
+  @keyframes grainFloat{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-16px);} }
+  .grain-photo-wrap{position:relative;display:inline-block;width:150px;}
+  .grain-body{width:100%;height:auto;display:block;position:relative;z-index:1;filter:drop-shadow(0 18px 20px rgba(120,80,30,.35));}
+  .grain-shadow{width:120px;height:22px;border-radius:50%;background:radial-gradient(ellipse at center, rgba(40,30,15,.28) 0%, rgba(40,30,15,0) 72%);margin-top:12px;animation:grainShadow 4.4s ease-in-out infinite;}
+  @keyframes grainShadow{ 0%,100%{transform:scale(1);opacity:.55;} 50%{transform:scale(.72);opacity:.3;} }
+
+  /* .grain-sample-pos: posiciona cada muestra sobre la circunferencia del aro (radio 170px,
+     mismo centro que .grain-ring vía top/left 50%) con un transform estático — separado del
+     pulso (que anima su propio transform:scale en .grain-sample) para que no se pisen entre sí. */
+  .grain-sample-pos{position:absolute;top:50%;left:50%;}
+  .grain-sample-pos.s1{width:66px;height:66px;transform:translate(calc(-50% - 120px),calc(-50% - 120px));}
+  .grain-sample-pos.s2{width:48px;height:48px;transform:translate(calc(-50% - 140px),calc(-50% + 100px));}
+  .grain-sample-pos.s3{width:66px;height:66px;transform:translate(calc(-50% + 168px),calc(-50% + 30px));}
+  .grain-sample{width:100%;height:100%;border-radius:10px;overflow:hidden;box-shadow:0 10px 22px rgba(20,29,51,.18);animation:grainSamplePulse 3.6s ease-in-out infinite;}
+  .grain-sample svg{width:100%;height:100%;display:block;}
+  .grain-sample-pos.s1 .grain-sample{animation-delay:0s;}
+  .grain-sample-pos.s2 .grain-sample{animation-delay:1.2s;}
+  .grain-sample-pos.s3 .grain-sample{animation-delay:2.4s;}
+  @keyframes grainSamplePulse{ 0%,100%{transform:scale(1);box-shadow:0 10px 22px rgba(20,29,51,.18);} 50%{transform:scale(1.08);box-shadow:0 14px 28px rgba(47,107,255,.28);} }
+
+  /* Cortina de escaneo: barre el grano (foto real) de arriba a abajo en loop, como si lo
+     estuviera analizando línea por línea.
+     - .grain-scan-mask: z-index explícito por encima de la foto (.grain-body es z-index:1)
+       y recortada con clip-path:ellipse() a la silueta aproximada del grano — más robusto
+       que mask-image con una foto (esa versión no se veía: dependía de que el navegador
+       resolviera el mask-image igual que el src, y ahí algo fallaba). overflow:hidden evita
+       que la banda se vea fuera del óvalo mientras entra/sale.
+     - .grain-scan: la banda en sí, una franja de altura fija que se traslada de arriba a
+       abajo (más simple y predecible que animar background-position de un gradiente
+       sobredimensionado, que quedaba demasiado difuso para leerse como una línea).
+     Fade in/out en los extremos para que el "corte" del loop no se note como un salto. */
+  .grain-scan-mask{
+    position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:5;
+    clip-path:ellipse(45% 49% at 50% 50%);
+    -webkit-clip-path:ellipse(45% 49% at 50% 50%);
+  }
+  .grain-scan{
+    position:absolute;left:-15%;width:130%;height:46px;
+    background:linear-gradient(180deg,
+      transparent 0%,
+      rgba(47,107,255,.7) 38%,
+      rgba(234,243,255,.96) 50%,
+      rgba(47,107,255,.7) 62%,
+      transparent 100%);
+    animation:grainScanSweep 2.8s cubic-bezier(.45,0,.55,1) infinite;
+  }
+  @keyframes grainScanSweep{
+    0%{transform:translateY(-46px);opacity:0;}
+    10%{opacity:1;}
+    85%{opacity:1;}
+    100%{transform:translateY(300px);opacity:0;}
+  }
+
+  /* En mobile no se re-calculan los offsets del aro/muestras (son px fijos, pensados para el
+     tamaño de escritorio) — en vez de eso se escala .grain-stage como bloque completo con
+     transform:scale(). Como .grain-stage no tiene transform propio, esto no pisa el
+     translate/animación de sus hijos (ring, arco, muestras, grano): todo se ve más chico
+     pero mantiene las mismas proporciones/posiciones relativas, sin romperse. */
+  @media (max-width:980px){
+    .login-hero{grid-template-columns:1fr;padding:40px 28px;min-height:auto;margin:0 16px 16px;}
+    .grain-stage{height:320px;margin-top:24px;transform:scale(.78);}
+  }
+  @media (max-width:560px){
+    .grain-stage{height:240px;transform:scale(.55);}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  }
 </style>
 </head>
 <body>
@@ -1073,6 +1370,8 @@
       </div>
       <a href="#" data-page="data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 9v11M15 9v11"/></svg><span class="lbl-text">Data</span></a>
       <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.6 2.6c-.7.3-1.3.9-1.3 1.8v.4"/><circle cx="11.9" cy="17" r="0.4" fill="currentColor" stroke="none"/></svg><span class="lbl-text">Help center</span></a>
+      <a href="#" id="navLogin" data-page="login" title="Login page mockup (demo only)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg><span class="lbl-text">Login (mockup)</span></a>
+      <a href="#" id="navTools" data-page="tools" title="Tools mockup (demo only)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a4 4 0 0 0-5.5 4.7L3 17.2V21h3.8l6.2-6.2a4 4 0 0 0 4.7-5.5l-2.8 2.8-2.1-2.1z"/></svg><span class="lbl-text">Tools (mockup)</span></a>
       <a href="#" class="demo-reset" onclick="resetMockDemo(); return false;" title="Erase all the data & reset the demo POC"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span class="lbl-text">Reset mock (DEMO)</span></a>
     </div>
   </aside>
@@ -1159,13 +1458,13 @@
                 <path d="M105,135 L105,178" stroke="#aab4c6" stroke-width="1.4"/>
                 <path d="M155,150 L155,193" stroke="#aab4c6" stroke-width="1.4"/>
                 <path d="M72,178 Q108,150 132,168 T196,152" stroke="#8b97ab" stroke-width="1.8" stroke-dasharray="1.5 6" stroke-linecap="round" fill="none"/>
-                <g transform="translate(96,104) scale(0.82)">
-                  <path d="M23,0 C10.3,0 0,10.3 0,23 C0,40 23,60 23,60 C23,60 46,40 46,23 C46,10.3 35.7,0 23,0 Z" fill="#6b7789"/>
-                  <path d="M15,26 L15,17 a8,8 0 0 1 16,0 L31,26 Z" fill="#3f4a5a"/>
+                <g transform="translate(96,104) scale(1.55)">
+                  <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12Z" fill="#6b7789"/>
+                  <path d="M6 13a3.5 3.5 0 0 1 7 0v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1Z" fill="#fff"/><path d="M13 15a2.8 2.8 0 0 1 5.6 0v6a1 1 0 0 1-1 1h-3.6a1 1 0 0 1-1-1Z" fill="#fff"/>
                 </g>
-                <g transform="translate(156,88) scale(0.98)">
-                  <path d="M23,0 C10.3,0 0,10.3 0,23 C0,40 23,60 23,60 C23,60 46,40 46,23 C46,10.3 35.7,0 23,0 Z" fill="#f2b21e"/>
-                  <path d="M15,26 L15,17 a8,8 0 0 1 16,0 L31,26 Z" fill="#d99a10"/>
+                <g transform="translate(156,88) scale(1.85)">
+                  <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12Z" fill="#f2b21e"/>
+                  <path d="M6 13a3.5 3.5 0 0 1 7 0v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1Z" fill="#fff"/><path d="M13 15a2.8 2.8 0 0 1 5.6 0v6a1 1 0 0 1-1 1h-3.6a1 1 0 0 1-1-1Z" fill="#fff"/>
                 </g>
               </svg>
             </div>
@@ -1383,6 +1682,79 @@
       </div>
     </div>
    </div><!-- /page-data -->
+
+   <!-- Login (mockup): solo demuestra cómo se vería la pantalla de login, no autentica de
+        verdad — el botón "Log in" no hace nada real (ver initLoginMockup / handleMockLogin). -->
+   <div id="page-login" style="display:none;">
+    <div class="content">
+      <div class="login-hero">
+        <div class="login-hero-copy">
+          <div class="login-hero-icon">
+            <img src="inarix-epi-signature.png" alt="Inarix">
+          </div>
+          <span class="login-hero-eyebrow">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 2l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 15.1l-5.2 2.9 1-5.8-4.2-4.1 5.8-.8L12 2Z"/></svg>
+            Sign in
+          </span>
+          <h2>Welcome back</h2>
+          <p>Log in to manage your sites, users and storage capacity from one place.</p>
+          <form class="login-hero-form" onsubmit="return handleMockLogin(event)">
+            <div>
+              <label class="fld-label" for="mockLoginEmail">Email</label>
+              <input class="fld" type="email" id="mockLoginEmail" placeholder="you@company.com" autocomplete="off">
+            </div>
+            <div>
+              <label class="fld-label" for="mockLoginPassword">Password</label>
+              <input class="fld" type="password" id="mockLoginPassword" placeholder="••••••••" autocomplete="off">
+            </div>
+            <div class="login-hero-row">
+              <label style="display:flex;align-items:center;gap:7px;font-weight:500;color:var(--muted2);cursor:pointer;">
+                <input type="checkbox" style="accent-color:var(--blue);width:14px;height:14px;"> Remember me
+              </label>
+              <a href="#" onclick="showSnack('Demo only — nothing to reset here'); return false;">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn">Log in</button>
+          </form>
+          <p class="login-hero-sub">Don't have an account? <a href="https://inarix.com" target="_blank" rel="noopener">Visit inarix.com</a></p>
+        </div>
+
+        <div class="grain-stage">
+          <div class="grain-ring"></div>
+          <div class="grain-ring-arc-wrap">
+            <div class="grain-ring-arc">
+              <svg viewBox="0 0 340 340">
+                <circle cx="170" cy="170" r="169" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="70 1100"/>
+              </svg>
+            </div>
+          </div>
+          <div class="grain-sample-pos s1"><div class="grain-sample" id="grainSample1"></div></div>
+          <div class="grain-sample-pos s2"><div class="grain-sample" id="grainSample2"></div></div>
+          <div class="grain-sample-pos s3"><div class="grain-sample" id="grainSample3"></div></div>
+          <div class="grain-float-wrap">
+            <div class="grain-photo-wrap">
+              <img class="grain-body" src="grain-wheat.png" alt="Wheat grain">
+              <!-- Cortina de escaneo: barre el grano de arriba a abajo, por encima de la
+                   foto (z-index) y recortada a su óvalo con clip-path -->
+              <div class="grain-scan-mask"><div class="grain-scan"></div></div>
+            </div>
+            <div class="grain-shadow"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+   </div><!-- /page-login -->
+
+   <!-- Tools (mockup): utilidades de demo. Primer tool: "Change font". -->
+   <div id="page-tools" style="display:none;">
+    <div class="content">
+      <div class="tools-grid">
+        <button class="tool-card" onclick="openChangeFontModal()" title="Preview the app in a different font family">
+          <span class="tool-card-ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20h4M8 20V6h1.6a4.4 4.4 0 0 1 0 8.8H8M13.5 20 17.5 8l4 12M14.6 15.8h5.8"/></svg></span>
+          <span class="tool-card-label">Change font</span>
+        </button>
+      </div>
+    </div>
+   </div><!-- /page-tools -->
   </main>
 </div>
 
@@ -1398,13 +1770,13 @@
         <path d="M105,135 L105,178" stroke="#aab4c6" stroke-width="1.4"/>
         <path d="M155,150 L155,193" stroke="#aab4c6" stroke-width="1.4"/>
         <path d="M72,178 Q108,150 132,168 T196,152" stroke="#8b97ab" stroke-width="1.8" stroke-dasharray="1.5 6" stroke-linecap="round" fill="none"/>
-        <g transform="translate(96,104) scale(0.82)">
-          <path d="M23,0 C10.3,0 0,10.3 0,23 C0,40 23,60 23,60 C23,60 46,40 46,23 C46,10.3 35.7,0 23,0 Z" fill="#6b7789"/>
-          <path d="M15,26 L15,17 a8,8 0 0 1 16,0 L31,26 Z" fill="#3f4a5a"/>
+        <g transform="translate(96,104) scale(1.55)">
+          <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12Z" fill="#6b7789"/>
+          <path d="M6 13a3.5 3.5 0 0 1 7 0v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1Z" fill="#fff"/><path d="M13 15a2.8 2.8 0 0 1 5.6 0v6a1 1 0 0 1-1 1h-3.6a1 1 0 0 1-1-1Z" fill="#fff"/>
         </g>
-        <g transform="translate(156,88) scale(0.98)">
-          <path d="M23,0 C10.3,0 0,10.3 0,23 C0,40 23,60 23,60 C23,60 46,40 46,23 C46,10.3 35.7,0 23,0 Z" fill="#f2b21e"/>
-          <path d="M15,26 L15,17 a8,8 0 0 1 16,0 L31,26 Z" fill="#d99a10"/>
+        <g transform="translate(156,88) scale(1.85)">
+          <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12Z" fill="#f2b21e"/>
+          <path d="M6 13a3.5 3.5 0 0 1 7 0v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1Z" fill="#fff"/><path d="M13 15a2.8 2.8 0 0 1 5.6 0v6a1 1 0 0 1-1 1h-3.6a1 1 0 0 1-1-1Z" fill="#fff"/>
         </g>
       </svg>
     </div>
@@ -2017,6 +2389,33 @@
         <span id="bmsConfirmIdleLabel">Move <span id="bmsConfirmCount">0</span> users</span>
         <span id="bmsConfirmLoadingLabel" style="display:none;">Moving…</span>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: tool "Change font" (Tools mockup) — aplica en vivo a toda la app vía --app-font -->
+<div class="modal-overlay hidden" id="changeFontModal">
+  <div class="form-modal" style="max-width:520px;">
+    <div class="form-scroll" style="padding:28px 30px 6px;">
+      <h3 class="storage-title" style="margin-bottom:4px;">Change font</h3>
+      <p class="storage-sub" style="margin-bottom:20px;">Preview the app in a different font family — applies instantly, across the whole app.</p>
+      <div class="font-opt-grid">
+        <button type="button" class="asc-card font-opt" id="fontOptCurrent" onclick="selectAppFont('current')">
+          <span class="font-opt-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg></span>
+          <span class="font-opt-sample" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">Aa</span>
+          <span class="asc-title">Current</span>
+          <span class="asc-desc">This app's system font stack (San Francisco / Segoe UI / Roboto, depending on your OS).</span>
+        </button>
+        <button type="button" class="asc-card font-opt" id="fontOptInarix" onclick="selectAppFont('inarix')">
+          <span class="font-opt-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg></span>
+          <span class="font-opt-sample" style="font-family:'Epilogue',sans-serif;">Aa</span>
+          <span class="asc-title">Inarix</span>
+          <span class="asc-desc">Epilogue — one of the two fonts inarix.com uses. (Their other font, Graphik, is a paid license we don't have a file for.)</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-footer" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeChangeFontModal()">Close</button>
     </div>
   </div>
 </div>
@@ -5068,14 +5467,37 @@
   // Silueta de silo rellena hasta el % usado. Solo demo: el "used" real siempre es 0
   // salvo que se use el botón "Mock the storage (DEMO)" para forzar 25/50/75/100%.
   let siloFillUid = 0;
+  // Curva senoidal aproximada con cúbicas, tileable cada `len` unidades — la superficie
+  // "ondulada" del grano/líquido. `w` cubre de sobra el ancho del silo (40) más un período
+  // de margen a cada lado, para que al animar translateX no se vea el borde del tile.
+  function siloWavePath(amp, len, w){
+    let d = `M-${len},0`;
+    for (let x = -len; x < w + len; x += len){
+      d += ` C ${x+len*0.25},${-amp} ${x+len*0.25},${-amp} ${x+len*0.5},0`;
+      d += ` C ${x+len*0.75},${amp} ${x+len*0.75},${amp} ${x+len},0`;
+    }
+    d += ` V 24 H -${len} Z`;
+    return d;
+  }
   function siloFillSvg(color, pct){
     // El domo empieza en y=13 (ápice) y el cuerpo termina en y=68: alto total 55.
     // Un poco más (60) asegura que el 100% cubra también la curva del domo, sin dejar la punta vacía.
     const fillY = 68 - (60 * pct / 100);
     const clipId = `sdSiloClip-${siloFillUid++}`;
+    // La ola solo tiene sentido a medio llenar: a 0% no hay nada que ondear, a 100% el silo
+    // ya está al borde y una cresta asomando por encima se vería como un desborde.
+    const animate = pct > 0 && pct < 100;
+    const waves = animate ? `
+      <g transform="translate(0,${fillY})">
+        <g class="silo-wave silo-wave-back" opacity="0.45"><path d="${siloWavePath(2.4,22,80)}" fill="${color}"/></g>
+        <g class="silo-wave silo-wave-front" opacity="0.8"><path d="${siloWavePath(1.5,16,80)}" fill="${color}"/></g>
+      </g>` : '';
     return `<svg viewBox="0 0 40 70" fill="none">
       <defs><clipPath id="${clipId}"><path d="M6 68 V27 A14 14 0 0 1 34 27 V68 Z"/></clipPath></defs>
-      <rect x="0" y="${fillY}" width="40" height="70" fill="${color}" clip-path="url(#${clipId})"/>
+      <g clip-path="url(#${clipId})">
+        <rect x="0" y="${fillY}" width="40" height="70" fill="${color}"/>
+        ${waves}
+      </g>
       <path d="M6 68 V27 A14 14 0 0 1 34 27 V68 Z" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
     </svg>`;
   }
@@ -5411,10 +5833,10 @@
 
   // Navegación entre páginas (Sites / Users / Licenses)
   function showPage(name){
-    const pages = { sites:'page-sites', users:'page-users', licenses:'page-licenses', devices:'page-devices', map:'page-map', data:'page-data' };
+    const pages = { sites:'page-sites', users:'page-users', licenses:'page-licenses', devices:'page-devices', map:'page-map', data:'page-data', login:'page-login', tools:'page-tools' };
     Object.entries(pages).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) el.style.display = k===name ? 'block' : 'none'; });
-    const navIds = { sites:'navSites', users:'navUsers', licenses:'navLicenses', devices:'navDevices', map:'navMap' };
-    document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+    const navIds = { sites:'navSites', users:'navUsers', licenses:'navLicenses', devices:'navDevices', map:'navMap', login:'navLogin', tools:'navTools' };
+    document.querySelectorAll('.nav a, .nav-bottom a').forEach(a=>a.classList.remove('active'));
     const active = document.getElementById(navIds[name]);
     if (active) active.classList.add('active');
     if (name==='users') renderUsers();
@@ -5422,11 +5844,82 @@
     else if (name==='licenses') renderLicenses();
     else if (name==='devices') renderDevices();
     else if (name==='data') renderDataPage();
+    else if (name==='login') initLoginMockup();
     else if (name==='map'){
       initMap();
       requestAnimationFrame(() => { siteMap.invalidateSize(); refreshMapMarkers(); });
     }
   }
+
+  /* ---------- Login (mockup) ---------- */
+  // No autentica de verdad — es solo para mostrar cómo se vería la pantalla.
+  function handleMockLogin(e){
+    e.preventDefault();
+    showSnack('Demo only — login isn\'t wired up');
+    return false;
+  }
+  // Mosaico de "píxeles" (cuadraditos de color) para simular una muestra ampliada del grano,
+  // ya que no tengo la foto real de referencia. Determinista por seed: siempre el mismo
+  // resultado, no cambia entre visitas ni queda distinto en cada re-render.
+  function grainPixelMosaic(seed, n){
+    let s = seed;
+    const rand = () => { s = (s * 1103515245 + 12345) >>> 0; return (s >>> 8) % 1000 / 1000; };
+    const palette = ['#c98a44','#a86a2e','#8a5726','#e0a862','#734419','#d19a5c','#b87a3a','#5c3a17'];
+    const cell = 100 / n;
+    let rects = '';
+    for (let y = 0; y < n; y++){
+      for (let x = 0; x < n; x++){
+        const c = palette[Math.floor(rand() * palette.length)];
+        rects += `<rect x="${(x*cell).toFixed(2)}" y="${(y*cell).toFixed(2)}" width="${(cell+0.6).toFixed(2)}" height="${(cell+0.6).toFixed(2)}" fill="${c}"/>`;
+      }
+    }
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none">${rects}</svg>`;
+  }
+  let loginMockupReady = false;
+  function initLoginMockup(){
+    if (loginMockupReady) return; // determinista: generar una sola vez, no en cada visita a la página
+    loginMockupReady = true;
+    const s1 = document.getElementById('grainSample1');
+    const s2 = document.getElementById('grainSample2');
+    const s3 = document.getElementById('grainSample3');
+    if (s1) s1.innerHTML = grainPixelMosaic(17, 8);
+    if (s2) s2.innerHTML = grainPixelMosaic(53, 6);
+    if (s3) s3.innerHTML = grainPixelMosaic(101, 8);
+  }
+
+  /* ---------- Tools (mockup) → "Change font" ----------
+     Cambia --app-font en :root, que es lo único de lo que depende body{font-family:...} —
+     el resto de la app usa font-family:inherit en cascada, así que este único cambio
+     alcanza a toda la interfaz. Persistido en localStorage, mismo patrón que el theme toggle. */
+  const APP_FONT_KEY = 'fleetview_app_font';
+  const APP_FONTS = {
+    current: `-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif`,
+    // Graphik (la otra fuente real de inarix.com) es de pago — no tenemos el archivo, así
+    // que la opción "Inarix" usa solo Epilogue, la que sí es un Google Font disponible.
+    inarix: `'Epilogue',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif`,
+  };
+  function applyAppFont(key){
+    document.documentElement.style.setProperty('--app-font', APP_FONTS[key] || APP_FONTS.current);
+    const cur = document.getElementById('fontOptCurrent');
+    const ina = document.getElementById('fontOptInarix');
+    if (cur) cur.classList.toggle('active', key === 'current');
+    if (ina) ina.classList.toggle('active', key === 'inarix');
+  }
+  function selectAppFont(key){
+    try{ localStorage.setItem(APP_FONT_KEY, key); }catch(e){}
+    applyAppFont(key);
+    showSnack(key === 'inarix' ? 'Font changed to Inarix (Epilogue)' : 'Font changed to the default');
+  }
+  function loadAppFont(){
+    let key = 'current';
+    try{ key = localStorage.getItem(APP_FONT_KEY) || 'current'; }catch(e){}
+    applyAppFont(key);
+  }
+  function openChangeFontModal(){ document.getElementById('changeFontModal').classList.remove('hidden'); }
+  function closeChangeFontModal(){ document.getElementById('changeFontModal').classList.add('hidden'); }
+  document.getElementById('changeFontModal').addEventListener('click', e => {
+    if (e.target.id === 'changeFontModal') closeChangeFontModal();
+  });
 
   function openModal(){ document.getElementById('siteModal').classList.remove('hidden'); }
   function closeModal(){ document.getElementById('siteModal').classList.add('hidden'); }
@@ -5487,6 +5980,10 @@
       if (page === 'sites'){ showPage('sites'); return; }
       // El mapa también permite crear el primer site, así que no se bloquea con 0 sites
       if (page === 'map'){ showPage('map'); return; }
+      // Mockup de login: solo demostrativo, siempre accesible sin importar el estado del demo
+      if (page === 'login'){ showPage('login'); return; }
+      // Mockup de tools: solo demostrativo, siempre accesible sin importar el estado del demo
+      if (page === 'tools'){ showPage('tools'); return; }
       // Sin ningún site, el resto de secciones quedan bloqueadas
       if (sites.length === 0){ openModal(); return; }
       if (page === 'users'){ showPage('users'); return; }
@@ -8260,6 +8757,7 @@
   }
 
   loadTheme();
+  loadAppFont();
   loadSidebarState();
   loadGroupsPanelState();
   loadSites();
