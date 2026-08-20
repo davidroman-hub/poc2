@@ -69,6 +69,19 @@
     --viz-6:#008300;
     --crd-hoverband:#20263d;
   }
+  /* Tool "Change design" (mockup): el azul del fondo de .login-hero (el que gustó), aplicado
+     a --card/--panel — como casi todas las cards/modales de la app ya usan var(--card)/
+     var(--panel) en vez de un color fijo, con solo pisar estos dos tokens el tinte se
+     propaga a stat cards, tool cards, storage cards, modales, dropdowns, etc. sin tener
+     que tocar cada selector uno por uno. */
+  :root[data-design="blue"]{
+    --card:#eef3ff;
+    --panel:#e3ebff;
+  }
+  :root[data-theme="dark"][data-design="blue"]{
+    --card:#1c2033;
+    --panel:#161a2c;
+  }
   /* Overrides de superficies claras en modo oscuro */
   [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background-color:var(--input-bg);color:var(--text);border-color:var(--border);}
   [data-theme="dark"] input::placeholder,[data-theme="dark"] textarea::placeholder{color:var(--muted);}
@@ -897,6 +910,11 @@
   .font-opt-check svg{width:12px;height:12px;}
   .font-opt.active .font-opt-check{display:flex;}
   .font-opt-sample{font-size:36px;font-weight:700;color:var(--navy);line-height:1;margin-bottom:6px;}
+
+  /* Tool "Change design": mismas .asc-card + .font-opt (check de seleccionado), sumando un
+     swatch de 3 tarjetitas apiladas para previsualizar el tinte antes de aplicarlo. */
+  .design-opt-swatch{display:flex;gap:6px;margin-bottom:10px;}
+  .design-opt-swatch span{flex:1;height:34px;border-radius:8px;border:1px solid var(--border);}
   .form-card{border:1px solid var(--border);border-radius:14px;padding:24px 26px;margin-bottom:20px;}
   .form-card h4{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:20px;}
   .fld-label{display:block;font-size:14px;font-weight:700;color:var(--navy);margin:0 0 9px;}
@@ -1752,6 +1770,10 @@
           <span class="tool-card-ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20h4M8 20V6h1.6a4.4 4.4 0 0 1 0 8.8H8M13.5 20 17.5 8l4 12M14.6 15.8h5.8"/></svg></span>
           <span class="tool-card-label">Change font</span>
         </button>
+        <button class="tool-card" onclick="openChangeDesignModal()" title="Preview the app with a different card color">
+          <span class="tool-card-ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18 4.5 4.5 0 0 0 4.5-4.5c0-1-.5-1.5-1.5-2h-1a1.5 1.5 0 0 1 0-3h1.5A2.5 2.5 0 0 0 18 9c0-3.3-2.7-6-6-6Z"/><circle cx="8" cy="10.5" r=".9" fill="currentColor" stroke="none"/><circle cx="11" cy="7.5" r=".9" fill="currentColor" stroke="none"/></svg></span>
+          <span class="tool-card-label">Change design</span>
+        </button>
       </div>
     </div>
    </div><!-- /page-tools -->
@@ -2416,6 +2438,34 @@
     </div>
     <div class="form-footer" style="justify-content:flex-end;">
       <button class="btn" onclick="closeChangeFontModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: tool "Change design" (Tools mockup) — el azul del fondo de .login-hero, aplicado
+     a --card/--panel en vivo, en toda la app -->
+<div class="modal-overlay hidden" id="changeDesignModal">
+  <div class="form-modal" style="max-width:520px;">
+    <div class="form-scroll" style="padding:28px 30px 6px;">
+      <h3 class="storage-title" style="margin-bottom:4px;">Change design</h3>
+      <p class="storage-sub" style="margin-bottom:20px;">Recolor cards and modals across the app — applies instantly, across the whole app.</p>
+      <div class="font-opt-grid">
+        <button type="button" class="asc-card font-opt" id="designOptCurrent" onclick="selectAppDesign('current')">
+          <span class="font-opt-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg></span>
+          <div class="design-opt-swatch"><span style="background:#ffffff;"></span><span style="background:#f8f9fc;"></span><span style="background:#ffffff;"></span></div>
+          <span class="asc-title">Current</span>
+          <span class="asc-desc">The app's default white/gray cards.</span>
+        </button>
+        <button type="button" class="asc-card font-opt" id="designOptBlue" onclick="selectAppDesign('blue')">
+          <span class="font-opt-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg></span>
+          <div class="design-opt-swatch"><span style="background:#eef3ff;"></span><span style="background:#e3ebff;"></span><span style="background:#eef3ff;"></span></div>
+          <span class="asc-title">Blue design</span>
+          <span class="asc-desc">The soft blue from the Login page's card background, carried over to cards and modals everywhere.</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-footer" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeChangeDesignModal()">Close</button>
     </div>
   </div>
 </div>
@@ -5921,6 +5971,36 @@
     if (e.target.id === 'changeFontModal') closeChangeFontModal();
   });
 
+  /* ---------- Tools (mockup) → "Change design" ----------
+     Mismo patrón que "Change font": un atributo en <html> (data-design, análogo a
+     data-theme) que pisa --card/--panel vía CSS (ver :root[data-design="blue"]), persistido
+     en localStorage. Como casi toda card/modal de la app ya usa var(--card)/var(--panel),
+     no hace falta tocar cada componente uno por uno. */
+  const APP_DESIGN_KEY = 'fleetview_app_design';
+  function applyAppDesign(key){
+    if (key === 'blue') document.documentElement.setAttribute('data-design', 'blue');
+    else document.documentElement.removeAttribute('data-design');
+    const cur = document.getElementById('designOptCurrent');
+    const blu = document.getElementById('designOptBlue');
+    if (cur) cur.classList.toggle('active', key !== 'blue');
+    if (blu) blu.classList.toggle('active', key === 'blue');
+  }
+  function selectAppDesign(key){
+    try{ localStorage.setItem(APP_DESIGN_KEY, key); }catch(e){}
+    applyAppDesign(key);
+    showSnack(key === 'blue' ? 'Design changed to Blue design' : 'Design changed to the default');
+  }
+  function loadAppDesign(){
+    let key = 'current';
+    try{ key = localStorage.getItem(APP_DESIGN_KEY) || 'current'; }catch(e){}
+    applyAppDesign(key);
+  }
+  function openChangeDesignModal(){ document.getElementById('changeDesignModal').classList.remove('hidden'); }
+  function closeChangeDesignModal(){ document.getElementById('changeDesignModal').classList.add('hidden'); }
+  document.getElementById('changeDesignModal').addEventListener('click', e => {
+    if (e.target.id === 'changeDesignModal') closeChangeDesignModal();
+  });
+
   function openModal(){ document.getElementById('siteModal').classList.remove('hidden'); }
   function closeModal(){ document.getElementById('siteModal').classList.add('hidden'); }
 
@@ -8758,6 +8838,7 @@
 
   loadTheme();
   loadAppFont();
+  loadAppDesign();
   loadSidebarState();
   loadGroupsPanelState();
   loadSites();
