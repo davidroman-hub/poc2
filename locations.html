@@ -767,6 +767,8 @@
   .ud-k{font-size:13px;font-weight:600;color:var(--muted2);}
   .ud-v{font-size:14px;color:var(--navy);font-weight:600;text-align:right;}
   .ud-block{padding-top:14px;}
+  .ud-block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .ud-block-head .ud-k{font-size:13px;}
   .ud-block .rev-chip{display:inline-block;background:#f4f6fa;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:12px;color:var(--navy);margin:0 6px 6px 0;}
 
   /* Mini mapa de localización en el modal de detalles de site */
@@ -1002,7 +1004,11 @@
   .map-popup .mp-loc{font-size:12px;color:var(--muted2);}
   .map-popup{min-width:210px;}
   .mp-storages{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
-  .mp-storages-title{font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+  .mp-storages-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .mp-storages-title{font-size:10.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px;}
+  .mp-storages-edit{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:none;border:none;color:var(--muted2);padding:2px;border-radius:6px;cursor:pointer;}
+  .mp-storages-edit svg{width:13px;height:13px;}
+  .mp-storages-edit:hover{background:#f1f3f8;color:var(--navy);}
   .mp-storage-list{display:flex;flex-direction:column;gap:7px;max-height:150px;overflow-y:auto;}
   .mp-storage-row{display:flex;align-items:center;gap:8px;}
   .mp-storage-ico{width:13px;flex-shrink:0;display:flex;align-items:flex-end;}
@@ -1011,6 +1017,9 @@
   .mp-storage-name{font-size:12px;font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .mp-storage-meta{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted2);margin-top:1px;}
   .mp-crop-pill{font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:20px;white-space:nowrap;}
+  .mp-details-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--blue);color:#fff;border:none;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
+  .mp-details-btn:hover{filter:brightness(1.08);}
+  .mp-actions{margin-top:9px;padding-top:9px;border-top:1px solid var(--border);display:flex;gap:6px;}
   .site-cluster{background:transparent;border:none;}
   .cluster-bubble{width:38px;height:38px;border-radius:50%;background:#f2b21e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 3px 10px rgba(242,178,30,.5);border:3px solid #fff;}
 </style>
@@ -2475,12 +2484,12 @@
     siteClusterGroup.clearLayers();
     siteMarkers = [];
     const pts = [];
-    sites.forEach(s => {
+    sites.forEach((s, i) => {
       const ll = siteCoords(s);
       if (!ll) return;
       const typeKey = SITE_TYPES[s.type] ? s.type : DEFAULT_SITE_TYPE;
       const marker = L.marker(ll, { icon: PIN_ICONS[typeKey] });
-      marker.bindPopup(`<div class="map-popup"><div class="mp-name">${s.name}</div><div class="mp-type">${SITE_TYPES[typeKey].label}</div><div class="mp-loc">${s.localisation}</div>${mapPopupStoragesHtml(s)}</div>`);
+      marker.bindPopup(`<div class="map-popup"><div class="mp-name">${escapeAttr(s.name)}</div><div class="mp-type">${SITE_TYPES[typeKey].label}</div><div class="mp-loc">${escapeAttr(s.localisation)}</div>${mapPopupStoragesHtml(s, i)}<div class="mp-actions"><button type="button" class="mp-details-btn" onclick="openSiteDetails(${i})">View more details</button></div></div>`);
       marker._siteName = s.name.toLowerCase();
       siteMarkers.push(marker);
       siteClusterGroup.addLayer(marker);
@@ -4403,7 +4412,15 @@
       <div class="ud-row"><span class="ud-k">Coordinates</span><span class="ud-v">${s.lat != null && s.lng != null ? `${s.lat}, ${s.lng}` : '—'}</span></div>
       <div class="ud-row"><span class="ud-k">Groups</span><span class="ud-v">${groupNames.length ? escapeAttr(groupNames.join(', ')) : '—'}</span></div>
       <div class="ud-row"><span class="ud-k">Capacity</span><span class="ud-v">${capacityLabel(s)}</span></div>
-      <div class="ud-block"><div class="ud-k" style="margin-bottom:8px;">Storage spaces</div>${storagesHtml}</div>`;
+      <div class="ud-block">
+        <div class="ud-block-head">
+          <div class="ud-k">Storage spaces (${storages.length})</div>
+          <button class="icon-btn" title="Edit storage spaces" onclick="openStorage(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </button>
+        </div>
+        ${storagesHtml}
+      </div>`;
     document.getElementById('siteDetailsModal').classList.remove('hidden');
     renderLocMap(s);
   }
@@ -4463,9 +4480,16 @@
   function mockKey(siteId, storageIdx){ return siteId + ':' + storageIdx; }
 
   // Mini-lista de storage spaces para el popup del pin de un site en el mapa.
-  function mapPopupStoragesHtml(s){
+  function mapPopupStoragesHtml(s, i){
     const storages = s.storages || [];
-    if (!storages.length) return '';
+    const editBtn = `<button type="button" class="mp-storages-edit" title="Edit storage spaces" onclick="openStorage(${i})">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    </button>`;
+    if (!storages.length){
+      return `<div class="mp-storages">
+        <div class="mp-storages-head"><div class="mp-storages-title">Storage spaces (0)</div>${editBtn}</div>
+      </div>`;
+    }
     const rows = storages.map((st, si) => {
       const c = CROP_COLORS[st.crop] || CROP_COLOR_DEFAULT;
       const pct = storageMockUsed[mockKey(s.id, si)] || 0;
@@ -4483,7 +4507,7 @@
       </div>`;
     }).join('');
     return `<div class="mp-storages">
-      <div class="mp-storages-title">Storage spaces (${storages.length})</div>
+      <div class="mp-storages-head"><div class="mp-storages-title">Storage spaces (${storages.length})</div>${editBtn}</div>
       <div class="mp-storage-list">${rows}</div>
     </div>`;
   }
@@ -4570,9 +4594,15 @@
     renderStorage();
   }
   function closeStorage(){
+    const editedSite = currentSite;
     document.getElementById('storageModal').classList.add('hidden');
     currentSite = null; selectedStorage = null;
     render();
+    // Si el modal de "Site details" (abierto desde la tabla o desde el mapa) seguía
+    // detrás, sus storage cards quedarían con datos viejos: se re-renderiza.
+    if (editedSite != null && !document.getElementById('siteDetailsModal').classList.contains('hidden')){
+      openSiteDetails(editedSite);
+    }
   }
   function addStorage(){
     const st = sites[currentSite].storages;
