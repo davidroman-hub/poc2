@@ -396,12 +396,6 @@
   .u-site{color:var(--muted2);font-size:13px;}
   .u-site-cell{display:flex;align-items:center;gap:6px;min-width:0;}
   .u-site-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .u-site-edit{display:flex;align-items:center;gap:4px;min-width:0;}
-  .u-site-edit select{border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:13px;font-family:inherit;color:var(--navy);background:var(--input-bg);outline:none;min-width:0;}
-  .u-site-edit select:focus{border-color:var(--blue);}
-  .u-site-edit .icon-btn{flex-shrink:0;padding:4px;}
-  .u-site-edit .icon-btn svg{width:15px;height:15px;}
-  .u-site-edit .btn-spinner{flex-shrink:0;}
   .u-pass-cell{display:flex;align-items:center;gap:6px;min-width:0;}
   .u-pass-text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.5px;}
   .u-pass-cell .icon-btn{flex-shrink:0;padding:4px;}
@@ -718,6 +712,7 @@
 
   /* Wizard (wide) + draft tables */
   #userWizard .form-modal{max-width:960px;}
+  #siteWizard .form-modal{max-width:960px;}
   .wiz-gen{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
   .wiz-gen .nl{font-size:14px;font-weight:700;color:var(--navy);}
 
@@ -750,6 +745,10 @@
   .draft-cb{accent-color:var(--blue);width:15px;height:15px;cursor:pointer;}
   .dup-warn{display:flex;align-items:center;gap:8px;background:#fdecec;color:#c0392b;border:1px solid #f6c9c4;border-radius:9px;padding:10px 14px;font-size:13px;margin:14px 0 0;}
   .dup-warn svg{width:16px;height:16px;flex-shrink:0;}
+  /* Advertencia informativa (ámbar), no bloqueante — distinta de .dup-warn (roja, sí bloquea). */
+  .loc-warn{display:flex;align-items:center;gap:8px;background:#fff5e9;color:#c2740c;border:1px solid #f6dcb6;border-radius:9px;padding:10px 14px;font-size:13px;margin:14px 0 0;}
+  .loc-warn svg{width:16px;height:16px;flex-shrink:0;}
+  [data-theme="dark"] .loc-warn{background:#2a2113;border-color:#4a3a1c;color:#e6a83c;}
   .bulk-bar{display:flex;align-items:center;gap:12px;background:#1b2a4a;border-radius:10px;padding:10px 14px;margin-top:14px;flex-wrap:wrap;}
   .bulk-bar .bc{color:#fff;font-weight:600;font-size:13px;}
   .bulk-bar select{border:none;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;background:var(--input-bg);color:var(--navy);}
@@ -862,6 +861,17 @@
     background-color:var(--blue);}
   #userWizard .form-scroll::-webkit-scrollbar-thumb:hover{background-color:var(--blue-hover);}
   .form-top{text-align:center;color:var(--muted2);font-size:15px;margin-bottom:22px;}
+  .asc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
+  .asc-card{display:flex;flex-direction:column;align-items:flex-start;gap:9px;text-align:left;
+    border:1.5px solid var(--border);border-radius:14px;padding:20px 18px;background:var(--card);
+    cursor:pointer;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease;}
+  .asc-card:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(47,107,255,.14);}
+  .asc-ico{width:38px;height:38px;border-radius:10px;background:#eef4ff;color:var(--blue);
+    display:flex;align-items:center;justify-content:center;}
+  .asc-ico svg{width:20px;height:20px;}
+  [data-theme="dark"] .asc-ico{background:#16233b;}
+  .asc-title{font-size:15px;font-weight:700;color:var(--navy);}
+  .asc-desc{font-size:12.5px;color:var(--muted2);line-height:1.45;}
   .form-card{border:1px solid var(--border);border-radius:14px;padding:24px 26px;margin-bottom:20px;}
   .form-card h4{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:20px;}
   .fld-label{display:block;font-size:14px;font-weight:700;color:var(--navy);margin:0 0 9px;}
@@ -880,7 +890,7 @@
   .addr-item svg{width:15px;height:15px;color:var(--muted);flex-shrink:0;margin-top:1px;}
   .addr-empty{padding:10px 8px;font-size:13px;color:var(--muted2);}
   .fld-search{position:relative;margin-bottom:20px;}
-  .fld-search .fld{margin-bottom:0;padding-right:44px;}
+  .fld-search .fld{margin-bottom:0;padding-right:44px;width:min-content;width:-webkit-fill-available;}
   .fld-search svg{position:absolute;right:15px;top:50%;transform:translateY(-50%);width:19px;height:19px;color:var(--muted);}
   .divider-text{display:flex;align-items:center;gap:14px;color:var(--muted2);font-size:14px;margin:6px 0 22px;}
   .divider-text::before,.divider-text::after{content:"";flex:1;height:1px;background:var(--border);}
@@ -1121,7 +1131,7 @@
             <div class="search"><input type="text" placeholder="Search sites..."></div>
             <button class="filters-btn">Filters</button>
             <div class="spacer"></div>
-            <button class="btn" id="btnToolbar" onclick="openForm()">
+            <button class="btn" id="btnToolbar" onclick="openAddSiteChoice()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
               Add new site
             </button>
@@ -1161,7 +1171,7 @@
             </div>
             <h3>Create your first site to continue the setup</h3>
             <p>A brand-new organization should start with 0 groups and no sites yet. Create the first site to unlock user onboarding and license assignment.</p>
-            <button class="btn btn-lg" onclick="openForm()">
+            <button class="btn btn-lg" onclick="openAddSiteChoice()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
               Add new site
             </button>
@@ -1335,7 +1345,7 @@
             Date range
           </button>
         </div>
-        <button class="btn map-add-btn" onclick="openForm()">
+        <button class="btn map-add-btn" onclick="openAddSiteChoice()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
           Add new site
         </button>
@@ -1343,7 +1353,7 @@
           <div class="map-empty-card">
             <h3 id="mapEmptyTitle">No sites on the map yet</h3>
             <p id="mapEmptyDesc">Add a site with an address or coordinates to see it appear here.</p>
-            <button class="btn" onclick="openForm()">Add new site</button>
+            <button class="btn" onclick="openAddSiteChoice()">Add new site</button>
           </div>
         </div>
       </div>
@@ -1400,10 +1410,35 @@
     </div>
     <h3>Create your first site to continue the setup</h3>
     <p>A brand-new organization should start with 0 groups and no sites yet. Create the first site to unlock user onboarding and license assignment.</p>
-    <button class="btn btn-lg" onclick="closeModal(); openForm();">
+    <button class="btn btn-lg" onclick="closeModal(); openAddSiteChoice();">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
       Add new site
     </button>
+  </div>
+</div>
+
+<!-- Modal: elegir "Single site" o "Multiple sites" al hacer click en "Add new site" -->
+<div class="modal-overlay hidden" id="addSiteChoiceModal">
+  <div class="form-modal" style="max-width:560px;">
+    <div class="form-scroll" style="padding:28px 30px 6px;">
+      <h3 class="storage-title" style="margin-bottom:4px;">Add new site</h3>
+      <p class="storage-sub" style="margin-bottom:20px;">How do you want to add sites?</p>
+      <div class="asc-grid">
+        <button type="button" class="asc-card" onclick="chooseSingleSite()">
+          <span class="asc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
+          <span class="asc-title">Single site</span>
+          <span class="asc-desc">Create one site with its address, coordinates and storages.</span>
+        </button>
+        <button type="button" class="asc-card" onclick="chooseMultiSite()">
+          <span class="asc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="8" r="3.4"/><circle cx="17" cy="8" r="3.4"/><path d="M3 19c0-3 1.8-5 4-5s4 2 4 5M13 19c0-3 1.8-5 4-5s4 2 4 5"/></svg></span>
+          <span class="asc-title">Multiple sites</span>
+          <span class="asc-desc">Add several sites at once.</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-footer" style="justify-content:flex-end;">
+      <button class="btn-back" onclick="closeAddSiteChoice()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -1460,6 +1495,77 @@
     <div class="form-footer">
       <button class="btn-back" onclick="closeForm()">Back</button>
       <button class="btn" onclick="submitForm()">Create site</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: wizard para añadir varios sites a la vez (mismo patrón que "Add users") -->
+<div class="modal-overlay hidden" id="siteWizard">
+  <div class="form-modal" id="siteWizardModal">
+    <div class="form-scroll">
+      <h3 class="storage-title" style="text-align:center;">Add sites</h3>
+      <p class="wiz-top">Configure multiple sites before adding them to the table.</p>
+
+      <div class="dup-warn" id="siteDupWarn" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <span>Some site names already exist or are duplicated. Make them unique before reviewing.</span>
+      </div>
+      <div class="loc-warn" id="siteLocWarn" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <span>Some sites share the exact same address and coordinates — double check these aren't duplicates. This won't block you from creating them.</span>
+      </div>
+
+      <div class="bulk-bar" id="siteBulkBar" style="display:none;">
+        <span class="bc" id="siteBulkCount">0 selected</span>
+        <select id="bulkSiteType"></select>
+        <button class="bbtn" onclick="bulkSetSiteType()">Set type</button>
+        <span class="bsep"></span>
+        <select id="bulkSiteGroup"></select>
+        <button class="bbtn" onclick="bulkAssignSiteGroup()">Assign to group</button>
+        <span class="bsep"></span>
+        <input id="siteBulkPrefix" placeholder="Prefix" value="Site">
+        <input id="siteBulkSuffix" placeholder="Suffix">
+        <button class="bbtn" onclick="bulkRenameSites()">Apply names</button>
+        <span class="bsep"></span>
+        <button class="bbtn" onclick="bulkDeleteSites()">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Delete
+        </button>
+        <button class="bbtn bclear" onclick="clearSiteSel()">Clear</button>
+      </div>
+
+      <div class="draft-wrap" style="margin-top:14px;">
+        <div class="draft-head" style="grid-template-columns:30px 1.3fr 0.9fr 1.3fr 0.7fr 0.7fr 0.9fr 70px 32px 32px;">
+          <div><input type="checkbox" class="draft-cb" id="draftSiteSelAll" onchange="toggleSiteSelAll(this)"></div>
+          <div>Name <span style="color:#e2453b;">*</span></div><div>Type <span style="color:#e2453b;">*</span></div><div>Localisation <span style="font-weight:400;text-transform:none;">(optional)</span></div><div>Lat <span style="color:#e2453b;">*</span></div><div>Lng <span style="color:#e2453b;">*</span></div><div>Group <span style="font-weight:400;text-transform:none;">(optional)</span></div><div>Status</div><div></div><div></div>
+        </div>
+        <div id="draftSitesRows"></div>
+        <div class="draft-empty" id="draftSitesEmpty">No sites yet. Click <b>Add site</b> to add one.</div>
+      </div>
+      <button class="u-add-single" onclick="addDraftSite()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Add site
+      </button>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn-back" onclick="closeSiteWizard()">Cancel</button>
+      <button class="btn" id="siteWizReviewBtn" onclick="siteWizReview()">Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: revisar y confirmar la creación en bloque de sites -->
+<div class="modal-overlay hidden" id="siteReviewModal">
+  <div class="rev-modal">
+    <div class="rev-scroll">
+      <div class="rev-h">Review &amp; confirm</div>
+      <div class="rev-sub">The following sites will be created in your organization.</div>
+      <div id="siteReviewBody"></div>
+    </div>
+    <div class="form-footer">
+      <button class="btn-back" onclick="closeSiteReview()">Back</button>
+      <button class="btn" onclick="siteReviewConfirm()"><span id="siteRevSaveLbl">Save</span></button>
     </div>
   </div>
 </div>
@@ -1882,7 +1988,7 @@
   </div>
 </div>
 
-<!-- Modal: bulk "Modify site" sobre varios site users a la vez (tabla Users) -->
+<!-- Modal: "Modify site" sobre uno o varios site users a la vez (tabla Users) -->
 <div class="modal-overlay hidden" id="bulkModifySiteModal">
   <div class="pack-modal">
     <div class="storage-scroll">
@@ -1894,12 +2000,16 @@
       </div>
       <div class="ud-block" style="margin-top:18px;">
         <div class="ud-k" style="margin-bottom:8px;">New site</div>
-        <select class="fld" id="bmsSiteSelect"></select>
+        <div class="fld-search" style="position:relative;margin-bottom:10px;">
+          <input class="fld" id="bmsSiteSearch" placeholder="Search sites..." autocomplete="off" oninput="renderBmsSiteList()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <div class="pack-list" id="bmsSiteList" style="max-height:240px;"></div>
       </div>
     </div>
     <div class="storage-footer">
       <button class="btn-back" id="bmsCancelBtn" onclick="closeBulkModifySiteModal()">Cancel</button>
-      <button class="btn" id="bmsConfirmBtn" onclick="confirmBulkModifySite()">
+      <button class="btn" id="bmsConfirmBtn" onclick="confirmBulkModifySite()" disabled>
         <span id="bmsConfirmSpinner" class="btn-spinner" style="display:none;"></span>
         <span id="bmsConfirmIdleLabel">Move <span id="bmsConfirmCount">0</span> users</span>
         <span id="bmsConfirmLoadingLabel" style="display:none;">Moving…</span>
@@ -2066,6 +2176,19 @@
 <div id="actChartTip"></div>
 <div id="dataFilterPop"></div>
 
+<!-- Dropdown compartido para "Edit site" (lápiz de la tabla de Users): un único elemento
+     reposicionado según la fila, en vez de un menú por fila — más liviano y sin los problemas
+     de foco de recrear el popover en cada render de la tabla. Mismo look que el modal "Modify
+     site" (buscador + .pack-list) pero flotante en vez de overlay de pantalla completa. -->
+<div class="autocomplete-pop usite-picker-pop" id="userSitePickerPop" style="display:none;">
+  <div class="fld-search" style="position:relative;margin-bottom:10px;">
+    <input type="text" class="fld" id="userSitePickerSearch" placeholder="Search sites..." autocomplete="off"
+      oninput="renderUserSitePickerList()" onclick="event.stopPropagation()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+  </div>
+  <div class="pack-list" id="userSitePickerList" style="max-height:260px;" onclick="event.stopPropagation()"></div>
+</div>
+
 <!-- Snackbar -->
 <div id="snackbar"></div>
 
@@ -2221,6 +2344,439 @@
     }
     renderGroupsList();
     if (siteMap) refreshMapMarkers();
+  }
+
+  // Modal "Add new site": elegir entre Single site (flujo existente) o Multiple sites (nuevo).
+  function openAddSiteChoice(){
+    document.getElementById('addSiteChoiceModal').classList.remove('hidden');
+  }
+  function closeAddSiteChoice(){
+    document.getElementById('addSiteChoiceModal').classList.add('hidden');
+  }
+  function chooseSingleSite(){
+    closeAddSiteChoice();
+    openForm();
+  }
+  function chooseMultiSite(){
+    closeAddSiteChoice();
+    openMultiSiteForm();
+  }
+  function openMultiSiteForm(){
+    openSiteWizard();
+  }
+
+  /* ================= WIZARD "Add sites" (multisite) =================
+     Mismo patrón que el wizard "Add users" (dUsers/dMgrs, draft-row, bulk-bar,
+     review modal): se drafta en `dSites` y solo se escribe en `sites` al confirmar. */
+  let dSites = [];
+  let draftSiteUid = 0;
+  let dSitesSel = new Set();
+
+  function openSiteWizard(){
+    dSites = [];
+    dSitesSel = new Set();
+    document.getElementById('bulkSiteType').innerHTML =
+      Object.keys(SITE_TYPES).map(k => `<option value="${k}">${SITE_TYPES[k].label}</option>`).join('');
+    document.getElementById('bulkSiteGroup').innerHTML =
+      `<option value="">No group</option>` + groups.map(g => `<option>${escapeAttr(g.name)}</option>`).join('');
+    renderDraftSites();
+    document.getElementById('siteWizard').classList.remove('hidden');
+  }
+  function closeSiteWizard(){
+    document.getElementById('siteWizard').classList.add('hidden');
+  }
+
+  function addDraftSite(){
+    // Type sin valor por defecto a propósito: se pide explícito, igual que en la creación individual.
+    dSites.push({ id: ++draftSiteUid, name:'', type:'', localisation:'', lat:'', lng:'', group:'' });
+    renderDraftSites();
+  }
+  function duplicateDraftSite(id){
+    const i = dSites.findIndex(x => x.id === id);
+    if (i < 0) return;
+    const src = dSites[i];
+    dSites.splice(i + 1, 0, { ...src, id: ++draftSiteUid, name: src.name ? src.name + '_copy' : '' });
+    renderDraftSites();
+  }
+  function deleteDraftSite(id){
+    dSitesSel.delete(id);
+    dSites = dSites.filter(x => x.id !== id);
+    renderDraftSites();
+  }
+  function setDSiteField(id, field, v){
+    const st = dSites.find(x => x.id === id);
+    if (!st) return;
+    st[field] = v;
+    if (field === 'name') refreshSiteDupState(); // solo el name afecta duplicados; el resto no necesita re-render
+    if (field === 'type') refreshSiteWizReviewBtn();
+    if (field === 'lat' || field === 'lng'){
+      // requireNow=false mientras se escribe (como oninput="validateCoordField(...)" del form individual,
+      // sin el 4º argumento): no se marca "required" hasta blur o intento de Review.
+      validateDSiteCoord(id, field, v, false);
+      refreshSiteWizReviewBtn();
+    }
+    if (field === 'localisation' || field === 'lat' || field === 'lng') refreshSiteLocationWarn();
+  }
+
+  // Límites de lat/lng — mismas reglas que validateCoordField() en la creación individual de un site
+  // (ahí son obligatorios): requireNow=true hace que vacío también cuente como error.
+  function dSiteCoordMessage(min, max, raw, requireNow){
+    const r = String(raw == null ? '' : raw).trim();
+    if (!r) return requireNow ? 'Required.' : '';
+    if (isNaN(Number(r))) return 'Must be a number.';
+    const val = Number(r);
+    if (val < min || val > max) return `Must be between ${min} and ${max}.`;
+    return '';
+  }
+  function validateDSiteCoord(id, field, rawValue, requireNow){
+    const input = document.getElementById(field === 'lat' ? 'dSiteLat-' + id : 'dSiteLng-' + id);
+    if (!input) return true;
+    const min = field === 'lat' ? -90 : -180;
+    const max = field === 'lat' ? 90 : 180;
+    const msg = dSiteCoordMessage(min, max, rawValue, requireNow);
+    input.classList.toggle('err', !!msg);
+    input.title = msg;
+    return !msg;
+  }
+  function dSitesHaveCoordErrors(){
+    return dSites.some(st =>
+      dSiteCoordMessage(-90, 90, st.lat, true) || dSiteCoordMessage(-180, 180, st.lng, true));
+  }
+  // Advertencia (no bloqueante): sites con exactamente la misma address + lat + lng.
+  // A diferencia de dSiteDupNames(), esto NO impide hacer Review/crear los sites.
+  function dSiteDupLocations(){
+    const counts = {};
+    const keyOf = st => {
+      const addr = (st.localisation || '').trim().toLowerCase();
+      const lat = String(st.lat == null ? '' : st.lat).trim();
+      const lng = String(st.lng == null ? '' : st.lng).trim();
+      if (!addr || !lat || !lng) return null; // solo se advierte cuando los 3 coinciden
+      return addr + '|' + lat + '|' + lng;
+    };
+    dSites.forEach(st => { const k = keyOf(st); if (k) counts[k] = (counts[k] || 0) + 1; });
+    const dup = new Set();
+    dSites.forEach(st => { const k = keyOf(st); if (k && counts[k] > 1) dup.add(st.id); });
+    return dup;
+  }
+  function refreshSiteLocationWarn(){
+    const warn = document.getElementById('siteLocWarn');
+    if (warn) warn.style.display = dSiteDupLocations().size > 0 ? 'flex' : 'none';
+  }
+
+  /* ---------- Geocoder por fila en el draft de sites ----------
+     Mismo geocoder (Nominatim vía leaflet-control-geocoder, `addressGeocoder`) y mismo
+     comportamiento que el campo "Search address" de la creación individual de un site
+     (onAddressInput/selectAddressResult), pero con estado por fila (id) en vez de global,
+     porque puede haber varias filas buscando direcciones a la vez. */
+  let dSiteAddrTimers = {};
+  let dSiteAddrTokens = {};
+  let dSiteAddrResults = {};
+
+  function onDSiteAddressInput(id, value){
+    setDSiteField(id, 'localisation', value);
+    clearTimeout(dSiteAddrTimers[id]);
+    const q = value.trim();
+    if (q.length < 3){ hideDSiteAddressDropdown(id); return; }
+    dSiteAddrTimers[id] = setTimeout(() => runDSiteAddressSearch(id, q), 450);
+  }
+  function runDSiteAddressSearch(id, q){
+    const myToken = (dSiteAddrTokens[id] = (dSiteAddrTokens[id] || 0) + 1);
+    renderDSiteAddressDropdown(id, null); // estado "Searching..."
+    showDSiteAddressDropdown(id);
+    addressGeocoder.geocode(q, results => {
+      if (dSiteAddrTokens[id] !== myToken) return; // llegó tarde, ya no aplica
+      dSiteAddrResults[id] = results || [];
+      renderDSiteAddressDropdown(id, results || []);
+    });
+  }
+  function renderDSiteAddressDropdown(id, results){
+    const dd = document.getElementById('dSiteAddrDD-' + id);
+    if (!dd) return;
+    if (results === null){
+      dd.innerHTML = `<div class="addr-empty">Searching…</div>`;
+      return;
+    }
+    if (!results.length){
+      dd.innerHTML = `<div class="addr-empty">No addresses found.</div>`;
+      return;
+    }
+    dd.innerHTML = results.map((r, i) => `
+      <div class="addr-item" onclick="selectDSiteAddressResult(${id},${i})">
+        ${ADDR_ICON}
+        <span>${r.name}</span>
+      </div>`).join('');
+  }
+  function selectDSiteAddressResult(id, i){
+    const r = (dSiteAddrResults[id] || [])[i];
+    const st = dSites.find(x => x.id === id);
+    if (!r || !st) return;
+    st.localisation = r.name;
+    st.lat = Number(r.center.lat.toFixed(6));
+    st.lng = Number(r.center.lng.toFixed(6));
+    const addrEl = document.getElementById('dSiteAddr-' + id);
+    const latEl = document.getElementById('dSiteLat-' + id);
+    const lngEl = document.getElementById('dSiteLng-' + id);
+    if (addrEl) addrEl.value = st.localisation;
+    if (latEl) latEl.value = st.lat;
+    if (lngEl) lngEl.value = st.lng;
+    validateDSiteCoord(id, 'lat', st.lat, true);
+    validateDSiteCoord(id, 'lng', st.lng, true);
+    refreshSiteWizReviewBtn();
+    refreshSiteLocationWarn();
+    hideDSiteAddressDropdown(id);
+  }
+  // Dropdown con position:fixed (mismo patrón que fAddressDropdown/gSiteDropdown) para que
+  // no aporte altura dentro del .draft-wrap ni quede recortado por su overflow.
+  function positionDSiteAddressDropdown(id){
+    const input = document.getElementById('dSiteAddr-' + id);
+    const dd = document.getElementById('dSiteAddrDD-' + id);
+    if (!input || !dd) return;
+    const r = input.getBoundingClientRect();
+    dd.style.left = r.left + 'px';
+    dd.style.top = (r.bottom + 5) + 'px';
+    dd.style.width = Math.max(r.width, 240) + 'px';
+  }
+  function showDSiteAddressDropdown(id){
+    hideAllDSiteAddressDropdowns();
+    const dd = document.getElementById('dSiteAddrDD-' + id);
+    if (!dd) return;
+    positionDSiteAddressDropdown(id);
+    dd.style.display = 'block';
+  }
+  function hideDSiteAddressDropdown(id){
+    const dd = document.getElementById('dSiteAddrDD-' + id);
+    if (dd) dd.style.display = 'none';
+  }
+  function hideAllDSiteAddressDropdowns(){
+    document.querySelectorAll('[id^="dSiteAddrDD-"]').forEach(dd => { dd.style.display = 'none'; });
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.dsite-addr-wrap')) hideAllDSiteAddressDropdowns();
+  });
+  window.addEventListener('resize', hideAllDSiteAddressDropdowns);
+  document.addEventListener('scroll', hideAllDSiteAddressDropdowns, true);
+
+  // Selección para bulk actions sobre el draft de sites (ids en `dSites`, no índices).
+  function toggleSiteSel(id, checked){
+    if (checked) dSitesSel.add(id); else dSitesSel.delete(id);
+    renderDraftSites();
+  }
+  function toggleSiteSelAll(cb){
+    dSitesSel = cb.checked ? new Set(dSites.map(s => s.id)) : new Set();
+    renderDraftSites();
+  }
+  function clearSiteSel(){
+    dSitesSel = new Set();
+    renderDraftSites();
+  }
+  function updateSiteBulkBar(){
+    const bar = document.getElementById('siteBulkBar');
+    if (!bar) return;
+    bar.style.display = dSitesSel.size > 0 ? 'flex' : 'none';
+    document.getElementById('siteBulkCount').textContent = `${dSitesSel.size} selected`;
+  }
+
+  function bulkSetSiteType(){
+    const type = document.getElementById('bulkSiteType').value;
+    dSites.forEach(st => { if (dSitesSel.has(st.id)) st.type = type; });
+    renderDraftSites();
+  }
+  function bulkAssignSiteGroup(){
+    const group = document.getElementById('bulkSiteGroup').value;
+    dSites.forEach(st => { if (dSitesSel.has(st.id)) st.group = group; });
+    renderDraftSites();
+  }
+  // Nombres de site ya en uso (sites guardados + resto del draft) para el mismo prefix/suffix —
+  // mismo propósito que usedNames() en el wizard de usuarios.
+  function usedSiteNames(excludeIds){
+    const set = new Set();
+    sites.forEach(s => set.add((s.name || '').trim().toLowerCase()));
+    dSites.forEach(st => { if (!excludeIds || !excludeIds.has(st.id)) set.add((st.name || '').trim().toLowerCase()); });
+    return set;
+  }
+  // Igual que freeUsername() en el wizard de usuarios: prueba el número siguiente y salta
+  // cualquiera ya usado, así que si ya existen sites "Farm_001".."Farm_003" propone "Farm_004".
+  function freeSiteName(prefix, suffix, seqStart, used){
+    let seq = seqStart;
+    let name;
+    do {
+      name = `${prefix}_${String(seq).padStart(3, '0')}${suffix ? '_' + suffix : ''}`;
+      seq++;
+    } while (used.has(name.toLowerCase()));
+    used.add(name.toLowerCase());
+    return { name, nextSeq: seq };
+  }
+  // Igual que bulkRename() en el wizard de usuarios (prefix/suffix), pero continuando la
+  // numeración después de los sites ya creados (y del resto del draft) con ese mismo prefix/suffix,
+  // en vez de siempre reiniciar en 001.
+  function bulkRenameSites(){
+    const p = document.getElementById('siteBulkPrefix').value.trim() || 'Site';
+    const s = document.getElementById('siteBulkSuffix').value.trim();
+    const targetIds = new Set();
+    dSites.forEach(st => { if (dSitesSel.has(st.id)) targetIds.add(st.id); });
+    const used = usedSiteNames(targetIds);
+    let seq = 1;
+    dSites.forEach(st => {
+      if (!dSitesSel.has(st.id)) return;
+      const r = freeSiteName(p, s, seq, used);
+      st.name = r.name;
+      seq = r.nextSeq;
+    });
+    renderDraftSites();
+  }
+  function bulkDeleteSites(){
+    dSites = dSites.filter(x => !dSitesSel.has(x.id));
+    dSitesSel = new Set();
+    renderDraftSites();
+  }
+
+  // Nombres duplicados dentro del draft o contra sites ya existentes — mismo propósito
+  // que la validación de usernames del wizard de usuarios (dupSet()).
+  function dSiteDupNames(){
+    const counts = {};
+    dSites.forEach(st => {
+      const n = (st.name || '').trim().toLowerCase();
+      if (!n) return;
+      counts[n] = (counts[n] || 0) + 1;
+    });
+    const existing = new Set(sites.map(s => (s.name || '').trim().toLowerCase()));
+    const dup = new Set();
+    dSites.forEach(st => {
+      const n = (st.name || '').trim().toLowerCase();
+      if (!n) return;
+      if (counts[n] > 1 || existing.has(n)) dup.add(st.id);
+    });
+    return dup;
+  }
+  // Parcheo ligero (sin re-render completo) al escribir el name, para no perder foco/cursor.
+  function refreshSiteDupState(){
+    const dupIds = dSiteDupNames();
+    dSites.forEach(st => {
+      const el = document.getElementById('dSiteName-' + st.id);
+      if (el) el.classList.toggle('dup', dupIds.has(st.id));
+    });
+    const warn = document.getElementById('siteDupWarn');
+    if (warn) warn.style.display = dupIds.size > 0 ? 'flex' : 'none';
+    refreshSiteWizReviewBtn();
+  }
+  function refreshSiteWizReviewBtn(){
+    const btn = document.getElementById('siteWizReviewBtn');
+    if (!btn) return;
+    const ready = dSites.length > 0
+      && dSites.every(st => (st.name || '').trim() && SITE_TYPES[st.type])
+      && dSiteDupNames().size === 0
+      && !dSitesHaveCoordErrors();
+    btn.disabled = !ready;
+    btn.style.opacity = ready ? '1' : '.5';
+    btn.style.cursor = ready ? 'pointer' : 'not-allowed';
+  }
+
+  function renderDraftSites(){
+    const rowsBox = document.getElementById('draftSitesRows');
+    const emptyBox = document.getElementById('draftSitesEmpty');
+    if (!rowsBox) return;
+
+    // Podar selección contra los ids válidos actuales de `dSites`.
+    Array.from(dSitesSel).forEach(id => { if (!dSites.some(s => s.id === id)) dSitesSel.delete(id); });
+
+    const dupIds = dSiteDupNames();
+    const grid = 'grid-template-columns:30px 1.3fr 0.9fr 1.3fr 0.7fr 0.7fr 0.9fr 70px 32px 32px;';
+    const typeOpts = st => `<option value="" disabled ${!st.type?'selected':''}>Select a type</option>` +
+      Object.keys(SITE_TYPES).map(k => `<option value="${k}" ${st.type===k?'selected':''}>${SITE_TYPES[k].label}</option>`).join('');
+    const groupOpts = st => `<option value="" ${!st.group?'selected':''}>No group</option>` + groups.map(g => `<option ${st.group===g.name?'selected':''}>${escapeAttr(g.name)}</option>`).join('');
+
+    rowsBox.innerHTML = dSites.map(st => `
+      <div class="draft-row" style="${grid}">
+        <div><input type="checkbox" class="draft-cb" ${dSitesSel.has(st.id)?'checked':''} onchange="toggleSiteSel(${st.id},this.checked)"></div>
+        <div><input type="text" class="di ${dupIds.has(st.id)?'dup':''}" id="dSiteName-${st.id}" value="${escapeAttr(st.name)}" oninput="setDSiteField(${st.id},'name',this.value)" placeholder="Site name" title="${dupIds.has(st.id)?'This name already exists or is duplicated':''}"></div>
+        <div><select class="di" id="dSiteType-${st.id}" onchange="setDSiteField(${st.id},'type',this.value); this.classList.remove('err');" onblur="this.classList.toggle('err', !this.value)">${typeOpts(st)}</select></div>
+        <div class="dsite-addr-wrap">
+          <input type="text" class="di" id="dSiteAddr-${st.id}" value="${escapeAttr(st.localisation)}" autocomplete="off" placeholder="Search address (optional)"
+            oninput="onDSiteAddressInput(${st.id},this.value)"
+            onfocus="if(this.value.trim().length>=3) showDSiteAddressDropdown(${st.id})">
+          <div class="autocomplete-pop" id="dSiteAddrDD-${st.id}" style="display:none;max-height:220px;overflow:auto;"></div>
+        </div>
+        <div><input type="number" step="any" min="-90" max="90" class="di ${dSiteCoordMessage(-90,90,st.lat)?'err':''}" id="dSiteLat-${st.id}" value="${st.lat===''?'':st.lat}" oninput="setDSiteField(${st.id},'lat',this.value)" onblur="validateDSiteCoord(${st.id},'lat',this.value,true)" placeholder="Lat *" title="${dSiteCoordMessage(-90,90,st.lat)}"></div>
+        <div><input type="number" step="any" min="-180" max="180" class="di ${dSiteCoordMessage(-180,180,st.lng)?'err':''}" id="dSiteLng-${st.id}" value="${st.lng===''?'':st.lng}" oninput="setDSiteField(${st.id},'lng',this.value)" onblur="validateDSiteCoord(${st.id},'lng',this.value,true)" placeholder="Lng *" title="${dSiteCoordMessage(-180,180,st.lng)}"></div>
+        <div><select class="di" onchange="setDSiteField(${st.id},'group',this.value)">${groupOpts(st)}</select></div>
+        <div><span class="badge-pending">Pending</span></div>
+        <div><button class="u-copy" title="Duplicate" onclick="duplicateDraftSite(${st.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/></svg></button></div>
+        <div><button class="u-del" title="Delete" onclick="deleteDraftSite(${st.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></button></div>
+      </div>`).join('');
+
+    emptyBox.style.display = dSites.length ? 'none' : 'block';
+
+    const warn = document.getElementById('siteDupWarn');
+    if (warn) warn.style.display = dupIds.size > 0 ? 'flex' : 'none';
+    refreshSiteLocationWarn();
+
+    const sa = document.getElementById('draftSiteSelAll');
+    if (sa){ sa.checked = dSites.length>0 && dSitesSel.size===dSites.length; sa.indeterminate = dSitesSel.size>0 && dSitesSel.size<dSites.length; }
+
+    updateSiteBulkBar();
+    refreshSiteWizReviewBtn();
+  }
+
+  // Review &amp; confirm — igual que wizReview()/reviewConfirm() del wizard de usuarios:
+  // no toca `sites` hasta que el usuario confirma en el modal de revisión.
+  function siteWizReview(){
+    if (dSites.length === 0) return;
+    if (!dSites.every(st => (st.name || '').trim() && SITE_TYPES[st.type])) return;
+    if (dSiteDupNames().size > 0) return;
+    if (dSitesHaveCoordErrors()) return;
+
+    const byGroup = {};
+    dSites.forEach(st => {
+      const g = st.group || 'No group';
+      (byGroup[g] = byGroup[g] || []).push(st);
+    });
+    const blocks = Object.keys(byGroup).map(g => `
+      <div class="rev-site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg> ${escapeAttr(g)} <span style="color:var(--muted);font-weight:600;">· ${byGroup[g].length}</span></div>
+      <div>${byGroup[g].map(st => `<span class="rev-chip">${escapeAttr(st.name)} · ${SITE_TYPES[st.type] ? SITE_TYPES[st.type].label : st.type}</span>`).join('')}</div>`).join('');
+
+    document.getElementById('siteReviewBody').innerHTML = `
+      <div class="rev-block">
+        <h5>Sites <span class="pill">${dSites.length}</span></h5>
+        ${blocks}
+      </div>`;
+    document.getElementById('siteRevSaveLbl').textContent = `Save ${dSites.length} site${dSites.length!==1?'s':''}`;
+    document.getElementById('siteReviewModal').classList.remove('hidden');
+  }
+  function closeSiteReview(){
+    document.getElementById('siteReviewModal').classList.add('hidden');
+  }
+  function siteReviewConfirm(){
+    const rows = dSites;
+    const created = rows.map(st => {
+      const lat = st.lat !== '' && st.lat != null && !isNaN(parseFloat(st.lat)) ? parseFloat(st.lat) : null;
+      const lng = st.lng !== '' && st.lng != null && !isNaN(parseFloat(st.lng)) ? parseFloat(st.lng) : null;
+      const address = (st.localisation || '').trim();
+      const localisation = address || (lat != null && lng != null ? `${lat}, ${lng}` : '');
+      return {
+        id: nextSiteId++,
+        name: st.name.trim(),
+        type: SITE_TYPES[st.type] ? st.type : DEFAULT_SITE_TYPE,
+        localisation, lat, lng,
+        group: '—',
+        storages: [],
+      };
+    });
+    sites = sites.concat(created);
+    // Los grupos elegidos en el draft se resuelven recién ahora, con los ids reales ya asignados.
+    created.forEach((s, idx) => {
+      const groupName = rows[idx].group;
+      if (!groupName) return;
+      const g = groups.find(g => g.name === groupName);
+      if (g){ g.siteIds = g.siteIds || []; g.siteIds.push(s.id); }
+    });
+    persistSites();
+    persistGroups();
+    renderGroupsList();
+    const count = created.length;
+    closeSiteReview();
+    closeSiteWizard();
+    render();
+    showSnack(`${count} site${count!==1?'s':''} created`);
   }
 
   // Abre el formulario de creación de site
@@ -2408,6 +2964,15 @@
   // Cerrar el formulario al hacer click fuera
   document.getElementById('formModal').addEventListener('click', e => {
     if (e.target.id === 'formModal') closeForm();
+  });
+  document.getElementById('addSiteChoiceModal').addEventListener('click', e => {
+    if (e.target.id === 'addSiteChoiceModal') closeAddSiteChoice();
+  });
+  document.getElementById('siteWizard').addEventListener('click', e => {
+    if (e.target.id === 'siteWizard') closeSiteWizard();
+  });
+  document.getElementById('siteReviewModal').addEventListener('click', e => {
+    if (e.target.id === 'siteReviewModal') closeSiteReview();
   });
 
   /* ================= MAP ================= */
@@ -4970,9 +5535,6 @@
   let editingUserValue = '';
   let editingUserError = '';
   let editingUserSaving = false;
-  // Edición inline del site (tabla de site users), mismo patrón que el username
-  let editingUserSiteIndex = null;
-  let editingUserSiteSaving = false;
 
   // Licencias: 5 licencias, cada una puede contener paquetes de créditos y
   // puede estar asignada a un usuario. Los paquetes empiezan como un pool
@@ -5156,19 +5718,11 @@
           <span class="u-name-text">${u.name}</span>
           <button class="icon-btn u-edit-btn" title="Edit username" onclick="startEditUsername(${i})">${pencilSvg}</button>
         </span>`}
-        ${u.nomad ? nomadBadge() : (editingUserSiteIndex===i ? `
-        <span class="u-site-edit">
-          <select id="uSiteInput-${i}" ${editingUserSiteSaving?'disabled':''} onchange="saveUserSite(${i},this.value)">
-            ${siteList().map(n=>`<option ${u.site===n?'selected':''}>${escapeAttr(n)}</option>`).join('')}
-          </select>
-          ${editingUserSiteSaving
-            ? `<span class="btn-spinner" style="border-top-color:var(--blue);border-color:rgba(43,91,255,.25);"></span>`
-            : `<button class="icon-btn" title="Cancel" onclick="cancelEditUserSite()">${xSvg}</button>`}
-        </span>` : `
+        ${u.nomad ? nomadBadge() : `
         <span class="u-site u-site-cell">
           <span class="u-site-text">${escapeAttr(u.site)}</span>
-          <button class="icon-btn u-edit-btn" title="Edit site" onclick="startEditUserSite(${i})">${pencilSvg}</button>
-        </span>`)}
+          <button class="icon-btn u-edit-btn" title="Edit site" onclick="event.stopPropagation(); openUserSitePicker(${i}, this)">${pencilSvg}</button>
+        </span>`}
         <span><span class="role-badge">Site User</span></span>
         <span class="u-pass-cell">
           <span class="u-pass-text">${revealedPasswords.has(i) ? escapeAttr(fakePassword(u)) : '••••••••'}</span>
@@ -5335,35 +5889,78 @@
     if (el){ el.focus(); const p = el.value.length; el.setSelectionRange(p,p); }
   }
 
-  /* ---------- Edición inline del site (tabla de site users) ---------- */
-  function startEditUserSite(i){
+  /* ---------- "Edit site" (tabla de Users) — dropdown flotante, no modal ----------
+     Un único elemento compartido (#userSitePickerPop), reposicionado según qué lápiz se
+     clickeó, en vez de un popover por fila: evita recrear/perder el foco del input en cada
+     render de la tabla. Mismo patrón que fAddressDropdown/gSiteDropdown (position:fixed +
+     búsqueda + click-fuera-cierra vía contains(), no un blanket "cierra todo .pop en cualquier
+     click" — eso fue lo que rompía el intento anterior: el propio click de abrir burbujeaba
+     y se cerraba a sí mismo). */
+  let userSitePickerTarget = null; // índice en `users` que se está editando, o null
+  let userSitePickerBtn = null;    // botón que abrió el dropdown, para reposicionar en scroll/resize
+  function openUserSitePicker(i, btnEl){
     const u = users[i]; if (!u || u.nomad) return;
-    editingUserSiteIndex = i;
-    editingUserSiteSaving = false;
-    renderUsers();
-    const el = document.getElementById('uSiteInput-'+i);
-    if (el) el.focus();
+    userSitePickerTarget = i;
+    userSitePickerBtn = btnEl;
+    const search = document.getElementById('userSitePickerSearch');
+    if (search) search.value = '';
+    positionUserSitePicker();
+    document.getElementById('userSitePickerPop').style.display = 'block';
+    renderUserSitePickerList();
+    if (search) search.focus();
   }
-  function cancelEditUserSite(){
-    if (editingUserSiteSaving) return;
-    editingUserSiteIndex = null;
-    renderUsers();
+  function closeUserSitePicker(){
+    userSitePickerTarget = null;
+    userSitePickerBtn = null;
+    document.getElementById('userSitePickerPop').style.display = 'none';
   }
-  function saveUserSite(i, site){
-    const u = users[i]; if (!u) return;
-    if (site === u.site){ cancelEditUserSite(); return; }
-    // Misma latencia falsa que saveUsername, para que el cambio se sienta aplicado de verdad.
-    editingUserSiteSaving = true;
-    renderUsers();
-    setTimeout(()=>{
-      u.site = site;
-      persistUsers();
-      editingUserSiteIndex = null;
-      editingUserSiteSaving = false;
-      renderUsers();
-      showSnack(`Site updated to "${site}"`);
-    }, 700);
+  function positionUserSitePicker(){
+    const btn = userSitePickerBtn;
+    const pop = document.getElementById('userSitePickerPop');
+    if (!btn || !pop) return;
+    const r = btn.getBoundingClientRect();
+    pop.style.left = r.left + 'px';
+    pop.style.top = (r.bottom + 6) + 'px';
+    pop.style.width = Math.max(r.width, 260) + 'px';
   }
+  function renderUserSitePickerList(){
+    const list = document.getElementById('userSitePickerList');
+    if (!list) return;
+    const search = document.getElementById('userSitePickerSearch');
+    const f = (search ? search.value : '').trim().toLowerCase();
+    const u = users[userSitePickerTarget];
+    const matches = siteList().filter(n => !f || n.toLowerCase().includes(f));
+    list.innerHTML = matches.length
+      ? matches.map(n => `
+        <label class="pack-row" style="cursor:pointer;${u && u.site===n?'border-color:var(--blue);background:#eef4ff;':''}" onclick="pickUserSite('${n.replace(/'/g,"\\'")}')">
+          ${escapeAttr(n)}
+        </label>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;">No matching sites.</p>`;
+  }
+  function pickUserSite(site){
+    const i = userSitePickerTarget;
+    if (i == null) return;
+    const u = users[i];
+    closeUserSitePicker();
+    if (!u || site === u.site) return;
+    u.site = site;
+    persistUsers();
+    renderUsers();
+    showSnack(`Site updated to "${site}"`);
+  }
+  // Cierra al hacer click fuera (mismo patrón que fAddressWrap/gSiteSearchWrap: el trigger
+  // hace stopPropagation en su propio onclick, así que este listener solo ve clicks genuinamente
+  // externos al dropdown).
+  document.addEventListener('click', e => {
+    const pop = document.getElementById('userSitePickerPop');
+    if (pop && pop.style.display === 'block' && !pop.contains(e.target)) closeUserSitePicker();
+  });
+  window.addEventListener('resize', () => {
+    if (userSitePickerTarget != null) positionUserSitePicker();
+  });
+  document.addEventListener('scroll', () => {
+    if (userSitePickerTarget != null) positionUserSitePicker();
+  }, true);
 
   /* ---------- "Add/Modify actions" — bulk o individual (tabla de Users) ----------
      Mismo modal para ambos casos. En bulk reemplaza — no combina — las actions de cada
@@ -5523,13 +6120,19 @@
     }, 700);
   }
 
-  /* ---------- Bulk "Modify site" (tabla de Users) ---------- */
+  /* ---------- Bulk "Modify site" (tabla de Users) ----------
+     Lista buscable (mismo patrón que assignUserList/renderAssignUserList) en vez de un
+     &lt;select&gt; plano: con cientos de sites un dropdown nativo es imposible de recorrer. */
+  let bmsSelectedSite = null;
   function openBulkModifySiteModal(){
     if (!siteUsersSelected.size) return;
+    bmsSelectedSite = null;
     renderBulkModifySiteUsers();
-    const sel = document.getElementById('bmsSiteSelect');
-    if (sel) sel.innerHTML = siteList().map(n=>`<option>${escapeAttr(n)}</option>`).join('');
+    const search = document.getElementById('bmsSiteSearch');
+    if (search) search.value = '';
+    renderBmsSiteList();
     document.getElementById('bulkModifySiteModal').classList.remove('hidden');
+    if (search) search.focus();
   }
   function closeBulkModifySiteModal(){
     document.getElementById('bulkModifySiteModal').classList.add('hidden');
@@ -5547,12 +6150,30 @@
     }).join('');
     box.innerHTML = rows || `<span class="rev-empty">No users selected</span>`;
   }
+  function renderBmsSiteList(){
+    const list = document.getElementById('bmsSiteList');
+    if (!list) return;
+    const f = (document.getElementById('bmsSiteSearch').value || '').trim().toLowerCase();
+    const matches = siteList().filter(n => !f || n.toLowerCase().includes(f));
+    list.innerHTML = matches.length
+      ? matches.map(n => `
+        <label class="pack-row" style="cursor:pointer;${bmsSelectedSite===n?'border-color:var(--blue);background:#eef4ff;':''}" onclick="selectBmsSite('${n.replace(/'/g,"\\'")}')">
+          ${escapeAttr(n)}
+        </label>`).join('')
+      : `<p style="color:var(--muted2);font-size:13px;">No matching sites.</p>`;
+    const btn = document.getElementById('bmsConfirmBtn');
+    if (btn) btn.disabled = !bmsSelectedSite;
+  }
+  function selectBmsSite(n){
+    bmsSelectedSite = n;
+    renderBmsSiteList();
+  }
   // Misma latencia falsa que confirmBulkUserActions, mismo motivo: un cambio en bloque
   // no debe sentirse instantáneo/inseguro. Los usuarios nomad se saltan (no tienen un site fijo).
   function confirmBulkModifySite(){
     const count = siteUsersSelected.size;
-    if (!count) return;
-    const site = document.getElementById('bmsSiteSelect').value;
+    if (!count || !bmsSelectedSite) return;
+    const site = bmsSelectedSite;
     const btn = document.getElementById('bmsConfirmBtn');
     const cancelBtn = document.getElementById('bmsCancelBtn');
     document.getElementById('bmsConfirmSpinner').style.display = 'inline-block';
