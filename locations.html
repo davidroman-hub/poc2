@@ -394,6 +394,18 @@
   .u-name-err{position:absolute;top:calc(100% + 4px);left:0;font-size:11.5px;font-weight:600;color:#e2453b;background:#fff;white-space:nowrap;z-index:5;}
   [data-theme="dark"] .u-name-err{background:var(--card);}
   .u-site{color:var(--muted2);font-size:13px;}
+  .u-site-cell{display:flex;align-items:center;gap:6px;min-width:0;}
+  .u-site-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .u-site-edit{display:flex;align-items:center;gap:4px;min-width:0;}
+  .u-site-edit select{border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:13px;font-family:inherit;color:var(--navy);background:var(--input-bg);outline:none;min-width:0;}
+  .u-site-edit select:focus{border-color:var(--blue);}
+  .u-site-edit .icon-btn{flex-shrink:0;padding:4px;}
+  .u-site-edit .icon-btn svg{width:15px;height:15px;}
+  .u-site-edit .btn-spinner{flex-shrink:0;}
+  .u-pass-cell{display:flex;align-items:center;gap:6px;min-width:0;}
+  .u-pass-text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.5px;}
+  .u-pass-cell .icon-btn{flex-shrink:0;padding:4px;}
+  .u-pass-cell .icon-btn svg{width:15px;height:15px;}
   .nomad-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;background:#eefaf1;color:#1c8a4b;border:1px solid #c4ecd1;}
   .u-actions-btn{width:100%;text-align:left;border:1px solid var(--border);border-radius:8px;padding:9px 30px 9px 11px;font-size:13px;background:#fff;cursor:pointer;font-family:inherit;color:var(--muted2);position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .u-actions-btn::after{content:"";position:absolute;right:11px;top:50%;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-70%) rotate(45deg);}
@@ -1836,14 +1848,14 @@
   </div>
 </div>
 
-<!-- Modal: bulk "Add/Modify actions" sobre varios site users a la vez (tabla Users) -->
+<!-- Modal: "Add/Modify actions" sobre uno o varios site users a la vez (tabla Users) -->
 <div class="modal-overlay hidden" id="bulkUserActionsModal">
   <div class="pack-modal">
     <div class="storage-scroll">
-      <h3 class="storage-title">Add / modify actions</h3>
-      <p class="storage-sub">The actions you select below will replace any actions already assigned to each of the <span id="buaUserCount">0</span> selected users.</p>
+      <h3 class="storage-title" id="buaModalTitle">Add / modify actions</h3>
+      <p class="storage-sub">The actions you select below will replace any actions currently assigned to the user(s) below.</p>
       <div class="ud-block">
-        <div class="ud-k" style="margin-bottom:8px;">Users being modified</div>
+        <div class="ud-k" style="margin-bottom:8px;">Users being modified (<span id="buaUserCount">0</span>)</div>
         <div id="buaUsers"></div>
       </div>
       <div class="ud-block" id="buaTemplatesBlock" style="margin-top:18px;display:none;">
@@ -1865,6 +1877,32 @@
         <span id="buaConfirmSpinner" class="btn-spinner" style="display:none;"></span>
         <span id="buaConfirmIdleLabel">Replace actions for <span id="buaConfirmCount">0</span> users</span>
         <span id="buaConfirmLoadingLabel" style="display:none;">Applying…</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: bulk "Modify site" sobre varios site users a la vez (tabla Users) -->
+<div class="modal-overlay hidden" id="bulkModifySiteModal">
+  <div class="pack-modal">
+    <div class="storage-scroll">
+      <h3 class="storage-title">Modify site</h3>
+      <p class="storage-sub">Move the <span id="bmsUserCount">0</span> selected users to another site.</p>
+      <div class="ud-block">
+        <div class="ud-k" style="margin-bottom:8px;">Users being modified</div>
+        <div id="bmsUsers"></div>
+      </div>
+      <div class="ud-block" style="margin-top:18px;">
+        <div class="ud-k" style="margin-bottom:8px;">New site</div>
+        <select class="fld" id="bmsSiteSelect"></select>
+      </div>
+    </div>
+    <div class="storage-footer">
+      <button class="btn-back" id="bmsCancelBtn" onclick="closeBulkModifySiteModal()">Cancel</button>
+      <button class="btn" id="bmsConfirmBtn" onclick="confirmBulkModifySite()">
+        <span id="bmsConfirmSpinner" class="btn-spinner" style="display:none;"></span>
+        <span id="bmsConfirmIdleLabel">Move <span id="bmsConfirmCount">0</span> users</span>
+        <span id="bmsConfirmLoadingLabel" style="display:none;">Moving…</span>
       </button>
     </div>
   </div>
@@ -4869,6 +4907,9 @@
   document.getElementById('bulkUserActionsModal').addEventListener('click', e => {
     if (e.target.id === 'bulkUserActionsModal') closeBulkUserActionsModal();
   });
+  document.getElementById('bulkModifySiteModal').addEventListener('click', e => {
+    if (e.target.id === 'bulkModifySiteModal') closeBulkModifySiteModal();
+  });
 
   // Navegación del menú
   document.querySelectorAll('.nav a, .nav-bottom a').forEach(link => {
@@ -4929,6 +4970,9 @@
   let editingUserValue = '';
   let editingUserError = '';
   let editingUserSaving = false;
+  // Edición inline del site (tabla de site users), mismo patrón que el username
+  let editingUserSiteIndex = null;
+  let editingUserSiteSaving = false;
 
   // Licencias: 5 licencias, cada una puede contener paquetes de créditos y
   // puede estar asignada a un usuario. Los paquetes empiezan como un pool
@@ -4975,11 +5019,54 @@
   }
   function nomadBadge(){ return `<span class="nomad-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg> Nomad</span>`; }
   function actsLabel(n){ return n===0 ? '—' : n===U_ACTIONS.length ? `All (${n})` : `${n} / ${U_ACTIONS.length}`; }
+  // Password fake (DEMO) para la columna "Password" de site users: no hay password real en
+  // el modelo de datos, así que se deriva del nombre con un PRNG simple para que sea siempre
+  // la misma al revelar/ocultar en vez de cambiar en cada render.
+  function fakePassword(u){
+    let seed = 0;
+    const str = String(u.name || '') + '#pwd';
+    for (let c = 0; c < str.length; c++) seed = (seed * 31 + str.charCodeAt(c)) >>> 0;
+    const chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%';
+    let out = '';
+    for (let k = 0; k < 12; k++){
+      seed = (seed * 1103515245 + 12345) >>> 0;
+      out += chars[seed % chars.length];
+    }
+    return out;
+  }
+  function toggleUserPasswordReveal(i){
+    if (revealedPasswords.has(i)) revealedPasswords.delete(i); else revealedPasswords.add(i);
+    renderUsers();
+  }
+  function copyUserPassword(i){
+    const u = users[i]; if (!u) return;
+    const pwd = fakePassword(u);
+    const done = () => showSnack('Password copied to clipboard');
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(pwd).then(done).catch(() => copyViaFallback(pwd, done));
+    } else {
+      copyViaFallback(pwd, done);
+    }
+  }
+  // Fallback para contextos sin Clipboard API (ej. http:// no seguro): un textarea oculto + execCommand.
+  function copyViaFallback(text, done){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+    if (done) done();
+  }
 
   /* ---------- Página Users (solo lectura) ---------- */
-  const U_GRID = 'grid-template-columns:36px 1.4fr 0.9fr 0.8fr 0.9fr 0.9fr 70px 44px 44px;';
+  const U_GRID = 'grid-template-columns:36px 1.4fr 0.9fr 0.8fr 1fr 0.9fr 0.9fr 70px 44px 44px;';
   // Selección para bulk actions sobre la tabla de site users (índices en `users`).
   let siteUsersSelected = new Set();
+  // Índices (en `users`) cuya password fake está revelada en la tabla (columna "Password", solo site users).
+  let revealedPasswords = new Set();
   function toggleSiteUserSelect(i, checked){
     if (checked) siteUsersSelected.add(i); else siteUsersSelected.delete(i);
     renderUsers();
@@ -5025,6 +5112,8 @@
     const showTools = usersTab==='tools';
 
     const eyeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const eyeOffSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-10.5-7-10.5-7a18.6 18.6 0 0 1 4.22-5.06M9.9 4.24A10.94 10.94 0 0 1 12 5c7 0 10.5 7 10.5 7a18.6 18.6 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>`;
+    const clipboardSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/></svg>`;
     const trashSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>`;
     const pencilSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`;
     const checkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-9"/></svg>`;
@@ -5044,8 +5133,9 @@
     const pageUsers = filteredUsers.slice(startIdx, startIdx + USERS_PAGE_SIZE);
     const rangeEnd = Math.min(startIdx + USERS_PAGE_SIZE, filteredUsers.length);
 
-    // Podar selección de bulk actions contra los índices válidos actuales de `users`.
+    // Podar selección de bulk actions y passwords reveladas contra los índices válidos actuales de `users`.
     Array.from(siteUsersSelected).forEach(i=>{ if (i<0 || i>=users.length) siteUsersSelected.delete(i); });
+    Array.from(revealedPasswords).forEach(i=>{ if (i<0 || i>=users.length) revealedPasswords.delete(i); });
 
     const uRows = pageUsers.map(({u,i})=>`
       <div class="u-row" style="${U_GRID}">
@@ -5066,9 +5156,29 @@
           <span class="u-name-text">${u.name}</span>
           <button class="icon-btn u-edit-btn" title="Edit username" onclick="startEditUsername(${i})">${pencilSvg}</button>
         </span>`}
-        ${u.nomad ? nomadBadge() : `<span class="u-site">${u.site}</span>`}
+        ${u.nomad ? nomadBadge() : (editingUserSiteIndex===i ? `
+        <span class="u-site-edit">
+          <select id="uSiteInput-${i}" ${editingUserSiteSaving?'disabled':''} onchange="saveUserSite(${i},this.value)">
+            ${siteList().map(n=>`<option ${u.site===n?'selected':''}>${escapeAttr(n)}</option>`).join('')}
+          </select>
+          ${editingUserSiteSaving
+            ? `<span class="btn-spinner" style="border-top-color:var(--blue);border-color:rgba(43,91,255,.25);"></span>`
+            : `<button class="icon-btn" title="Cancel" onclick="cancelEditUserSite()">${xSvg}</button>`}
+        </span>` : `
+        <span class="u-site u-site-cell">
+          <span class="u-site-text">${escapeAttr(u.site)}</span>
+          <button class="icon-btn u-edit-btn" title="Edit site" onclick="startEditUserSite(${i})">${pencilSvg}</button>
+        </span>`)}
         <span><span class="role-badge">Site User</span></span>
-        <span class="u-site">${actsLabel(u.actions.length)}</span>
+        <span class="u-pass-cell">
+          <span class="u-pass-text">${revealedPasswords.has(i) ? escapeAttr(fakePassword(u)) : '••••••••'}</span>
+          <button class="icon-btn" title="${revealedPasswords.has(i)?'Hide password':'Reveal password'}" onclick="toggleUserPasswordReveal(${i})">${revealedPasswords.has(i) ? eyeOffSvg : eyeSvg}</button>
+          ${revealedPasswords.has(i) ? `<button class="icon-btn" title="Copy password" onclick="copyUserPassword(${i})">${clipboardSvg}</button>` : ''}
+        </span>
+        <span class="u-site u-site-cell">
+          <span class="u-site-text">${actsLabel(u.actions.length)}</span>
+          <button class="icon-btn u-edit-btn" title="Edit actions" onclick="openUserActionsModal(${i})">${pencilSvg}</button>
+        </span>
         ${userDeviceCell(u)}
         <span class="u-site">${u.nomad?'Yes':'—'}</span>
         <span class="r"><button class="icon-btn" title="View details" onclick="viewUser('site',${i})">${eyeSvg}</button></span>
@@ -5080,14 +5190,15 @@
       ${siteUsersSelected.size>0 ? `
       <div class="bulk-bar" style="display:flex;">
         <span class="bc">${siteUsersSelected.size} selected</span>
-        <select onchange="if(this.value==='actions'){openBulkUserActionsModal();} this.value='';">
+        <select onchange="if(this.value==='actions'){openBulkUserActionsModal();} else if(this.value==='site'){openBulkModifySiteModal();} this.value='';">
           <option value="">With selected...</option>
           <option value="actions">Add/Modify actions</option>
+          <option value="site">Modify site</option>
         </select>
         <button class="bbtn bclear" onclick="clearSiteUsersSelection()">Clear</button>
       </div>` : ''}
       <div class="table-head" style="${U_GRID}">
-        <div></div><div>Username</div><div>Site</div><div>Role</div><div>Actions</div><div>Device</div><div>Nomad</div><div class="r"></div><div class="r"></div>
+        <div></div><div>Username</div><div>Site</div><div>Role</div><div>Password</div><div>Actions</div><div>Device</div><div>Nomad</div><div class="r"></div><div class="r"></div>
       </div>
       ${uRows}
       <div class="table-footer">
@@ -5224,17 +5335,69 @@
     if (el){ el.focus(); const p = el.value.length; el.setSelectionRange(p,p); }
   }
 
-  /* ---------- Bulk "Add/Modify actions" (tabla de Users) ----------
-     Reemplaza — no combina — las actions de cada usuario seleccionado por la selección
-     hecha en el modal, así que arranca vacío: no hay un único "estado actual" coherente
-     cuando los usuarios seleccionados ya traían distintas actions cada uno. */
+  /* ---------- Edición inline del site (tabla de site users) ---------- */
+  function startEditUserSite(i){
+    const u = users[i]; if (!u || u.nomad) return;
+    editingUserSiteIndex = i;
+    editingUserSiteSaving = false;
+    renderUsers();
+    const el = document.getElementById('uSiteInput-'+i);
+    if (el) el.focus();
+  }
+  function cancelEditUserSite(){
+    if (editingUserSiteSaving) return;
+    editingUserSiteIndex = null;
+    renderUsers();
+  }
+  function saveUserSite(i, site){
+    const u = users[i]; if (!u) return;
+    if (site === u.site){ cancelEditUserSite(); return; }
+    // Misma latencia falsa que saveUsername, para que el cambio se sienta aplicado de verdad.
+    editingUserSiteSaving = true;
+    renderUsers();
+    setTimeout(()=>{
+      u.site = site;
+      persistUsers();
+      editingUserSiteIndex = null;
+      editingUserSiteSaving = false;
+      renderUsers();
+      showSnack(`Site updated to "${site}"`);
+    }, 700);
+  }
+
+  /* ---------- "Add/Modify actions" — bulk o individual (tabla de Users) ----------
+     Mismo modal para ambos casos. En bulk reemplaza — no combina — las actions de cada
+     usuario seleccionado por la selección hecha en el modal, así que arranca vacío: no hay
+     un único "estado actual" coherente cuando los usuarios seleccionados ya traían distintas
+     actions cada uno. En modo individual (lápiz de la fila) sí arranca con las actions
+     actuales del usuario, para editarlas en lugar de reemplazarlas a ciegas. */
   let buaSelectedActions = [];
   let buaSelectedTemplate = null; // índice en `actionTemplates` aplicado actualmente, o null
+  let buaSingleUserIndex = null;  // índice en `users` si se abrió desde el lápiz de una fila, o null (bulk)
 
   function openBulkUserActionsModal(){
     if (!siteUsersSelected.size) return;
+    buaSingleUserIndex = null;
     buaSelectedActions = [];
     buaSelectedTemplate = null;
+    document.getElementById('buaModalTitle').textContent = 'Add / modify actions';
+    const idleLabel = document.getElementById('buaConfirmIdleLabel');
+    if (idleLabel) idleLabel.innerHTML = `Replace actions for <span id="buaConfirmCount">0</span> users`;
+    const searchEl = document.getElementById('buaActionSearch');
+    if (searchEl) searchEl.value = '';
+    renderBulkUserActionsUsers();
+    renderBuaTemplates();
+    renderBulkUserActionsList('');
+    document.getElementById('bulkUserActionsModal').classList.remove('hidden');
+  }
+  function openUserActionsModal(i){
+    const u = users[i]; if (!u) return;
+    buaSingleUserIndex = i;
+    buaSelectedActions = [...u.actions];
+    buaSelectedTemplate = null;
+    document.getElementById('buaModalTitle').textContent = `Edit actions — ${u.name}`;
+    const idleLabel = document.getElementById('buaConfirmIdleLabel');
+    if (idleLabel) idleLabel.textContent = 'Save actions';
     const searchEl = document.getElementById('buaActionSearch');
     if (searchEl) searchEl.value = '';
     renderBulkUserActionsUsers();
@@ -5277,13 +5440,16 @@
   }
   function closeBulkUserActionsModal(){
     document.getElementById('bulkUserActionsModal').classList.add('hidden');
+    buaSingleUserIndex = null;
   }
   function renderBulkUserActionsUsers(){
     const box = document.getElementById('buaUsers');
     if (!box) return;
-    document.getElementById('buaUserCount').textContent = siteUsersSelected.size;
-    document.getElementById('buaConfirmCount').textContent = siteUsersSelected.size;
-    const rows = Array.from(siteUsersSelected).map(i=>{
+    const indices = buaSingleUserIndex != null ? [buaSingleUserIndex] : Array.from(siteUsersSelected);
+    document.getElementById('buaUserCount').textContent = indices.length;
+    const confirmCount = document.getElementById('buaConfirmCount');
+    if (confirmCount) confirmCount.textContent = indices.length;
+    const rows = indices.map(i=>{
       const u = users[i];
       if (!u) return '';
       const site = u.nomad ? 'Nomad (all sites)' : (u.site || '—');
@@ -5321,10 +5487,12 @@
     renderBulkUserActionsList(document.getElementById('buaActionSearch').value);
     renderBuaTemplates();
   }
-  // Fake latency so a bulk edit affecting several users doesn't feel instantaneous/unsafe —
+  // Fake latency so an edit affecting one or several users doesn't feel instantaneous/unsafe —
   // matches the "this is really applying something" expectation for a destructive replace.
   function confirmBulkUserActions(){
-    const count = siteUsersSelected.size;
+    const single = buaSingleUserIndex;
+    const indices = single != null ? [single] : Array.from(siteUsersSelected);
+    const count = indices.length;
     if (!count) return;
     const btn = document.getElementById('buaConfirmBtn');
     const cancelBtn = document.getElementById('buaCancelBtn');
@@ -5335,12 +5503,13 @@
     if (cancelBtn) cancelBtn.disabled = true;
 
     setTimeout(()=>{
-      siteUsersSelected.forEach(i=>{
+      let name = '';
+      indices.forEach(i=>{
         const u = users[i];
-        if (u) u.actions = [...buaSelectedActions];
+        if (u){ u.actions = [...buaSelectedActions]; name = u.name; }
       });
       persistUsers();
-      siteUsersSelected.clear();
+      if (single == null) siteUsersSelected.clear();
       closeBulkUserActionsModal();
       renderUsers();
 
@@ -5350,7 +5519,65 @@
       btn.disabled = false;
       if (cancelBtn) cancelBtn.disabled = false;
 
-      showSnack(`Actions updated for ${count} user${count===1?'':'s'}`);
+      showSnack(single != null ? `Actions updated for "${name}"` : `Actions updated for ${count} user${count===1?'':'s'}`);
+    }, 700);
+  }
+
+  /* ---------- Bulk "Modify site" (tabla de Users) ---------- */
+  function openBulkModifySiteModal(){
+    if (!siteUsersSelected.size) return;
+    renderBulkModifySiteUsers();
+    const sel = document.getElementById('bmsSiteSelect');
+    if (sel) sel.innerHTML = siteList().map(n=>`<option>${escapeAttr(n)}</option>`).join('');
+    document.getElementById('bulkModifySiteModal').classList.remove('hidden');
+  }
+  function closeBulkModifySiteModal(){
+    document.getElementById('bulkModifySiteModal').classList.add('hidden');
+  }
+  function renderBulkModifySiteUsers(){
+    const box = document.getElementById('bmsUsers');
+    if (!box) return;
+    document.getElementById('bmsUserCount').textContent = siteUsersSelected.size;
+    document.getElementById('bmsConfirmCount').textContent = siteUsersSelected.size;
+    const rows = Array.from(siteUsersSelected).map(i=>{
+      const u = users[i];
+      if (!u) return '';
+      const site = u.nomad ? 'Nomad (all sites)' : (u.site || '—');
+      return `<span class="rev-chip">${escapeAttr(u.name)} <span style="color:var(--muted2);font-weight:400;">— ${escapeAttr(site)}</span></span>`;
+    }).join('');
+    box.innerHTML = rows || `<span class="rev-empty">No users selected</span>`;
+  }
+  // Misma latencia falsa que confirmBulkUserActions, mismo motivo: un cambio en bloque
+  // no debe sentirse instantáneo/inseguro. Los usuarios nomad se saltan (no tienen un site fijo).
+  function confirmBulkModifySite(){
+    const count = siteUsersSelected.size;
+    if (!count) return;
+    const site = document.getElementById('bmsSiteSelect').value;
+    const btn = document.getElementById('bmsConfirmBtn');
+    const cancelBtn = document.getElementById('bmsCancelBtn');
+    document.getElementById('bmsConfirmSpinner').style.display = 'inline-block';
+    document.getElementById('bmsConfirmIdleLabel').style.display = 'none';
+    document.getElementById('bmsConfirmLoadingLabel').style.display = 'inline';
+    btn.disabled = true;
+    if (cancelBtn) cancelBtn.disabled = true;
+
+    setTimeout(()=>{
+      siteUsersSelected.forEach(i=>{
+        const u = users[i];
+        if (u && !u.nomad) u.site = site;
+      });
+      persistUsers();
+      siteUsersSelected.clear();
+      closeBulkModifySiteModal();
+      renderUsers();
+
+      document.getElementById('bmsConfirmSpinner').style.display = 'none';
+      document.getElementById('bmsConfirmIdleLabel').style.display = 'inline';
+      document.getElementById('bmsConfirmLoadingLabel').style.display = 'none';
+      btn.disabled = false;
+      if (cancelBtn) cancelBtn.disabled = false;
+
+      showSnack(`Site updated for ${count} user${count===1?'':'s'}`);
     }, 700);
   }
 
