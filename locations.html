@@ -579,10 +579,25 @@
   [data-theme="dark"] .status-complete{background:#122619;border-color:#1e3d29;color:#5cd08a;}
   .dc-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .col-dots{color:var(--muted);flex-shrink:0;}
-  .data-th{display:flex;align-items:center;gap:4px;}
+  .data-th{display:flex;align-items:center;gap:4px;position:relative;}
+  .data-th-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
   .col-dots-btn{padding:3px;flex-shrink:0;}
   .col-dots-btn svg{width:14px;height:14px;}
   .col-pin-badge{color:var(--blue);flex-shrink:0;}
+  /* Data table: once enough columns are visible the row's own inline width (see dataGridStyle)
+     exceeds this wrapper, so it scrolls horizontally instead of squeezing every column to fit.
+     Sticky (pinned) columns/eye-icon column stay put via their own inline position:sticky. */
+  .data-table-scroll{overflow-x:auto;padding-bottom:6px;}
+  /* Grid items default to min-width:auto, which lets a header cell's own content (label + pin
+     badge + dots button) refuse to shrink below its fixed px track and quietly overflow it —
+     that overflow was what let the header end up a few pixels wider than the body rows and
+     made the whole table scroll a little further than its declared width. Forcing min-width:0
+     (+clipping the rare cell whose content still doesn't fit) keeps every cell honestly locked
+     to its column's track, so header and body scroll as exactly the same width. Scoped to this
+     table only — .table-head/.site-row are shared by other pages that don't have this problem. */
+  .data-table-scroll .table-head>*,.data-table-scroll .site-row>*{min-width:0;overflow:hidden;}
+  .data-th-resize{position:absolute;top:0;bottom:0;right:0;width:6px;cursor:col-resize;z-index:1;}
+  .data-th-resize:hover,.data-th-resize:active{background:var(--blue);opacity:.3;}
   .data-pager{display:flex;align-items:center;gap:6px;}
   .data-pager button{background:none;border:none;color:var(--muted2);cursor:pointer;padding:4px;border-radius:6px;display:flex;}
   .data-pager button:disabled{opacity:.4;cursor:default;}
@@ -3993,7 +4008,7 @@
         // Has values but deliberately absent from DATA_FILTER_FIELDS/DATA_COL_TO_FILTER_FIELD —
         // there's no pre-built filter for it, so both the Filters panel and each column's
         // "Filter column" menu item can only reach it through the Custom filters section.
-        billedCredits: hasResult ? 1 + Math.floor(Math.random()*5) : 0,
+        billedCredits: Math.floor(Math.random()*4),
       });
     }
     out.sort((a,b)=> b.actionDate - a.actionDate);
@@ -4937,6 +4952,8 @@
     const view = dataViews.find(v=>v.id===id);
     if (!view) return;
     dataVisibleColumns = [...view.columns];
+    dataPinnedLeft = [...(view.pinnedLeft || [])];
+    dataPinnedRight = [...(view.pinnedRight || [])];
     if (view.hasFilters && view.filters) dataFilters = cloneDataFilters(view.filters);
     dataActiveViewId = id;
     dataPage = 1;
@@ -4958,6 +4975,9 @@
 
   function resetToDefaultDataView(){
     dataVisibleColumns = DATA_TABLE_COLUMNS.map(c=>c.key);
+    dataPinnedLeft = [];
+    dataPinnedRight = [];
+    DATA_TABLE_COLUMNS.forEach(c=>{ c.width = DATA_TABLE_DEFAULT_WIDTHS[c.key]; });
     dataActiveViewId = null;
     dataPage = 1;
     renderDataViewsPanel();
@@ -5029,6 +5049,8 @@
       description,
       hasFilters,
       columns: [...dataVisibleColumns],
+      pinnedLeft: [...dataPinnedLeft],
+      pinnedRight: [...dataPinnedRight],
       filters: hasFilters ? cloneDataFilters(dataFilters) : null,
       createdAt: Date.now(),
     };
@@ -5051,23 +5073,39 @@
     showSnack('Data refreshed');
   }
 
-  // Table columns shown/hidden via the "Display" popover. `width` feeds the grid-template-columns
-  // track for that column (the leading 52px "Details"/eye-icon column is always shown, fixed).
+  // Table columns shown/hidden via the "Display" popover. `width` (px, not fr) is what makes
+  // the table wider than the viewport once enough columns are visible — see dataGridStyle/
+  // .data-table-scroll — so it can actually be scrolled horizontally instead of always being
+  // squeezed to fit. Every cell() takes (action, extraStyle) — extraStyle carries the sticky
+  // positioning a pinned column needs (see dataStickyStyles); it must land on the same element
+  // that's the grid's direct child, or the sticky offset/background won't apply to the right box.
   const DATA_TABLE_COLUMNS = [
-    { key:'status',     label:'Action status', width:'1.5fr', cell:a => `<span>${statusPill(a.statusKey, a.statusLabel)}</span>` },
-    { key:'crop',       label:'Crop name',     width:'1fr',   cell:a => { const c = CROP_COLORS[a.crop] || CROP_COLOR_DEFAULT; return `<span><span class="ssc-crop-pill" style="background:${c.bg};color:${c.text};">${a.cropLabel}</span></span>`; } },
-    { key:'sampleId',   label:'Sample ID',     width:'1fr',   cell:a => `<span class="dc-ellipsis">${a.sampleId || ''}</span>` },
-    { key:'username',   label:'Username',      width:'1.3fr', cell:a => `<span class="dc-ellipsis" title="${a.username}">${a.username}</span>` },
-    { key:'site',       label:'Site',          width:'1.5fr', cell:a => `<span class="dc-ellipsis" title="${a.site}">${a.site}</span>` },
-    { key:'actionName', label:'Action name',   width:'1.4fr', cell:a => `<span class="dc-ellipsis">${a.actionName}</span>` },
-    { key:'actionDate', label:'Action date',   width:'1.2fr', cell:a => `<span class="dc-ellipsis">${dataActionDate(a)}</span>` },
-    { key:'variety',    label:'Variety',       width:'0.9fr', cell:a => `<span class="dc-ellipsis">${a.variety || ''}</span>` },
-    { key:'billedCredits', label:'Billed credits', width:'0.8fr', cell:a => `<span class="dc-ellipsis" style="text-align:right;">${a.billedCredits}</span>` },
+    { key:'status',       label:'Action status',   width:180, cell:(a,s) => `<span style="${s||''}">${statusPill(a.statusKey, a.statusLabel)}</span>` },
+    { key:'crop',         label:'Crop name',       width:130, cell:(a,s) => { const c = CROP_COLORS[a.crop] || CROP_COLOR_DEFAULT; return `<span style="${s||''}"><span class="ssc-crop-pill" style="background:${c.bg};color:${c.text};">${a.cropLabel}</span></span>`; } },
+    { key:'sampleId',     label:'Sample ID',       width:140, cell:(a,s) => `<span class="dc-ellipsis" style="${s||''}">${a.sampleId || ''}</span>` },
+    { key:'username',     label:'Username',        width:190, cell:(a,s) => `<span class="dc-ellipsis" title="${a.username}" style="${s||''}">${a.username}</span>` },
+    { key:'site',         label:'Site',            width:170, cell:(a,s) => `<span class="dc-ellipsis" title="${a.site}" style="${s||''}">${a.site}</span>` },
+    { key:'actionName',   label:'Action name',     width:170, cell:(a,s) => `<span class="dc-ellipsis" style="${s||''}">${a.actionName}</span>` },
+    { key:'actionDate',   label:'Action date',     width:150, cell:(a,s) => `<span class="dc-ellipsis" style="${s||''}">${dataActionDate(a)}</span>` },
+    { key:'variety',      label:'Variety',         width:130, cell:(a,s) => `<span class="dc-ellipsis" style="${s||''}">${a.variety || ''}</span>` },
+    { key:'billedCredits',label:'Billed credits',  width:140, cell:(a,s) => `<span class="dc-ellipsis" style="text-align:right;${s||''}">${a.billedCredits}</span>` },
+    { key:'device',       label:'Device',          width:220, cell:(a,s) => `<span class="dc-ellipsis" title="${a.device}" style="${s||''}">${a.device}</span>` },
+    { key:'humidity',     label:'Humidity (%)',    width:140, cell:(a,s) => `<span class="dc-ellipsis" style="text-align:right;${s||''}">${a.humidity ?? ''}</span>` },
+    { key:'testWeight',   label:'Test weight',     width:140, cell:(a,s) => `<span class="dc-ellipsis" style="text-align:right;${s||''}">${a.testWeight ?? ''}</span>` },
+    { key:'protein',      label:'Protein (%)',     width:130, cell:(a,s) => `<span class="dc-ellipsis" style="text-align:right;${s||''}">${a.protein ?? ''}</span>` },
+    { key:'visualCriteria', label:'Visual criteria', width:150, cell:(a,s) => `<span class="dc-ellipsis" style="${s||''}">${a.visualCriteria===null?'':(a.visualCriteria?'Yes':'No')}</span>` },
+    { key:'photoCount',   label:'Photo count',     width:130, cell:(a,s) => `<span class="dc-ellipsis" style="text-align:right;${s||''}">${a.photoCount}</span>` },
+    { key:'infraredId',   label:'Infrared ID',     width:190, cell:(a,s) => `<span class="dc-ellipsis" title="${a.infraredId}" style="${s||''}">${a.infraredId}</span>` },
+    { key:'actionId',     label:'Action ID',       width:220, cell:(a,s) => `<span class="dc-ellipsis" title="${a.actionId}" style="${s||''}">${a.actionId}</span>` },
   ];
+  // Snapshot of the original widths, taken before anything can resize them, so "Default view"
+  // can restore them later (see resetToDefaultDataView).
+  const DATA_TABLE_DEFAULT_WIDTHS = Object.fromEntries(DATA_TABLE_COLUMNS.map(c=>[c.key, c.width]));
   let dataVisibleColumns = DATA_TABLE_COLUMNS.map(c=>c.key);
-  // Pinning just reorders a column to the left/right edge of the visible set (this table always
-  // fits the viewport width — no horizontal scroll — so there's no true sticky-on-scroll to show,
-  // but grouping pinned columns at each edge mirrors what "Pin to the left/right" does elsewhere).
+  // Pinned columns stay stuck to their edge (sticky, backed by an opaque bg so scrolling
+  // columns don't show through underneath) while the rest of the table scrolls horizontally —
+  // see dataStickyStyles. Order here is pin order: first-pinned-left sits closest to the
+  // "Details" eye-icon column; first-pinned-right sits closest to the scrollable middle.
   let dataPinnedLeft = [];
   let dataPinnedRight = [];
 
@@ -5081,8 +5119,82 @@
     return [...left, ...middle, ...right];
   }
 
-  function dataGridStyle(){
-    return `grid-template-columns:52px ${dataVisibleColumnDefs().map(c=>c.width).join(' ')};`;
+  // NOTE: deliberately no `width` here — .table-head and every .site-row share this same string,
+  // and previously each also got its own `width:${total}px`. Two elements independently declaring
+  // "I am 2440px wide" should in principle render identically, but that's what let the header and
+  // the rows drift into scrolling as if they were two separate widths. Now only .data-table-inner
+  // (one single element, see renderDataPage) carries the width; .table-head/.site-row just fill it
+  // at 100% (block default), so there is exactly one source of truth for how wide the table is.
+  function dataGridStyle(cols){
+    cols = cols || dataVisibleColumnDefs();
+    // gap:0 overrides .table-head's shared 8px gap (.site-row has none) — without forcing both
+    // to match, the sticky left/right px math below (which assumes no gap) drifts out of sync
+    // between the header row and body rows as more pinned columns stack up.
+    return `grid-template-columns:52px ${cols.map(c=>c.width+'px').join(' ')};gap:0;`;
+  }
+
+  function dataGridTotalWidth(cols){
+    cols = cols || dataVisibleColumnDefs();
+    return 52 + cols.reduce((s,c)=>s+c.width,0);
+  }
+
+  // left/right px offsets for every currently-pinned (and visible) column, keyed by column key,
+  // as a ready-to-use inline `style` fragment. The "Details" eye-icon column is always sticky-left
+  // at 0 (handled separately in renderDataPage) since it has no header menu of its own to unpin it.
+  function dataStickyStyles(cols){
+    const styles = {};
+    let leftAcc = 52;
+    dataPinnedLeft.forEach(k=>{
+      const col = cols.find(c=>c.key===k);
+      if (!col) return;
+      styles[k] = `position:sticky;left:${leftAcc}px;z-index:2;background:var(--card);`;
+      leftAcc += col.width;
+    });
+    let rightAcc = 0;
+    [...dataPinnedRight].reverse().forEach(k=>{
+      const col = cols.find(c=>c.key===k);
+      if (!col) return;
+      styles[k] = `position:sticky;right:${rightAcc}px;z-index:2;background:var(--card);`;
+      rightAcc += col.width;
+    });
+    return styles;
+  }
+
+  // ---- Column resize: drag the thin handle on a header cell's right edge ----
+  const DATA_COL_MIN_WIDTH = 80;
+  let dataColResizeState = null; // { key, startX, startWidth }
+  let dataColResizeRaf = null;
+
+  function startDataColResize(ev, key){
+    ev.stopPropagation();
+    ev.preventDefault();
+    const col = DATA_TABLE_COLUMNS.find(c=>c.key===key);
+    if (!col) return;
+    dataColResizeState = { key, startX: ev.clientX, startWidth: col.width };
+    document.addEventListener('mousemove', onDataColResizeMove);
+    document.addEventListener('mouseup', onDataColResizeEnd);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }
+
+  function onDataColResizeMove(ev){
+    if (!dataColResizeState) return;
+    const col = DATA_TABLE_COLUMNS.find(c=>c.key===dataColResizeState.key);
+    if (!col) return;
+    col.width = Math.max(DATA_COL_MIN_WIDTH, dataColResizeState.startWidth + (ev.clientX - dataColResizeState.startX));
+    if (dataColResizeRaf) return;
+    dataColResizeRaf = requestAnimationFrame(()=>{
+      dataColResizeRaf = null;
+      renderDataPage();
+    });
+  }
+
+  function onDataColResizeEnd(){
+    dataColResizeState = null;
+    document.removeEventListener('mousemove', onDataColResizeMove);
+    document.removeEventListener('mouseup', onDataColResizeEnd);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
   }
 
   function dataActionDate(a){
@@ -5176,6 +5288,14 @@
     const filterBar = document.getElementById('dataFilterBar');
     if (!body) return;
 
+    // body.innerHTML is fully rebuilt below, which replaces .data-table-scroll with a brand new
+    // element — the browser doesn't carry scrollLeft over to that new element, so without this
+    // every render (a column toggle, a filter, and especially every resize-drag frame) silently
+    // snapped the horizontal scroll back to 0. That's what made resizing a column you'd scrolled
+    // to reach feel like it kept fighting/escaping the cursor.
+    const prevScroll = body.querySelector('.data-table-scroll');
+    const savedScrollLeft = prevScroll ? prevScroll.scrollLeft : 0;
+
     if (dataActions.length === 0){
       if (filterBar) filterBar.innerHTML = '';
       body.innerHTML = dataEmptyStateHtml();
@@ -5199,11 +5319,13 @@
     const pinSvg = `<svg class="col-pin-badge" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M8 3h8l-1 6 3 3v2H6v-2l3-3-1-6Z"/></svg>`;
 
     const cols = dataVisibleColumnDefs();
-    const gridStyle = dataGridStyle();
+    const gridStyle = dataGridStyle(cols);
+    const sticky = dataStickyStyles(cols);
+    const eyeStickyStyle = 'position:sticky;left:0;z-index:3;background:var(--card);';
     const head = `
       <div class="table-head" style="${gridStyle}">
-        <div></div>
-        ${cols.map(c=>`<div class="data-th">${c.label} ${(dataPinnedLeft.includes(c.key)||dataPinnedRight.includes(c.key)) ? pinSvg : ''}<button class="icon-btn col-dots-btn" title="Column options" onclick="openDataColHeaderMenu(event,'${c.key}')">${dotsSvg}</button></div>`).join('')}
+        <div style="${eyeStickyStyle}"></div>
+        ${cols.map(c=>`<div class="data-th" style="${sticky[c.key]||''}"><span class="data-th-label">${c.label}</span>${(dataPinnedLeft.includes(c.key)||dataPinnedRight.includes(c.key)) ? pinSvg : ''}<button class="icon-btn col-dots-btn" title="Column options" onclick="openDataColHeaderMenu(event,'${c.key}')">${dotsSvg}</button><span class="data-th-resize" title="Drag to resize" onmousedown="startDataColResize(event,'${c.key}')"></span></div>`).join('')}
       </div>`;
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / DATA_PAGE_SIZE));
@@ -5215,8 +5337,8 @@
       const i = dataActions.indexOf(a);
       return `
       <div class="site-row" style="${gridStyle}">
-        <span class="r"><button class="icon-btn" title="View details" onclick="viewDataAction(${i})">${eyeSvg}</button></span>
-        ${cols.map(c=>c.cell(a)).join('')}
+        <span class="r" style="${eyeStickyStyle}"><button class="icon-btn" title="View details" onclick="viewDataAction(${i})">${eyeSvg}</button></span>
+        ${cols.map(c=>c.cell(a, sticky[c.key])).join('')}
       </div>`;
     }).join('');
 
@@ -5232,9 +5354,14 @@
       </div>`;
 
     body.innerHTML = `
-      ${head}
-      <div id="dataRows">${rows}</div>
+      <div class="data-table-scroll" id="dataTableScroll">
+        <div class="data-table-inner" style="width:${dataGridTotalWidth(cols)}px;">
+          ${head}
+          <div id="dataRows">${rows}</div>
+        </div>
+      </div>
       ${footer}`;
+    if (savedScrollLeft) document.getElementById('dataTableScroll').scrollLeft = savedScrollLeft;
   }
 
   function dataEmptyStateHtml(){
