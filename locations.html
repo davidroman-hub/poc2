@@ -580,6 +580,9 @@
   .dc-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .col-dots{color:var(--muted);flex-shrink:0;}
   .data-th{display:flex;align-items:center;gap:4px;}
+  .col-dots-btn{padding:3px;flex-shrink:0;}
+  .col-dots-btn svg{width:14px;height:14px;}
+  .col-pin-badge{color:var(--blue);flex-shrink:0;}
   .data-pager{display:flex;align-items:center;gap:6px;}
   .data-pager button{background:none;border:none;color:var(--muted2);cursor:pointer;padding:4px;border-radius:6px;display:flex;}
   .data-pager button:disabled{opacity:.4;cursor:default;}
@@ -653,6 +656,48 @@
   .dfpp-custom-row select:focus,.dfpp-custom-row input:focus{outline:none;border-color:var(--blue);}
   .dfpp-add-filter{display:inline-block;margin-top:10px;}
   .dfpp-footer{display:flex;justify-content:flex-end;gap:10px;padding:12px 16px;border-top:1px solid var(--border);}
+
+  /* Display popover: toggle table column visibility */
+  #dataDisplayPop{display:none;position:fixed;z-index:260;width:290px;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(20,29,51,.2);padding:14px;}
+  .ddp-actions{display:flex;gap:16px;margin:2px 0 8px;}
+  .ddp-actions span{font-size:12.5px;font-weight:600;color:var(--blue);cursor:pointer;}
+  .ddp-list{max-height:280px;overflow-y:auto;}
+  .ddp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 2px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--navy);}
+  .ddp-row:last-child{border-bottom:none;}
+  .switch.sm{width:34px;height:19px;}
+  .switch.sm .slider::before{width:15px;height:15px;left:2px;top:2px;}
+  .switch.sm input:checked + .slider::before{transform:translateX(15px);}
+
+  /* Column show/hide: slower, springier toggle + a cross-fade of the whole table (driven by the
+     View Transitions API in animateDataTableRender) so a column appearing/disappearing reads as
+     a deliberate transition instead of an instant snap. */
+  .switch .slider,.switch .slider::before{transition-duration:var(--dur-slow);transition-timing-function:var(--ease-out);}
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:var(--dur-slow);animation-timing-function:var(--ease-out);}
+
+  /* Views popover: save/apply/delete reusable table configurations */
+  #dataViewsPop{display:none;position:fixed;z-index:260;width:320px;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(20,29,51,.2);padding:14px;}
+  .dvp-intro{font-size:12.5px;color:var(--muted2);margin:0 0 12px;line-height:1.4;}
+  .dvp-actions{display:flex;gap:8px;margin-bottom:12px;}
+  .dvp-default-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid #f6c9c4;color:#c0392b;background:#fdecec;border-radius:8px;padding:0 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .dvp-default-btn:hover{background:#fbdedb;}
+  .dvp-default-btn svg{width:13px;height:13px;}
+  [data-theme="dark"] .dvp-default-btn{background:#3a1e1c;border-color:#5a2b28;color:#e2756a;}
+  .dvp-list{max-height:260px;overflow-y:auto;margin-top:10px;}
+  .dvp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:7px;}
+  .dvp-row:hover{background:var(--panel);}
+  .dvp-row.active .dvp-row-name{color:var(--blue);}
+  .dvp-row-info{display:flex;flex-direction:column;gap:2px;overflow:hidden;}
+  .dvp-row-name{font-size:13.5px;font-weight:700;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .dvp-row-date{font-size:11.5px;color:var(--muted2);}
+  .dvp-row .icon-btn{flex-shrink:0;}
+
+  /* Column header "⋮" menu: filter / hide / pin this one column */
+  #dataColHeaderMenu{display:none;position:fixed;z-index:270;width:190px;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(20,29,51,.2);padding:6px;}
+  .chm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--navy);cursor:pointer;}
+  .chm-item:hover{background:var(--panel);}
+  .chm-item svg{width:16px;height:16px;color:var(--muted);flex-shrink:0;}
+  .chm-item.active{color:var(--blue);}
+  .chm-item.active svg{color:var(--blue);}
   .dfpp-footer .btn{padding:9px 20px;font-size:13.5px;}
   .dfpp-footer .btn-back{padding:9px 20px;font-size:13.5px;}
 
@@ -2251,6 +2296,34 @@
   </div>
 </div>
 
+<!-- Modal: guardar la configuración actual de la tabla Data como una "view" reutilizable -->
+<div class="modal-overlay hidden" id="saveDataViewModal">
+  <div class="form-modal" style="max-width:480px;">
+    <div class="form-scroll">
+      <h3 style="font-size:19px;font-weight:800;color:var(--navy);margin-bottom:18px;">Save new view</h3>
+
+      <div class="toggle-row" style="margin-bottom:18px;">
+        <label class="switch"><input type="checkbox" id="sdvHasFilters" checked><span class="slider"></span></label>
+        <div>
+          <div class="toggle-title" style="font-size:14px;">View with filters</div>
+          <div class="toggle-sub" style="font-size:12.5px;">Views with filters also save the currently applied filters (including custom filters and a modified date range) along with column visibility.</div>
+        </div>
+      </div>
+
+      <label class="fld-label">View name <span class="req">*</span></label>
+      <input class="fld" id="sdvName" placeholder="Enter view name" maxlength="30" oninput="sdvUpdateCount()">
+      <div style="text-align:right;font-size:11.5px;color:var(--muted2);margin:-8px 0 14px;"><span id="sdvCount">0</span>/30 caracteres</div>
+
+      <label class="fld-label">Description</label>
+      <textarea class="fld" id="sdvDescription" rows="3" placeholder="Optional description"></textarea>
+    </div>
+    <div class="form-footer">
+      <button class="btn-back" onclick="closeSaveDataViewModal()">Cancel</button>
+      <button class="btn" onclick="submitSaveDataView()">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: detalles de site. Solo se cierra con el botón Close (sin click fuera, sin X). -->
 <div class="modal-overlay hidden" id="siteDetailsModal">
   <div class="form-modal" style="max-width:700px;">
@@ -2642,6 +2715,9 @@
 <div id="licTip"></div>
 <div id="actChartTip"></div>
 <div id="dataFilterPop"></div>
+<div id="dataDisplayPop"></div>
+<div id="dataViewsPop"></div>
+<div id="dataColHeaderMenu"></div>
 
 <!-- Dropdown compartido para "Edit site" (lápiz de la tabla de Users): un único elemento
      reposicionado según la fila, en vez de un menú por fila — más liviano y sin los problemas
@@ -3914,6 +3990,10 @@
         visualCriteria: hasResult ? Math.random() < 0.08 : null,
         photoCount: hasResult ? (Math.random()<0.15 ? 0 : (Math.random()<0.5 ? 1 : 2)) : 0,
         infraredId: hasResult ? dataUuid() : '',
+        // Has values but deliberately absent from DATA_FILTER_FIELDS/DATA_COL_TO_FILTER_FIELD —
+        // there's no pre-built filter for it, so both the Filters panel and each column's
+        // "Filter column" menu item can only reach it through the Custom filters section.
+        billedCredits: hasResult ? 1 + Math.floor(Math.random()*5) : 0,
       });
     }
     out.sort((a,b)=> b.actionDate - a.actionDate);
@@ -3985,6 +4065,7 @@
     { key:'photoCount',  label:'Photo count' },
     { key:'infraredId',  label:'Infrared ID' },
     { key:'actionId',    label:'Action ID' },
+    { key:'billedCredits', label:'Billed credits' },
   ];
   const DATA_CUSTOM_OPERATORS = [
     { value:'eq', label:'equals' },
@@ -4014,6 +4095,9 @@
   const DFP_X = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
   const DFP_FILTER_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg>`;
   const DFP_EXPORT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>`;
+  const DATA_DISPLAY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>`;
+  const DATA_VIEWS_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const DATA_REFRESH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>`;
 
   // Exporta las filas actualmente filtradas (respeta los filtros aplicados en ambas pestañas,
   // Data y Activity, ya que Activity es solo una vista agregada del mismo set) como .xls: una
@@ -4347,6 +4431,12 @@
     return f.multi ? source[f.key] : [];
   }
 
+  // Deep-ish clone (arrays copied, not shared by reference) — used whenever a filter snapshot
+  // must outlive further edits to the live `dataFilters`/draft (opening the panel, saving a view).
+  function cloneDataFilters(source){
+    return { status:[...source.status], crop:[...source.crop], site:[...source.site], actionName:[...source.actionName], variety:[...source.variety], username:source.username, dateFrom:source.dateFrom, dateTo:source.dateTo, custom:source.custom.map(c=>({...c})) };
+  }
+
   function dataDateRangeActive(source){
     source = source || dataFilters;
     return !!(source.dateFrom || source.dateTo);
@@ -4395,6 +4485,9 @@
     return `
       <div class="data-filter-bar-row">
         <button class="filters-btn dfpp-trigger" onclick="openDataFilterPanel(event)">${DFP_FILTER_ICON}Filters${n?` <span class="dfpp-badge">${n}</span>`:''}</button>
+        <button class="filters-btn dfpp-trigger" onclick="openDataDisplayPanel(event)" title="Show or hide table columns">${DATA_DISPLAY_ICON}Display</button>
+        <button class="filters-btn dfpp-trigger" onclick="openDataViewsPanel(event)" title="Save and load predefined table configurations">${DATA_VIEWS_ICON}Views</button>
+        <button class="filters-btn dfpp-trigger" onclick="refreshDataActions()" title="Reload the table data">${DATA_REFRESH_ICON}Refresh data</button>
         <button class="filters-btn dfpp-trigger" onclick="exportDataActions()">${DFP_EXPORT_ICON}Export</button>
         ${chips.join('')}
         ${n ? `<button class="dfp-clear" onclick="clearAppliedDataFilters()">${DFP_X} Clear filters</button>` : ''}
@@ -4449,13 +4542,23 @@
   // ---- Filter panel (draft state; Cancel discards, Apply commits) ----
   function openDataFilterPanel(ev){
     ev.stopPropagation();
-    dataFiltersDraft = { status:[...dataFilters.status], crop:[...dataFilters.crop], site:[...dataFilters.site], actionName:[...dataFilters.actionName], variety:[...dataFilters.variety], username:dataFilters.username, dateFrom:dataFilters.dateFrom, dateTo:dataFilters.dateTo, custom:dataFilters.custom.map(c=>({...c})) };
+    hideDataDisplayPopover();
+    hideDataViewsPopover();
+    dataFiltersDraft = cloneDataFilters(dataFilters);
     dataFilterActiveField = 'status';
     renderDataFilterPanel();
+    positionDataFilterPop(ev.currentTarget.getBoundingClientRect());
+  }
+
+  // Shared by the toolbar "Filters" button and the column header menu's "Filter column" —
+  // clamped both axes so the (tall, 3-column) panel never opens partly off-screen, which is
+  // what happened when the column menu route anchored off its own small popover's position
+  // instead of the column header button that was actually clicked.
+  function positionDataFilterPop(r){
     const pop = document.getElementById('dataFilterPop');
-    const r = ev.currentTarget.getBoundingClientRect();
+    const estHeight = 420;
     pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 660)) + 'px';
-    pop.style.top = (r.bottom + 8) + 'px';
+    pop.style.top = Math.max(8, Math.min(r.bottom + 8, window.innerHeight - estHeight - 8)) + 'px';
     pop.style.display = 'block';
     pop.dataset.key = 'panel';
   }
@@ -4711,10 +4814,362 @@
   // here (instead of on its children) survives the re-render.
   document.getElementById('dataFilterPop').addEventListener('click', e => e.stopPropagation());
 
-  const DATA_GRID = 'grid-template-columns:52px 1.5fr 1fr 1fr 1.3fr 1.5fr 1.4fr 1.2fr 0.9fr;';
+  // ---- Display popover: show/hide table columns ----
+  let dataDisplaySearch = '';
+
+  function openDataDisplayPanel(ev){
+    ev.stopPropagation();
+    hideDataFilterPopover();
+    hideDataViewsPopover();
+    dataDisplaySearch = '';
+    renderDataDisplayPanel();
+    const pop = document.getElementById('dataDisplayPop');
+    const r = ev.currentTarget.getBoundingClientRect();
+    pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 300)) + 'px';
+    pop.style.top = (r.bottom + 8) + 'px';
+    pop.style.display = 'block';
+  }
+
+  function hideDataDisplayPopover(){
+    const pop = document.getElementById('dataDisplayPop');
+    if (pop) pop.style.display = 'none';
+  }
+
+  function setDataDisplaySearch(v){
+    dataDisplaySearch = v;
+    renderDataDisplayPanel();
+  }
+
+  function toggleDataColumnVisible(key){
+    const i = dataVisibleColumns.indexOf(key);
+    if (i>-1) dataVisibleColumns.splice(i,1); else dataVisibleColumns.push(key);
+    renderDataDisplayPanel();
+    animateDataTableRender();
+  }
+
+  function setAllDataColumnsVisible(all){
+    dataVisibleColumns = all ? DATA_TABLE_COLUMNS.map(c=>c.key) : [];
+    renderDataDisplayPanel();
+    animateDataTableRender();
+  }
+
+  // Table rows are rebuilt wholesale on every render (see renderDataPage), so a plain CSS
+  // transition can't animate a column appearing/disappearing — there's no shared element to
+  // transition between the old and new markup. The View Transitions API solves exactly this:
+  // it snapshots the DOM before/after the callback and cross-fades the diff for us. Only used
+  // for column show/hide (not every render) so routine table updates stay instant. Falls back
+  // to a plain instant re-render on browsers without support (Safari/Firefox as of writing).
+  function animateDataTableRender(){
+    if (document.startViewTransition) document.startViewTransition(() => renderDataPage());
+    else renderDataPage();
+  }
+
+  function renderDataDisplayPanel(){
+    const pop = document.getElementById('dataDisplayPop');
+    if (!pop) return;
+    const q = dataDisplaySearch.toLowerCase();
+    const rows = DATA_TABLE_COLUMNS.filter(c=>c.label.toLowerCase().includes(q)).map(c=>{
+      const checked = dataVisibleColumns.includes(c.key);
+      return `
+        <div class="ddp-row">
+          <span>${escapeAttr(c.label)}</span>
+          <label class="switch sm"><input type="checkbox" ${checked?'checked':''} onchange="toggleDataColumnVisible('${c.key}')"><span class="slider"></span></label>
+        </div>`;
+    }).join('') || `<div class="dfpp-empty">No columns match.</div>`;
+    pop.innerHTML = `
+      <div class="ddp">
+        <div class="dfpp-search"><input type="text" placeholder="Search for a column" value="${escapeAttr(dataDisplaySearch)}" oninput="setDataDisplaySearch(this.value)"></div>
+        <div class="ddp-actions">
+          <span onclick="setAllDataColumnsVisible(false)">Hide all</span>
+          <span onclick="setAllDataColumnsVisible(true)">Show all</span>
+        </div>
+        <div class="ddp-list">${rows}</div>
+      </div>`;
+  }
+
+  document.addEventListener('click', e=>{
+    const pop = document.getElementById('dataDisplayPop');
+    if (pop && pop.style.display==='block' && !pop.contains(e.target)) hideDataDisplayPopover();
+  });
+  document.getElementById('dataDisplayPop').addEventListener('click', e => e.stopPropagation());
+
+  // ---- Views popover: save/apply/delete reusable table configurations (columns + optional filters) ----
+  const DATA_VIEWS_KEY = 'fleetview_data_views_v1';
+  let dataViews = [];
+  let dataActiveViewId = null;
+  let dataViewsSearch = '';
+
+  function loadDataViews(){
+    try{
+      const raw = localStorage.getItem(DATA_VIEWS_KEY);
+      dataViews = raw ? JSON.parse(raw) : [];
+    }catch(e){ dataViews = []; }
+  }
+
+  function saveDataViewsToStorage(){
+    try{ localStorage.setItem(DATA_VIEWS_KEY, JSON.stringify(dataViews)); }catch(e){}
+  }
+
+  function openDataViewsPanel(ev){
+    ev.stopPropagation();
+    hideDataFilterPopover();
+    hideDataDisplayPopover();
+    dataViewsSearch = '';
+    renderDataViewsPanel();
+    const pop = document.getElementById('dataViewsPop');
+    const r = ev.currentTarget.getBoundingClientRect();
+    pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 340)) + 'px';
+    pop.style.top = (r.bottom + 8) + 'px';
+    pop.style.display = 'block';
+  }
+
+  function hideDataViewsPopover(){
+    const pop = document.getElementById('dataViewsPop');
+    if (pop) pop.style.display = 'none';
+  }
+
+  function setDataViewsSearch(v){
+    dataViewsSearch = v;
+    renderDataViewsPanel();
+  }
+
+  function applyDataView(id){
+    const view = dataViews.find(v=>v.id===id);
+    if (!view) return;
+    dataVisibleColumns = [...view.columns];
+    if (view.hasFilters && view.filters) dataFilters = cloneDataFilters(view.filters);
+    dataActiveViewId = id;
+    dataPage = 1;
+    hideDataViewsPopover();
+    animateDataTableRender();
+    showSnack(`Applied "${view.name}"`);
+  }
+
+  function deleteDataView(id, ev){
+    ev.stopPropagation();
+    const view = dataViews.find(v=>v.id===id);
+    if (!view) return;
+    if (!confirm(`Delete the view "${view.name}"?`)) return;
+    dataViews = dataViews.filter(v=>v.id!==id);
+    if (dataActiveViewId === id) dataActiveViewId = null;
+    saveDataViewsToStorage();
+    renderDataViewsPanel();
+  }
+
+  function resetToDefaultDataView(){
+    dataVisibleColumns = DATA_TABLE_COLUMNS.map(c=>c.key);
+    dataActiveViewId = null;
+    dataPage = 1;
+    renderDataViewsPanel();
+    animateDataTableRender();
+    showSnack('Default view restored');
+  }
+
+  function renderDataViewsPanel(){
+    const pop = document.getElementById('dataViewsPop');
+    if (!pop) return;
+    const q = dataViewsSearch.toLowerCase();
+    const fmt = ts => new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const rows = dataViews.filter(v=>v.name.toLowerCase().includes(q)).map(v=>{
+      const active = v.id === dataActiveViewId;
+      return `
+        <div class="dvp-row ${active?'active':''}" onclick="applyDataView('${v.id}')">
+          <div class="dvp-row-info">
+            <span class="dvp-row-name">${escapeAttr(v.name)}</span>
+            <span class="dvp-row-date">${fmt(v.createdAt)}</span>
+          </div>
+          <button class="icon-btn danger" title="Delete view" onclick="deleteDataView('${v.id}', event)">${DATA_TRASH_ICON}</button>
+        </div>`;
+    }).join('') || `<div class="dfpp-empty">No saved views yet.</div>`;
+    pop.innerHTML = `
+      <div class="dvp">
+        <p class="dvp-intro">Save the current table configuration for later use</p>
+        <div class="dvp-actions">
+          <button type="button" class="btn" style="flex:1;" onclick="openSaveDataViewModal()">Save view</button>
+          <button type="button" class="dvp-default-btn" onclick="resetToDefaultDataView()">${DATA_RESET_ICON} Default view</button>
+        </div>
+        <div class="dfpp-search"><input type="text" placeholder="Search views..." value="${escapeAttr(dataViewsSearch)}" oninput="setDataViewsSearch(this.value)"></div>
+        <div class="dvp-list">${rows}</div>
+      </div>`;
+  }
+
+  document.addEventListener('click', e=>{
+    const pop = document.getElementById('dataViewsPop');
+    if (pop && pop.style.display==='block' && !pop.contains(e.target)) hideDataViewsPopover();
+  });
+  document.getElementById('dataViewsPop').addEventListener('click', e => e.stopPropagation());
+
+  // ---- Save view modal ----
+  function openSaveDataViewModal(){
+    hideDataViewsPopover();
+    document.getElementById('sdvHasFilters').checked = true;
+    document.getElementById('sdvName').value = '';
+    document.getElementById('sdvDescription').value = '';
+    sdvUpdateCount();
+    document.getElementById('saveDataViewModal').classList.remove('hidden');
+    document.getElementById('sdvName').focus();
+  }
+
+  function closeSaveDataViewModal(){
+    document.getElementById('saveDataViewModal').classList.add('hidden');
+  }
+
+  function sdvUpdateCount(){
+    document.getElementById('sdvCount').textContent = document.getElementById('sdvName').value.length;
+  }
+
+  function submitSaveDataView(){
+    const name = document.getElementById('sdvName').value.trim();
+    if (!name){ showSnack('Give the view a name first'); return; }
+    const hasFilters = document.getElementById('sdvHasFilters').checked;
+    const description = document.getElementById('sdvDescription').value.trim();
+    const view = {
+      id: 'view'+Date.now()+Math.floor(Math.random()*1000),
+      name,
+      description,
+      hasFilters,
+      columns: [...dataVisibleColumns],
+      filters: hasFilters ? cloneDataFilters(dataFilters) : null,
+      createdAt: Date.now(),
+    };
+    dataViews.unshift(view);
+    saveDataViewsToStorage();
+    dataActiveViewId = view.id;
+    closeSaveDataViewModal();
+    showSnack(`View "${name}" saved`);
+  }
+
+  const DATA_TRASH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg>`;
+  const DATA_RESET_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 3 6.7"/><path d="M3 21v-6h6"/></svg>`;
+
+  // ---- Refresh data ----
+  function refreshDataActions(){
+    if (!users.length){ showSnack('Add at least one user first'); return; }
+    dataActions = generateMockDataActions(dataActions.length || 100);
+    dataPage = 1;
+    renderDataPage();
+    showSnack('Data refreshed');
+  }
+
+  // Table columns shown/hidden via the "Display" popover. `width` feeds the grid-template-columns
+  // track for that column (the leading 52px "Details"/eye-icon column is always shown, fixed).
+  const DATA_TABLE_COLUMNS = [
+    { key:'status',     label:'Action status', width:'1.5fr', cell:a => `<span>${statusPill(a.statusKey, a.statusLabel)}</span>` },
+    { key:'crop',       label:'Crop name',     width:'1fr',   cell:a => { const c = CROP_COLORS[a.crop] || CROP_COLOR_DEFAULT; return `<span><span class="ssc-crop-pill" style="background:${c.bg};color:${c.text};">${a.cropLabel}</span></span>`; } },
+    { key:'sampleId',   label:'Sample ID',     width:'1fr',   cell:a => `<span class="dc-ellipsis">${a.sampleId || ''}</span>` },
+    { key:'username',   label:'Username',      width:'1.3fr', cell:a => `<span class="dc-ellipsis" title="${a.username}">${a.username}</span>` },
+    { key:'site',       label:'Site',          width:'1.5fr', cell:a => `<span class="dc-ellipsis" title="${a.site}">${a.site}</span>` },
+    { key:'actionName', label:'Action name',   width:'1.4fr', cell:a => `<span class="dc-ellipsis">${a.actionName}</span>` },
+    { key:'actionDate', label:'Action date',   width:'1.2fr', cell:a => `<span class="dc-ellipsis">${dataActionDate(a)}</span>` },
+    { key:'variety',    label:'Variety',       width:'0.9fr', cell:a => `<span class="dc-ellipsis">${a.variety || ''}</span>` },
+    { key:'billedCredits', label:'Billed credits', width:'0.8fr', cell:a => `<span class="dc-ellipsis" style="text-align:right;">${a.billedCredits}</span>` },
+  ];
+  let dataVisibleColumns = DATA_TABLE_COLUMNS.map(c=>c.key);
+  // Pinning just reorders a column to the left/right edge of the visible set (this table always
+  // fits the viewport width — no horizontal scroll — so there's no true sticky-on-scroll to show,
+  // but grouping pinned columns at each edge mirrors what "Pin to the left/right" does elsewhere).
+  let dataPinnedLeft = [];
+  let dataPinnedRight = [];
+
+  function dataVisibleColumnDefs(){
+    const visible = DATA_TABLE_COLUMNS.filter(c=>dataVisibleColumns.includes(c.key));
+    const byKey = k => visible.find(c=>c.key===k);
+    const left = dataPinnedLeft.map(byKey).filter(Boolean);
+    const right = dataPinnedRight.map(byKey).filter(Boolean);
+    const pinned = new Set([...dataPinnedLeft, ...dataPinnedRight]);
+    const middle = visible.filter(c=>!pinned.has(c.key));
+    return [...left, ...middle, ...right];
+  }
+
+  function dataGridStyle(){
+    return `grid-template-columns:52px ${dataVisibleColumnDefs().map(c=>c.width).join(' ')};`;
+  }
+
   function dataActionDate(a){
     return a.actionDate.toLocaleString('en-US',{month:'numeric',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
   }
+
+  // ---- Column header "⋮" menu: Filter column / Hide / Pin to the left / Pin to the right ----
+  const CHM_FILTER_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg>`;
+  const CHM_EYE_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const CHM_PIN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M8 3h8l-1 6 3 3v2H6v-2l3-3-1-6Z"/></svg>`;
+  // Maps a table column key to the matching pre-built filter field (when one exists) so
+  // "Filter column" can jump straight to it instead of always falling back to a custom filter.
+  const DATA_COL_TO_FILTER_FIELD = { status:'status', crop:'crop', site:'site', actionName:'actionName', variety:'variety', username:'username', actionDate:'date' };
+  let dataColHeaderMenuKey = null;
+  let dataColHeaderMenuAnchorRect = null; // the ⋮ button's own rect, kept for "Filter column" to anchor on (not this menu's rect, which sits further down)
+
+  function openDataColHeaderMenu(ev, key){
+    ev.stopPropagation();
+    hideDataFilterPopover();
+    hideDataDisplayPopover();
+    hideDataViewsPopover();
+    dataColHeaderMenuKey = key;
+    renderDataColHeaderMenu();
+    const pop = document.getElementById('dataColHeaderMenu');
+    const r = ev.currentTarget.getBoundingClientRect();
+    dataColHeaderMenuAnchorRect = r;
+    pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 200)) + 'px';
+    pop.style.top = (r.bottom + 6) + 'px';
+    pop.style.display = 'block';
+  }
+
+  function hideDataColHeaderMenu(){
+    const pop = document.getElementById('dataColHeaderMenu');
+    if (pop) pop.style.display = 'none';
+    dataColHeaderMenuKey = null;
+  }
+
+  function renderDataColHeaderMenu(){
+    const pop = document.getElementById('dataColHeaderMenu');
+    if (!pop || !dataColHeaderMenuKey) return;
+    const key = dataColHeaderMenuKey;
+    const pinnedLeft = dataPinnedLeft.includes(key);
+    const pinnedRight = dataPinnedRight.includes(key);
+    pop.innerHTML = `
+      <div class="chm-item" onclick="colMenuFilterColumn('${key}', event)">${CHM_FILTER_ICON}<span>Filter column</span></div>
+      <div class="chm-item" onclick="colMenuHideColumn('${key}')">${CHM_EYE_ICON}<span>Hide</span></div>
+      <div class="chm-item ${pinnedLeft?'active':''}" onclick="colMenuTogglePin('${key}','left')">${CHM_PIN_ICON}<span>${pinnedLeft?'Unpin':'Pin to the left'}</span></div>
+      <div class="chm-item ${pinnedRight?'active':''}" onclick="colMenuTogglePin('${key}','right')"><span style="display:inline-flex;transform:scaleX(-1);">${CHM_PIN_ICON}</span><span>${pinnedRight?'Unpin':'Pin to the right'}</span></div>`;
+  }
+
+  function colMenuFilterColumn(key, ev){
+    const anchor = dataColHeaderMenuAnchorRect;
+    hideDataColHeaderMenu();
+    const fieldKey = DATA_COL_TO_FILTER_FIELD[key];
+    dataFiltersDraft = cloneDataFilters(dataFilters);
+    if (fieldKey){
+      dataFilterActiveField = fieldKey;
+    } else {
+      dataFilterActiveField = 'custom';
+      if (!dataFiltersDraft.custom.some(c=>c.column===key)) dataFiltersDraft.custom.push({ ...newCustomFilterRow(), column:key });
+    }
+    renderDataFilterPanel();
+    positionDataFilterPop(anchor);
+  }
+
+  function colMenuHideColumn(key){
+    hideDataColHeaderMenu();
+    if (dataVisibleColumns.includes(key)) toggleDataColumnVisible(key);
+  }
+
+  function colMenuTogglePin(key, side){
+    const arr = side==='left' ? dataPinnedLeft : dataPinnedRight;
+    const already = arr.includes(key);
+    dataPinnedLeft = dataPinnedLeft.filter(k=>k!==key);
+    dataPinnedRight = dataPinnedRight.filter(k=>k!==key);
+    if (!already){
+      if (side==='left') dataPinnedLeft.push(key); else dataPinnedRight.push(key);
+    }
+    hideDataColHeaderMenu();
+    animateDataTableRender();
+  }
+
+  document.addEventListener('click', e=>{
+    const pop = document.getElementById('dataColHeaderMenu');
+    if (pop && pop.style.display==='block' && !pop.contains(e.target)) hideDataColHeaderMenu();
+  });
+  document.getElementById('dataColHeaderMenu').addEventListener('click', e => e.stopPropagation());
 
   function renderDataPage(){
     const body = document.getElementById('dataSectionBody');
@@ -4741,18 +5196,14 @@
 
     const eyeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>`;
     const dotsSvg = `<svg class="col-dots" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>`;
+    const pinSvg = `<svg class="col-pin-badge" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M8 3h8l-1 6 3 3v2H6v-2l3-3-1-6Z"/></svg>`;
 
+    const cols = dataVisibleColumnDefs();
+    const gridStyle = dataGridStyle();
     const head = `
-      <div class="table-head" style="${DATA_GRID}">
+      <div class="table-head" style="${gridStyle}">
         <div></div>
-        <div class="data-th">Action status ${dotsSvg}</div>
-        <div class="data-th">Crop name ${dotsSvg}</div>
-        <div class="data-th">Sample ID ${dotsSvg}</div>
-        <div class="data-th">Username ${dotsSvg}</div>
-        <div class="data-th">Site ${dotsSvg}</div>
-        <div class="data-th">Action name ${dotsSvg}</div>
-        <div class="data-th">Action date ${dotsSvg}</div>
-        <div class="data-th">Variety ${dotsSvg}</div>
+        ${cols.map(c=>`<div class="data-th">${c.label} ${(dataPinnedLeft.includes(c.key)||dataPinnedRight.includes(c.key)) ? pinSvg : ''}<button class="icon-btn col-dots-btn" title="Column options" onclick="openDataColHeaderMenu(event,'${c.key}')">${dotsSvg}</button></div>`).join('')}
       </div>`;
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / DATA_PAGE_SIZE));
@@ -4762,18 +5213,10 @@
 
     const rows = pageItems.map((a)=>{
       const i = dataActions.indexOf(a);
-      const c = CROP_COLORS[a.crop] || CROP_COLOR_DEFAULT;
       return `
-      <div class="site-row" style="${DATA_GRID}">
+      <div class="site-row" style="${gridStyle}">
         <span class="r"><button class="icon-btn" title="View details" onclick="viewDataAction(${i})">${eyeSvg}</button></span>
-        <span>${statusPill(a.statusKey, a.statusLabel)}</span>
-        <span><span class="ssc-crop-pill" style="background:${c.bg};color:${c.text};">${a.cropLabel}</span></span>
-        <span class="dc-ellipsis">${a.sampleId || ''}</span>
-        <span class="dc-ellipsis" title="${a.username}">${a.username}</span>
-        <span class="dc-ellipsis" title="${a.site}">${a.site}</span>
-        <span class="dc-ellipsis">${a.actionName}</span>
-        <span class="dc-ellipsis">${dataActionDate(a)}</span>
-        <span class="dc-ellipsis">${a.variety || ''}</span>
+        ${cols.map(c=>c.cell(a)).join('')}
       </div>`;
     }).join('');
 
@@ -9088,6 +9531,7 @@
   loadUsers();
   loadGroups();
   loadActionTemplates();
+  loadDataViews();
   render();
 </script>
 </body>
