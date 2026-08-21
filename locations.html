@@ -255,15 +255,24 @@
   .sites-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;flex:1;display:flex;flex-direction:column;min-height:0;}
   #rows{flex:1;overflow-y:auto;min-height:400px;}
   #usersCard{overflow-y:auto;min-height:200px;}
-  #dataRows{max-height:480px;overflow-y:auto;}
+  /* #dataRows used to have its own max-height:480px + overflow-y:auto (an inner vertical
+     scroll), from before the Data table had pagination or a horizontal-scroll wrapper. Now it
+     sits inside .data-table-scroll (horizontal only) and pagination already caps rows per page,
+     so that inner vertical scroll was redundant — worse, it gave #dataRows its own scrollable
+     region nested inside .data-table-scroll's, and the two fought over wheel/trackpad gestures,
+     which is what showed up as a stray blue scrollbar before the "real" horizontal one took over. */
 
   /* Scrollbar de color propio en las zonas con scroll interno, para que se
      note a simple vista que hay más filas/opciones debajo. */
-  #rows,#usersCard,.groups,#dataRows{scrollbar-width:thin;scrollbar-color:var(--blue) transparent;}
-  #rows::-webkit-scrollbar,#usersCard::-webkit-scrollbar,.groups::-webkit-scrollbar,#dataRows::-webkit-scrollbar{width:8px;}
-  #rows::-webkit-scrollbar-track,#usersCard::-webkit-scrollbar-track,.groups::-webkit-scrollbar-track,#dataRows::-webkit-scrollbar-track{background:transparent;}
-  #rows::-webkit-scrollbar-thumb,#usersCard::-webkit-scrollbar-thumb,.groups::-webkit-scrollbar-thumb,#dataRows::-webkit-scrollbar-thumb{background:var(--blue);border-radius:20px;border:2px solid transparent;background-clip:padding-box;}
-  #rows::-webkit-scrollbar-thumb:hover,#usersCard::-webkit-scrollbar-thumb:hover,.groups::-webkit-scrollbar-thumb:hover,#dataRows::-webkit-scrollbar-thumb:hover{background:var(--blue-hover);background-clip:padding-box;}
+  #rows,#usersCard,.groups{scrollbar-width:thin;scrollbar-color:var(--blue) transparent;}
+  #rows::-webkit-scrollbar,#usersCard::-webkit-scrollbar,.groups::-webkit-scrollbar{width:8px;}
+  #rows::-webkit-scrollbar-track,#usersCard::-webkit-scrollbar-track,.groups::-webkit-scrollbar-track{background:transparent;}
+  #rows::-webkit-scrollbar-thumb,#usersCard::-webkit-scrollbar-thumb,.groups::-webkit-scrollbar-thumb{background:var(--blue);border-radius:20px;border:2px solid transparent;background-clip:padding-box;}
+  #rows::-webkit-scrollbar-thumb:hover,#usersCard::-webkit-scrollbar-thumb:hover,.groups::-webkit-scrollbar-thumb:hover{background:var(--blue-hover);background-clip:padding-box;}
+  .data-table-scroll::-webkit-scrollbar{height:8px;}
+  .data-table-scroll::-webkit-scrollbar-track{background:transparent;}
+  .data-table-scroll::-webkit-scrollbar-thumb{background:var(--blue);border-radius:20px;border:2px solid transparent;background-clip:padding-box;}
+  .data-table-scroll::-webkit-scrollbar-thumb:hover{background:var(--blue-hover);background-clip:padding-box;}
   .sites-toolbar{display:flex;align-items:center;gap:12px;}
   .sites-toolbar .all{font-size:15px;font-weight:700;color:var(--navy);}
   .search{flex:1;max-width:420px;}
@@ -587,7 +596,7 @@
   /* Data table: once enough columns are visible the row's own inline width (see dataGridStyle)
      exceeds this wrapper, so it scrolls horizontally instead of squeezing every column to fit.
      Sticky (pinned) columns/eye-icon column stay put via their own inline position:sticky. */
-  .data-table-scroll{overflow-x:auto;padding-bottom:6px;}
+  .data-table-scroll{overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;scrollbar-color:var(--blue) transparent;}
   /* Grid items default to min-width:auto, which lets a header cell's own content (label + pin
      badge + dots button) refuse to shrink below its fixed px track and quietly overflow it —
      that overflow was what let the header end up a few pixels wider than the body rows and
