@@ -645,6 +645,13 @@
   .dfpp-sum-x:hover{background:rgba(226,69,59,.14);color:#e2453b;}
   .dfpp-sum-x svg{width:11px;height:11px;}
   .dfpp-empty{padding:10px 4px;font-size:12.5px;color:var(--muted2);}
+  .dfpp-cat-sep{border-top:1px solid var(--border);margin:8px 2px;}
+  .dfpp-custom-list{max-height:230px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+  .dfpp-custom-row{display:flex;flex-direction:column;gap:6px;border:1px solid var(--border);border-radius:9px;padding:9px;}
+  .dfpp-custom-row-head{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px;}
+  .dfpp-custom-row select,.dfpp-custom-row input{width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 9px;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);}
+  .dfpp-custom-row select:focus,.dfpp-custom-row input:focus{outline:none;border-color:var(--blue);}
+  .dfpp-add-filter{display:inline-block;margin-top:10px;}
   .dfpp-footer{display:flex;justify-content:flex-end;gap:10px;padding:12px 16px;border-top:1px solid var(--border);}
   .dfpp-footer .btn{padding:9px 20px;font-size:13.5px;}
   .dfpp-footer .btn-back{padding:9px 20px;font-size:13.5px;}
@@ -3809,9 +3816,10 @@
   // Fixed filters shared by the Data and Activity tabs. Kept as discrete fields (not free-text
   // search) so each one maps to a single indexable API query param at real scale.
   // status/crop/site are multi-select (arrays); dateFrom/dateTo are a plain date range.
-  let dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'' };
+  let dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'', custom:[] };
   let dataFiltersDraft = null;      // working copy while the filter panel is open; null when closed
   let dataFilterActiveField = 'status'; // which left-column field the panel's middle list shows
+  let dataCustomFilterSeq = 0;      // monotonic id source for custom filter rows
 
   // Variedades y rangos de análisis por crop; el crop de cada action se deriva del
   // texto entre paréntesis del propio action name (p.ej. "Varieties (Barley)" -> Barley).
@@ -3916,7 +3924,7 @@
     if (!users.length){ showSnack('Add at least one user first'); return; }
     dataActions = generateMockDataActions(100);
     dataPage = 1;
-    dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'' };
+    dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'', custom:[] };
     setDataSection('data');
   }
 
@@ -3942,6 +3950,7 @@
     const fromTs = dataFilters.dateFrom ? new Date(dataFilters.dateFrom+'T00:00:00').getTime() : null;
     const toTs = dataFilters.dateTo ? new Date(dataFilters.dateTo+'T23:59:59.999').getTime() : null;
     const uname = dataFilters.username.trim().toLowerCase();
+    const activeCustom = dataFilters.custom.filter(c=>c.column && c.value !== '');
     return dataActions.filter(a=>{
       if (dataFilters.status.length && !dataFilters.status.includes(a.statusKey)) return false;
       if (dataFilters.crop.length && !dataFilters.crop.includes(a.crop)) return false;
@@ -3952,8 +3961,54 @@
       const t = a.actionDate.getTime();
       if (fromTs!==null && t < fromTs) return false;
       if (toTs!==null && t > toTs) return false;
+      for (const c of activeCustom){
+        if (!customFilterMatch(a[c.column], c.operator, c.value)) return false;
+      }
       return true;
     });
+  }
+
+  // Custom filters: generic "any column" comparison, added by the user via the Custom
+  // filters category at the bottom of the filter panel (Column / Operator / Value rows).
+  const DATA_CUSTOM_FILTER_COLUMNS = [
+    { key:'statusLabel', label:'Action status' },
+    { key:'cropLabel',   label:'Crop name' },
+    { key:'sampleId',    label:'Sample ID' },
+    { key:'username',    label:'Username' },
+    { key:'site',        label:'Site' },
+    { key:'actionName',  label:'Action name' },
+    { key:'variety',     label:'Variety' },
+    { key:'device',      label:'Device' },
+    { key:'humidity',    label:'Humidity' },
+    { key:'testWeight',  label:'Test weight' },
+    { key:'protein',     label:'Protein' },
+    { key:'photoCount',  label:'Photo count' },
+    { key:'infraredId',  label:'Infrared ID' },
+    { key:'actionId',    label:'Action ID' },
+  ];
+  const DATA_CUSTOM_OPERATORS = [
+    { value:'eq', label:'equals' },
+    { value:'gt', label:'greater than' },
+    { value:'lt', label:'less than' },
+    { value:'ne', label:'not equal' },
+  ];
+
+  function customFilterMatch(rawValue, operator, filterValue){
+    const a = rawValue == null ? '' : rawValue;
+    const numA = parseFloat(a), numB = parseFloat(filterValue);
+    const bothNumeric = a !== '' && !isNaN(numA) && filterValue !== '' && !isNaN(numB);
+    const strA = String(a).toLowerCase(), strB = String(filterValue).toLowerCase();
+    switch(operator){
+      case 'gt': return bothNumeric ? numA > numB : strA > strB;
+      case 'lt': return bothNumeric ? numA < numB : strA < strB;
+      case 'ne': return bothNumeric ? numA !== numB : strA !== strB;
+      default:   return bothNumeric ? numA === numB : strA === strB;
+    }
+  }
+
+  function newCustomFilterRow(){
+    dataCustomFilterSeq++;
+    return { id:'cf'+dataCustomFilterSeq, column:DATA_CUSTOM_FILTER_COLUMNS[0].key, operator:'eq', value:'' };
   }
 
   const DFP_X = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
@@ -4310,7 +4365,8 @@
   function countActiveDataFilters(source){
     source = source || dataFilters;
     const n = DATA_FILTER_FIELDS.filter(f=>f.multi).reduce((n,f)=> n + source[f.key].length, 0);
-    return n + (dataDateRangeActive(source) ? 1 : 0) + (source.username ? 1 : 0);
+    const customN = source.custom.filter(c=>c.column && c.value !== '').length;
+    return n + (dataDateRangeActive(source) ? 1 : 0) + (source.username ? 1 : 0) + customN;
   }
 
   // Chips + "Filters" trigger button, always visible above the tabs' content — shows the
@@ -4331,6 +4387,10 @@
       dataFilterFieldValues(f).forEach(v=>{
         chips.push(`<span class="dfp-chip">${f.label}: ${escapeAttr(optsMap[v]||v)}<span class="dfp-x" onclick="removeAppliedDataFilterValue('${f.key}','${escapeJsStr(v)}')">${DFP_X}</span></span>`);
       });
+    });
+    dataFilters.custom.forEach(c=>{
+      if (!c.column || c.value === '') return;
+      chips.push(`<span class="dfp-chip">${customFilterChipLabel(c)}<span class="dfp-x" onclick="removeAppliedCustomFilter('${c.id}')">${DFP_X}</span></span>`);
     });
     return `
       <div class="data-filter-bar-row">
@@ -4360,8 +4420,28 @@
     renderDataPage();
   }
 
+  function customFilterColumnLabel(key){
+    const col = DATA_CUSTOM_FILTER_COLUMNS.find(c=>c.key===key);
+    return col ? col.label : key;
+  }
+
+  function customFilterOperatorLabel(value){
+    const op = DATA_CUSTOM_OPERATORS.find(o=>o.value===value);
+    return op ? op.label : value;
+  }
+
+  function customFilterChipLabel(c){
+    return `${customFilterColumnLabel(c.column)} ${customFilterOperatorLabel(c.operator)} ${escapeAttr(c.value)}`;
+  }
+
+  function removeAppliedCustomFilter(id){
+    dataFilters.custom = dataFilters.custom.filter(c=>c.id!==id);
+    dataPage = 1;
+    renderDataPage();
+  }
+
   function clearAppliedDataFilters(){
-    dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'' };
+    dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'', custom:[] };
     dataPage = 1;
     renderDataPage();
   }
@@ -4369,7 +4449,7 @@
   // ---- Filter panel (draft state; Cancel discards, Apply commits) ----
   function openDataFilterPanel(ev){
     ev.stopPropagation();
-    dataFiltersDraft = { status:[...dataFilters.status], crop:[...dataFilters.crop], site:[...dataFilters.site], actionName:[...dataFilters.actionName], variety:[...dataFilters.variety], username:dataFilters.username, dateFrom:dataFilters.dateFrom, dateTo:dataFilters.dateTo };
+    dataFiltersDraft = { status:[...dataFilters.status], crop:[...dataFilters.crop], site:[...dataFilters.site], actionName:[...dataFilters.actionName], variety:[...dataFilters.variety], username:dataFilters.username, dateFrom:dataFilters.dateFrom, dateTo:dataFilters.dateTo, custom:dataFilters.custom.map(c=>({...c})) };
     dataFilterActiveField = 'status';
     renderDataFilterPanel();
     const pop = document.getElementById('dataFilterPop');
@@ -4445,7 +4525,28 @@
   }
 
   function clearAllDataFilterDraft(){
-    dataFiltersDraft = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'' };
+    dataFiltersDraft = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'', custom:[] };
+    renderDataFilterPanel();
+  }
+
+  function addCustomFilterDraftRow(){
+    dataFiltersDraft.custom.push(newCustomFilterRow());
+    renderDataFilterPanel();
+  }
+
+  function removeCustomFilterDraftRow(id){
+    dataFiltersDraft.custom = dataFiltersDraft.custom.filter(c=>c.id!==id);
+    renderDataFilterPanel();
+  }
+
+  function setCustomFilterDraftRow(id, field, value){
+    const row = dataFiltersDraft.custom.find(c=>c.id===id);
+    if (row) row[field] = value;
+    renderDataFilterPanel();
+  }
+
+  function clearCustomFilterDraft(){
+    dataFiltersDraft.custom = [];
     renderDataFilterPanel();
   }
 
@@ -4478,23 +4579,44 @@
     const pop = document.getElementById('dataFilterPop');
     if (!pop || !dataFiltersDraft) return;
 
-    const activeField = DATA_FILTER_FIELDS.find(f=>f.key===dataFilterActiveField);
-    const isDate = activeField.special === 'date';
-    const isText = activeField.special === 'text';
-    const isList = !isDate && !isText;
+    const isCustom = dataFilterActiveField === 'custom';
+    const activeField = isCustom ? null : DATA_FILTER_FIELDS.find(f=>f.key===dataFilterActiveField);
+    const isDate = !isCustom && activeField.special === 'date';
+    const isText = !isCustom && activeField.special === 'text';
+    const isList = !isCustom && !isDate && !isText;
     const opts = isList ? activeField.options() : [];
     const selectedForField = isList ? dataFiltersDraft[activeField.key] : [];
 
+    const customCount = dataFiltersDraft.custom.length;
     const leftHtml = DATA_FILTER_FIELDS.map(f=>{
       let n;
       if (f.special === 'date') n = dataDateRangeActive(dataFiltersDraft) ? 1 : 0;
       else if (f.special === 'text') n = dataFiltersDraft[f.key] ? 1 : 0;
       else n = dataFiltersDraft[f.key].length;
       return `<div class="dfpp-cat ${f.key===dataFilterActiveField?'active':''}" onclick="setDataFilterActiveField('${f.key}')">${f.label}${n?` <span class="dfpp-cat-count">${n}</span>`:''}</div>`;
-    }).join('');
+    }).join('') + `<div class="dfpp-cat-sep"></div><div class="dfpp-cat ${isCustom?'active':''}" onclick="setDataFilterActiveField('custom')">Custom filters${customCount?` <span class="dfpp-cat-count">${customCount}</span>`:''}</div>`;
 
     let midHtml;
-    if (isDate){
+    if (isCustom){
+      midHtml = `
+        <div class="dfpp-custom-list">
+          ${dataFiltersDraft.custom.map((row,idx)=>`
+            <div class="dfpp-custom-row">
+              <div class="dfpp-custom-row-head">
+                <span>Filter ${idx+1}</span>
+                <span class="dfpp-sum-x" onclick="removeCustomFilterDraftRow('${row.id}')">${DFP_X}</span>
+              </div>
+              <select onchange="setCustomFilterDraftRow('${row.id}','column',this.value)">
+                ${DATA_CUSTOM_FILTER_COLUMNS.map(c=>`<option value="${c.key}" ${row.column===c.key?'selected':''}>${c.label}</option>`).join('')}
+              </select>
+              <select onchange="setCustomFilterDraftRow('${row.id}','operator',this.value)">
+                ${DATA_CUSTOM_OPERATORS.map(o=>`<option value="${o.value}" ${row.operator===o.value?'selected':''}>${o.label}</option>`).join('')}
+              </select>
+              <input type="text" placeholder="Value" value="${escapeAttr(row.value)}" onchange="setCustomFilterDraftRow('${row.id}','value',this.value)">
+            </div>`).join('') || `<div class="dfpp-empty">No custom filters yet.</div>`}
+        </div>
+        <button type="button" class="mini-link dfpp-add-filter" onclick="addCustomFilterDraftRow()">+ Add filter</button>`;
+    } else if (isDate){
       midHtml = `
         <div class="dfpp-date-presets">
           ${DATA_DATE_PRESETS.map(p=>`<button type="button" class="dfpp-preset-btn ${dataFilterPresetMatches(p.days)?'active':''}" onclick="applyDataFilterDatePreset(${p.days})">${p.label}</button>`).join('')}
@@ -4549,7 +4671,11 @@
           <div class="dfpp-sum-head">${f.label} <span class="dfpp-sum-clear" onclick="clearDataFilterDraftField('${f.key}')">Clear</span></div>
           ${values.map(v=>`<div class="dfpp-sum-item"><span>${escapeAttr(optsMap[v]||v)}</span><span class="dfpp-sum-x" onclick="removeDataFilterDraftValue('${f.key}','${escapeJsStr(v)}')">${DFP_X}</span></div>`).join('')}
         </div>`;
-    }).join('') || `<div class="dfpp-empty">No filters selected</div>`;
+    }).join('') + (dataFiltersDraft.custom.length ? `
+      <div class="dfpp-sum-group">
+        <div class="dfpp-sum-head">Custom filters <span class="dfpp-sum-clear" onclick="clearCustomFilterDraft()">Clear</span></div>
+        ${dataFiltersDraft.custom.map(c=>`<div class="dfpp-sum-item"><span>${customFilterChipLabel(c)}</span><span class="dfpp-sum-x" onclick="removeCustomFilterDraftRow('${c.id}')">${DFP_X}</span></div>`).join('')}
+      </div>` : '') || `<div class="dfpp-empty">No filters selected</div>`;
 
     pop.innerHTML = `
       <div class="dfpp">
