@@ -274,6 +274,12 @@
 
   .table-head{display:grid;grid-template-columns:1.2fr 0.9fr 1fr 1fr 1fr 0.6fr 0.6fr;gap:8px;padding:10px 6px 8px;border-bottom:1px solid var(--border);color:var(--navy);font-weight:700;font-size:14px;}
   .table-head .r{text-align:center;}
+  .th-sort{display:inline-flex;align-items:center;gap:4px;cursor:pointer;user-select:none;}
+  .th-sort:hover{color:var(--blue);}
+  .th-sort-ico{width:13px;height:13px;flex:none;opacity:.35;transition:transform .15s var(--ease-out,ease),opacity .15s;}
+  .th-sort.active{color:var(--blue);}
+  .th-sort.active .th-sort-ico{opacity:1;}
+  .th-sort.asc .th-sort-ico{transform:rotate(180deg);}
 
   .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 20px;}
   .empty .pic{display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
@@ -1518,7 +1524,7 @@
         <p class="page-sub">Add and manage users for your organization.</p>
       </div>
       <div style="display:flex;gap:12px;align-items:center;">
-        <button class="btn-export">
+        <button class="btn-export" onclick="exportUsers()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
           Export
         </button>
@@ -2037,6 +2043,8 @@
           <span class="bsep"></span>
           <button class="bbtn" onclick="bulkNomad(true)">Nomad on</button>
           <button class="bbtn" onclick="bulkNomad(false)">Nomad off</button>
+          <span class="bsep"></span>
+          <button class="bbtn" onclick="openBulkUserActionsModalDraft()">Reassign actions</button>
           <button class="bbtn" onclick="bulkDelete()">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
             Delete
@@ -6551,9 +6559,19 @@
   let buaSelectedActions = [];
   let buaSelectedTemplate = null; // índice en `actionTemplates` aplicado actualmente, o null
   let buaSingleUserIndex = null;  // índice en `users` si se abrió desde el lápiz de una fila, o null (bulk)
+  let buaTarget = 'real';         // 'real' = tabla de Users (users/siteUsersSelected), 'draft' = wizard "Add users" (dUsers/selDraft)
+
+  // Usuarios afectados por la selección actual, resueltos a objetos (no índices) porque el
+  // modo 'draft' identifica filas por `id` (selDraft), no por posición en el array.
+  function buaTargetUsers(){
+    if (buaTarget === 'draft') return dUsers.filter(u=>selDraft.has(u.id));
+    if (buaSingleUserIndex != null) return users[buaSingleUserIndex] ? [users[buaSingleUserIndex]] : [];
+    return Array.from(siteUsersSelected).map(i=>users[i]).filter(Boolean);
+  }
 
   function openBulkUserActionsModal(){
     if (!siteUsersSelected.size) return;
+    buaTarget = 'real';
     buaSingleUserIndex = null;
     buaSelectedActions = [];
     buaSelectedTemplate = null;
@@ -6569,12 +6587,32 @@
   }
   function openUserActionsModal(i){
     const u = users[i]; if (!u) return;
+    buaTarget = 'real';
     buaSingleUserIndex = i;
     buaSelectedActions = [...u.actions];
     buaSelectedTemplate = null;
     document.getElementById('buaModalTitle').textContent = `Edit actions — ${u.name}`;
     const idleLabel = document.getElementById('buaConfirmIdleLabel');
     if (idleLabel) idleLabel.textContent = 'Save actions';
+    const searchEl = document.getElementById('buaActionSearch');
+    if (searchEl) searchEl.value = '';
+    renderBulkUserActionsUsers();
+    renderBuaTemplates();
+    renderBulkUserActionsList('');
+    document.getElementById('bulkUserActionsModal').classList.remove('hidden');
+  }
+  // Mismo modal que la tabla de Users, pero contra las filas en borrador (dUsers) seleccionadas
+  // en el wizard "Add users" — permite reasignar acciones (a mano o desde un action template)
+  // antes de confirmar la creación de los usuarios.
+  function openBulkUserActionsModalDraft(){
+    if (!selDraft.size) return;
+    buaTarget = 'draft';
+    buaSingleUserIndex = null;
+    buaSelectedActions = [];
+    buaSelectedTemplate = null;
+    document.getElementById('buaModalTitle').textContent = 'Reassign actions';
+    const idleLabel = document.getElementById('buaConfirmIdleLabel');
+    if (idleLabel) idleLabel.innerHTML = `Replace actions for <span id="buaConfirmCount">0</span> users`;
     const searchEl = document.getElementById('buaActionSearch');
     if (searchEl) searchEl.value = '';
     renderBulkUserActionsUsers();
@@ -6622,13 +6660,11 @@
   function renderBulkUserActionsUsers(){
     const box = document.getElementById('buaUsers');
     if (!box) return;
-    const indices = buaSingleUserIndex != null ? [buaSingleUserIndex] : Array.from(siteUsersSelected);
-    document.getElementById('buaUserCount').textContent = indices.length;
+    const list = buaTargetUsers();
+    document.getElementById('buaUserCount').textContent = list.length;
     const confirmCount = document.getElementById('buaConfirmCount');
-    if (confirmCount) confirmCount.textContent = indices.length;
-    const rows = indices.map(i=>{
-      const u = users[i];
-      if (!u) return '';
+    if (confirmCount) confirmCount.textContent = list.length;
+    const rows = list.map(u=>{
       const site = u.nomad ? 'Nomad (all sites)' : (u.site || '—');
       return `<span class="rev-chip">${escapeAttr(u.name)} <span style="color:var(--muted2);font-weight:400;">— ${escapeAttr(site)}</span></span>`;
     }).join('');
@@ -6667,9 +6703,9 @@
   // Fake latency so an edit affecting one or several users doesn't feel instantaneous/unsafe —
   // matches the "this is really applying something" expectation for a destructive replace.
   function confirmBulkUserActions(){
-    const single = buaSingleUserIndex;
-    const indices = single != null ? [single] : Array.from(siteUsersSelected);
-    const count = indices.length;
+    const single = buaTarget === 'real' ? buaSingleUserIndex : null;
+    const list = buaTargetUsers();
+    const count = list.length;
     if (!count) return;
     const btn = document.getElementById('buaConfirmBtn');
     const cancelBtn = document.getElementById('buaCancelBtn');
@@ -6681,14 +6717,11 @@
 
     setTimeout(()=>{
       let name = '';
-      indices.forEach(i=>{
-        const u = users[i];
-        if (u){ u.actions = [...buaSelectedActions]; name = u.name; }
-      });
-      persistUsers();
-      if (single == null) siteUsersSelected.clear();
+      list.forEach(u=>{ u.actions = [...buaSelectedActions]; name = u.name; });
+      const isDraft = buaTarget === 'draft';
+      if (isDraft){ selDraft.clear(); } else { persistUsers(); if (single == null) siteUsersSelected.clear(); }
       closeBulkUserActionsModal();
-      renderUsers();
+      if (isDraft) renderDraftUsers(); else renderUsers();
 
       document.getElementById('buaConfirmSpinner').style.display = 'none';
       document.getElementById('buaConfirmIdleLabel').style.display = 'inline';
@@ -6805,6 +6838,20 @@
       consumed: lic.packs.reduce((s,p)=>s+p.consumed,0),
       total: lic.packs.reduce((s,p)=>s+p.credits,0),
     };
+  }
+
+  // Sort por columna en la tabla de licencias (Credits remaining/consumed, Total purchased).
+  // null = orden natural (sin ordenar); un segundo click sobre la misma columna invierte la dirección.
+  let licensesSortKey = null;
+  let licensesSortDir = 'desc';
+  function setLicensesSort(key){
+    if (licensesSortKey === key) licensesSortDir = licensesSortDir === 'desc' ? 'asc' : 'desc';
+    else { licensesSortKey = key; licensesSortDir = 'desc'; }
+    renderLicenses();
+  }
+  function licSortHeader(key, label){
+    const active = licensesSortKey === key;
+    return `<div class="th-sort ${active ? 'active '+licensesSortDir : ''}" onclick="setLicensesSort('${key}')">${label}<svg class="th-sort-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>`;
   }
 
   // Fechas "de la licencia" = las del pack actualmente en curso (o el primero en cola si aún no hay ninguno activo).
@@ -7379,6 +7426,10 @@
     if (licensesCountry!=='all') filtered = filtered.filter(l=>l.location===licensesCountry);
     if (licensesRunningLowOnly) filtered = filtered.filter(isLicenseRunningLow);
     if (licensesExpiringSoonOnly) filtered = filtered.filter(isLicenseExpiringSoon);
+    if (licensesSortKey){
+      const dir = licensesSortDir === 'asc' ? 1 : -1;
+      filtered = filtered.slice().sort((a,b) => (licenseStats(a)[licensesSortKey] - licenseStats(b)[licensesSortKey]) * dir);
+    }
 
     const L_GRID = 'grid-template-columns:1fr 100px 100px 100px 130px 150px 140px 150px 110px 110px 44px 44px;min-width:1560px;';
     const rows = filtered.map(lic => {
@@ -7441,7 +7492,7 @@
       </div>
       <div class="lic-table-scroll">
         <div class="table-head" style="${L_GRID}">
-          <div>Assigned user</div><div>License</div><div>Location</div><div>Status</div><div>Credits remaining</div><div>Credits consumed</div><div>Total purchased</div><div>Plan</div><div>Activation</div><div>Expiration</div><div class="r"></div><div class="r"></div>
+          <div>Assigned user</div><div>License</div><div>Location</div><div>Status</div>${licSortHeader('remaining','Credits remaining')}${licSortHeader('consumed','Credits consumed')}${licSortHeader('total','Total purchased')}<div>Plan</div><div>Activation</div><div>Expiration</div><div class="r"></div><div class="r"></div>
         </div>
         ${rows}
       </div>
@@ -7528,6 +7579,72 @@
     downloadUrl(url, `licenses-export-${new Date().toISOString().slice(0,10)}.xls`);
     URL.revokeObjectURL(url);
     showSnack(`Exported ${filtered.length} license${filtered.length===1?'':'s'}`);
+  }
+
+  // Exporta admins y site users en un mismo .xls, separados por una fila de sección
+  // (misma técnica que exportLicenses/exportDataActions: tabla HTML con estilos inline).
+  // Comparten las columnas ya que los campos no aplicables por fila quedan en '—'.
+  const USERS_XLS_COLS = [
+    { label:'Name / E-mail', width:200 },
+    { label:'Role',          width:110 },
+    { label:'Site',          width:150 },
+    { label:'Password',      width:130 },
+    { label:'Actions',       width:110 },
+    { label:'Device',        width:170 },
+    { label:'Nomad',         width:80 },
+  ];
+  function exportUsers(){
+    if (!managers.length && !users.length){ showSnack('No users to export'); return; }
+
+    const thStyle = 'background:#1B2A4E;color:#FFFFFF;font-weight:bold;font-size:12px;padding:7px 9px;border:1px solid #12203D;text-align:left;white-space:nowrap;';
+    const tdStyle = 'font-size:12px;padding:5px 9px;border:1px solid #E3E7EE;';
+    const secStyle = 'background:#EAF1FF;color:#1B2A4E;font-weight:bold;font-size:12px;padding:7px 9px;border:1px solid #12203D;';
+
+    const colgroup = USERS_XLS_COLS.map(c=>`<col style="width:${c.width}px;">`).join('');
+    const headRow = `<tr>${USERS_XLS_COLS.map(c=>`<th style="${thStyle}">${xlsEscape(c.label)}</th>`).join('')}</tr>`;
+    const cols = USERS_XLS_COLS.length;
+
+    const sectionRow = label => `<tr><td colspan="${cols}" style="${secStyle}">${xlsEscape(label)}</td></tr>`;
+    const dataRow = (cells, idx) => {
+      const zebra = idx % 2 === 1 ? 'background:#F8F9FC;' : 'background:#FFFFFF;';
+      return `<tr>${cells.map(c=>`<td style="${tdStyle}${zebra}">${xlsEscape(c)}</td>`).join('')}</tr>`;
+    };
+
+    const adminRows = managers.map((m,idx)=>dataRow([m.email, m.role, m.site || '—', '—', '—', '—', '—'], idx)).join('');
+    const siteRows = users.map((u,idx)=>{
+      const di = devices.findIndex(d => d.lastAllotedUser && d.lastAllotedUser.username === u.name);
+      const device = di > -1 ? deviceModelLabel(devices[di]) : (u.device || '—');
+      return dataRow([u.name, 'Site User', u.site, fakePassword(u), actsLabel(u.actions.length), device, u.nomad ? 'Yes' : '—'], idx);
+    }).join('');
+
+    const bodyRows =
+      (managers.length ? sectionRow(`Admin users (${managers.length})`) + adminRows : '') +
+      (users.length ? sectionRow(`Site users (${users.length})`) + siteRows : '');
+
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8">
+<!--[if gte mso 9]><xml>
+<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+<x:Name>Users export</x:Name>
+<x:WorksheetOptions>
+<x:FreezePanes/><x:FrozenNoSplit/><x:SplitHorizontal>1</x:SplitHorizontal><x:TopRowBottomPane>1</x:TopRowBottomPane><x:ActivePane>2</x:ActivePane>
+</x:WorksheetOptions>
+</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+<body>
+<table style="border-collapse:collapse;font-family:Calibri,Arial,sans-serif;">
+<colgroup>${colgroup}</colgroup>
+<tbody>${headRow}${bodyRows}</tbody>
+</table>
+</body></html>`;
+
+    const blob = new Blob(['﻿'+html], { type:'application/vnd.ms-excel;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    downloadUrl(url, `users-export-${new Date().toISOString().slice(0,10)}.xls`);
+    URL.revokeObjectURL(url);
+    const total = managers.length + users.length;
+    showSnack(`Exported ${total} user${total===1?'':'s'}`);
   }
 
   /* ================= DEVICES ================= */
