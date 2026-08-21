@@ -3911,7 +3911,8 @@
   let dataActions = [];
   let dataSection = 'data';
   let dataPage = 1;
-  const DATA_PAGE_SIZE = 50;
+  let dataPageSize = 50;
+  const DATA_PAGE_SIZE_OPTIONS = [25, 50, 100];
   let cropDetailCrop = null; // crop selected in the "Distribution by variety" block
   // Fixed filters shared by the Data and Activity tabs. Kept as discrete fields (not free-text
   // search) so each one maps to a single indexable API query param at real scale.
@@ -4033,8 +4034,14 @@
   }
 
   function dataChangePage(delta){
-    const totalPages = Math.max(1, Math.ceil(getFilteredDataActions().length / DATA_PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(getFilteredDataActions().length / dataPageSize));
     dataPage = Math.min(totalPages, Math.max(1, dataPage + delta));
+    renderDataPage();
+  }
+
+  function setDataPageSize(v){
+    dataPageSize = parseInt(v, 10);
+    dataPage = 1;
     renderDataPage();
   }
 
@@ -5337,10 +5344,10 @@
         ${cols.map(c=>`<div class="data-th" style="${sticky[c.key]||''}"><span class="data-th-label">${c.label}</span>${(dataPinnedLeft.includes(c.key)||dataPinnedRight.includes(c.key)) ? pinSvg : ''}<button class="icon-btn col-dots-btn" title="Column options" onclick="openDataColHeaderMenu(event,'${c.key}')">${dotsSvg}</button><span class="data-th-resize" title="Drag to resize" onmousedown="startDataColResize(event,'${c.key}')"></span></div>`).join('')}
       </div>`;
 
-    const totalPages = Math.max(1, Math.ceil(filtered.length / DATA_PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(filtered.length / dataPageSize));
     if (dataPage > totalPages) dataPage = totalPages;
-    const startIdx = (dataPage-1) * DATA_PAGE_SIZE;
-    const pageItems = filtered.slice(startIdx, startIdx + DATA_PAGE_SIZE);
+    const startIdx = (dataPage-1) * dataPageSize;
+    const pageItems = filtered.slice(startIdx, startIdx + dataPageSize);
 
     const rows = pageItems.map((a)=>{
       const i = dataActions.indexOf(a);
@@ -5351,10 +5358,10 @@
       </div>`;
     }).join('');
 
-    const rangeEnd = Math.min(startIdx + DATA_PAGE_SIZE, filtered.length);
+    const rangeEnd = Math.min(startIdx + dataPageSize, filtered.length);
     const footer = `
       <div class="table-footer">
-        <span>Rows per page: <select class="rpp-select" disabled><option>${DATA_PAGE_SIZE}</option></select></span>
+        <span>Rows per page: <select class="rpp-select" onchange="setDataPageSize(this.value)">${DATA_PAGE_SIZE_OPTIONS.map(n=>`<option value="${n}" ${n===dataPageSize?'selected':''}>${n}</option>`).join('')}</select></span>
         <span>${startIdx+1}–${rangeEnd} of ${filtered.length}</span>
         <span class="data-pager">
           <button ${dataPage<=1?'disabled':''} title="Previous page" onclick="dataChangePage(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
