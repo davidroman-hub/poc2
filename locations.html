@@ -1083,6 +1083,8 @@
   .info-box{background:#f2f6ff;border-radius:9px;padding:13px 15px;font-size:14px;color:#51607a;display:flex;gap:9px;align-items:center;margin-bottom:22px;}
   .info-box b{color:var(--navy);}
   .info-box svg{width:17px;height:17px;color:var(--blue);flex-shrink:0;}
+  .info-box-link{color:var(--blue);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+  .info-box-link:hover{color:var(--blue-hover);}
   .alloc-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-top:6px;}
   .alloc-title{font-weight:700;font-size:14px;color:var(--navy);}
   .alloc-title span{color:var(--muted);font-weight:500;}
@@ -1523,6 +1525,11 @@
           <div class="stepper" id="stepperSites"></div>
         </div>
 
+        <div class="info-box" style="align-items:flex-start;line-height:1.55;margin-top:-4px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          <span><b>What are Sites?</b> Sites are the physical locations your organization operates — silos, warehouses, labs or collection points where grain is stored and inspected. Users, licenses and analysis results are all tied to a site, and you can use <a role="button" tabindex="0" class="info-box-link" onclick="openGroupModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openGroupModal()}">site groups</a> to manage many at once. Add as many as you need.</span>
+        </div>
+
         <!-- Sites -->
         <div class="sites-card">
           <div class="sites-toolbar">
@@ -1620,6 +1627,11 @@
         <div class="stepper" id="stepperUsers"></div>
       </div>
 
+      <div class="info-box" style="align-items:flex-start;line-height:1.55;margin-top:-4px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <span><b>What are Users?</b> Users are the people and accounts that operate within your organization. Add <a role="button" tabindex="0" class="info-box-link" onclick="openUserWizard('users')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUserWizard('users')}">site users</a> so field operators can sign in to <b>PocketLab</b> and run analyses on-site. <a role="button" tabindex="0" class="info-box-link" onclick="openUserWizard('mgr')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUserWizard('mgr')}">Admin users</a> can also run analyses, and on top of that they manage sites, licenses and results from this dashboard. Add as many as you need.</span>
+      </div>
+
       <div class="sites-card" id="usersCard"></div>
     </div>
    </div><!-- /page-users -->
@@ -1640,6 +1652,10 @@
       </div>
     </div>
     <div class="content" style="margin-top:22px;">
+      <div class="info-box" style="align-items:flex-start;line-height:1.55;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <span><b>What are Licenses?</b> A license grants a user access to <b>PocketLab</b> and draws from your organization's <a role="button" tabindex="0" class="info-box-link" onclick="openPoolModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPoolModal()}">credit packs pool</a> to run analyses. Assign a license to a user who needs to work on-site; unassigned licenses stay in the pool until you need them.</span>
+      </div>
       <div class="stat-row">
         <div class="stat-card" onclick="openPoolModal()" title="View credit packs pool">
           <div class="stat-card-top">
@@ -1687,6 +1703,10 @@
       </div>
     </div>
     <div class="content" style="margin-top:22px;">
+      <div class="info-box" style="align-items:flex-start;line-height:1.55;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <span><b>What are Devices?</b> Devices are the phones and tablets your field users run <b>PocketLab</b> on to capture samples and analyses. Each one appears here the first time a user uses it, together with its last activity so you can spot the devices that are inactive or stale.</span>
+      </div>
       <div class="stat-row" style="grid-template-columns:repeat(3,1fr);">
         <div class="stat-card" onclick="setDevicesTab('all')" title="Show all devices">
           <div class="stat-card-top">
@@ -1728,6 +1748,10 @@
     </div>
 
     <div class="map-page-wrap" style="margin-top:22px;">
+      <div class="info-box" style="align-items:flex-start;line-height:1.55;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <span><b>What is the Map?</b> The Map plots every site that has an address or coordinates, so you can see your organization's footprint at a glance, search for a specific site, and <a role="button" tabindex="0" class="info-box-link" onclick="openAddSiteChoice()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAddSiteChoice()}">add new sites</a> right where you need them.</span>
+      </div>
       <div class="map-card">
         <div id="siteMap"></div>
         <div class="map-controls">
@@ -1772,6 +1796,10 @@
     </div>
 
     <div class="content" style="margin-top:22px;">
+      <div class="info-box" style="align-items:flex-start;line-height:1.55;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <span><b>What is Data?</b> Data brings together every analysis run across your sites, devices and users. Explore individual results in the <a role="button" tabindex="0" class="info-box-link" onclick="setDataSection('data')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setDataSection('data')}">Data</a> tab, or switch to <a role="button" tabindex="0" class="info-box-link" onclick="setDataSection('activity')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setDataSection('activity')}">Activity</a> for usage trends by user, crop and site.</span>
+      </div>
       <div class="sites-card">
         <div class="u-tabs">
           <button class="u-tab active" onclick="setDataSection('data')" id="dataTabBtn-data">Data</button>
@@ -1936,9 +1964,6 @@
         <label class="fld-label">Site type <span class="req">*</span></label>
         <select class="fld" id="fType">
           <option value="" disabled selected>Select a type</option>
-          <option value="farm">Farm</option>
-          <option value="storage">Storage</option>
-          <option value="industrial">Industrial site</option>
         </select>
         <div class="fld-err" id="fTypeErr"></div>
 
@@ -2865,8 +2890,9 @@
     const contBar = document.getElementById('continueUsersBar');
     if (contBar) contBar.style.display = (hasSites && (typeof users==='undefined' || users.length===0)) ? 'flex' : 'none';
 
-    // Timeline compartido (Sites + Users). El paso 2 se habilita con al menos un site
-    const hasUsers = (typeof users!=='undefined') && users.length>0;
+    // Timeline compartido (Sites + Users). El paso 2 se habilita con al menos un site.
+    // Cuenta tanto site users como admin users (el Global Admin por defecto ya es un usuario real).
+    const hasUsers = (typeof users!=='undefined' && users.length>0) || (typeof managers!=='undefined' && managers.length>0);
     const sh = stepperHTML(hasSites, hasUsers);
     document.getElementById('stepperSites').innerHTML = sh;
     document.getElementById('stepperUsers').innerHTML = sh;
@@ -3350,6 +3376,9 @@
   function openForm(){
     document.getElementById('formModal').classList.remove('hidden');
     ['fName','fAddress','fLat','fLng','fId'].forEach(id => document.getElementById(id).value = '');
+    // Opciones de tipo generadas desde SITE_TYPES (única fuente de verdad), no hardcodeadas
+    document.getElementById('fType').innerHTML = '<option value="" disabled selected>Select a type</option>' +
+      Object.keys(SITE_TYPES).map(k => `<option value="${k}">${SITE_TYPES[k].label}</option>`).join('');
     document.getElementById('fType').value = '';
     document.getElementById('fType').classList.remove('err');
     document.getElementById('fTypeErr').textContent = '';
@@ -3568,14 +3597,15 @@
     return L.tileLayer(cfg.url, { attribution: cfg.attribution, maxZoom: cfg.maxZoom, subdomains: cfg.subdomains });
   }
 
-  // Pin por tipo de site: color + glifo blanco, igual al esquema de la referencia
-  // (verde/hoja = farm, amarillo/silo = storage, azul/fábrica = industrial).
+  // Pin por tipo de site: color + glifo blanco.
+  // (amarillo/bidones = Silo, azul/matraz = Laboratory, verde/hoja = Farm — este último
+  //  aún no existe en producción, se deja preparado por si se implementa más adelante).
   const SITE_TYPES = {
-    farm:       { label: 'Farm',            color: '#22a55e', glyph: '<path d="M12 5c3.5 3.5 3.5 10.5 0 14-3.5-3.5-3.5-10.5 0-14Z" fill="#fff"/>' },
-    storage:    { label: 'Storage',         color: '#f2b21e', glyph: '<path d="M6 13a3.5 3.5 0 0 1 7 0v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1Z" fill="#fff"/><path d="M13 15a2.8 2.8 0 0 1 5.6 0v6a1 1 0 0 1-1 1h-3.6a1 1 0 0 1-1-1Z" fill="#fff"/>' },
-    industrial: { label: 'Industrial site',  color: '#2f6bff', glyph: '<path d="M4 21V11L12 5L20 11V21Z" fill="#fff"/>' },
+    silo:       { label: 'Silo',       color: '#f2b21e', glyph: '<path d="M6 13a3.5 3.5 0 0 1 7 0v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1Z" fill="#fff"/><path d="M13 15a2.8 2.8 0 0 1 5.6 0v6a1 1 0 0 1-1 1h-3.6a1 1 0 0 1-1-1Z" fill="#fff"/>' },
+    laboratory: { label: 'Laboratory', color: '#2f6bff', glyph: '<path d="M10.2 5h3.6M11 5v4.2l-3.4 6.4A1.5 1.5 0 0 0 8.9 18h6.2a1.5 1.5 0 0 0 1.3-2.4L13 9.2V5Z" fill="#fff"/><path d="M9.8 14.6h4.4" stroke="#2f6bff" stroke-width="1.2" stroke-linecap="round"/>' },
+    farm:       { label: 'Farm (doesn\'t exist yet)', color: '#22a55e', glyph: '<path d="M12 5c3.5 3.5 3.5 10.5 0 14-3.5-3.5-3.5-10.5 0-14Z" fill="#fff"/>' },
   };
-  const DEFAULT_SITE_TYPE = 'industrial'; // fallback solo para sites guardados antes de que "type" existiera
+  const DEFAULT_SITE_TYPE = 'silo'; // fallback solo para sites guardados antes de que "type" existiera (antes: storage/industrial)
 
   // Etiqueta de tipo de site para la tabla (con punto de color a juego con el pin del mapa)
   function siteTypeLabel(s){
@@ -3981,10 +4011,11 @@
 
   function generateMockDataActions(n){
     const out = [];
-    if (!users.length) return out; // no site users saved yet, nothing real to mock from
+    const people = mockPeople();
+    if (!people.length) return out; // no users saved yet, nothing real to mock from
     const now = Date.now();
     for (let i=0;i<n;i++){
-      const u = dataPick(users);
+      const u = dataPick(people);
       const actionPool = (u.actions && u.actions.length) ? u.actions : U_ACTIONS;
       const actionName = dataPick(actionPool);
       const { key: cropKey, label: cropLabel } = dataCropFromAction(actionName);
@@ -4026,7 +4057,7 @@
   }
 
   function mockDataActions(){
-    if (!users.length){ showSnack('Add at least one user first'); return; }
+    if (!mockPeople().length){ showSnack('Add at least one user first'); return; }
     dataActions = generateMockDataActions(100);
     dataPage = 1;
     dataFilters = { status:[], crop:[], site:[], actionName:[], variety:[], username:'', dateFrom:'', dateTo:'', custom:[] };
@@ -5082,7 +5113,7 @@
 
   // ---- Refresh data ----
   function refreshDataActions(){
-    if (!users.length){ showSnack('Add at least one user first'); return; }
+    if (!mockPeople().length){ showSnack('Add at least one user first'); return; }
     dataActions = generateMockDataActions(dataActions.length || 100);
     dataPage = 1;
     renderDataPage();
@@ -5443,7 +5474,7 @@
     const counts = {};
     list.forEach(a=>{
       if (!counts[a.username]){
-        const ru = users.find(u=>u.name===a.username);
+        const ru = mockPeople().find(u=>u.name===a.username);
         counts[a.username] = { name:a.username, site: ru ? (ru.nomad ? 'Nomad (all sites)' : ru.site) : a.site, total:0 };
       }
       counts[a.username].total++;
@@ -5834,7 +5865,7 @@
     const siteData = activitySiteData(list);
     const deviceRows = actDeviceUsageData(list);
     const activeNames = new Set(list.map(a=>a.username));
-    const totalUsers = users.length;
+    const totalUsers = mockPeople().length;
     const activeUsers = activeNames.size;
     const inactiveUsers = Math.max(0, totalUsers - activeUsers);
 
@@ -6577,9 +6608,10 @@
     });
   }
   function stepperHTML(hasSites, hasUsers){
-    const lic = hasSites && hasUsers;
-    document.querySelectorAll('.stepper-toggle-btn').forEach(btn => btn.classList.toggle('show', lic));
-    if (!lic && stepperCollapsed) stepperCollapsed = false; // no ocultar pasos incompletos
+    const unlocked = hasSites && hasUsers;
+    const licensesAssigned = unlocked && licenses.some(l=>l.userIndex!==null);
+    document.querySelectorAll('.stepper-toggle-btn').forEach(btn => btn.classList.toggle('show', unlocked));
+    if (!unlocked && stepperCollapsed) stepperCollapsed = false; // no ocultar pasos incompletos
     applyStepperCollapse();
     return `
       <div class="line l1"></div>
@@ -6594,10 +6626,10 @@
         <div class="st-title ${hasSites?'clickable':''}" ${hasSites?"onclick=\"showPage('users')\"":''}>Add users</div>
         <div class="st-sub">${hasUsers?'Ready':(hasSites?'Ready to add users':'Available after your first site')}</div>
       </div>
-      <div class="step ${lic?'active':'locked'}">
-        <div class="circle ${lic?'done clickable':''}" ${lic?"onclick=\"showPage('licenses')\" title=\"Go to licenses\"":''}>${lic?CHECK:'3'+LOCK}</div>
-        <div class="st-title ${lic?'clickable':''}" ${lic?"onclick=\"showPage('licenses')\"":''}>Assign licenses</div>
-        <div class="st-sub">${lic?'Ready to assign licenses':'Unlocked once users are added'}</div>
+      <div class="step ${unlocked?'active':'locked'}">
+        <div class="circle ${licensesAssigned?'done ':''}${unlocked?'clickable':''}" ${unlocked?"onclick=\"showPage('licenses')\" title=\"Go to licenses\"":''}>${licensesAssigned?CHECK:(unlocked?'3':'3'+LOCK)}</div>
+        <div class="st-title ${unlocked?'clickable':''}" ${unlocked?"onclick=\"showPage('licenses')\"":''}>Assign licenses</div>
+        <div class="st-sub">${licensesAssigned?'Ready':(unlocked?'Ready to assign licenses':'Unlocked once users are added')}</div>
       </div>`;
   }
 
@@ -6734,6 +6766,15 @@
   }
   function closeRequireUsersModal(){ document.getElementById('requireUsersModal').classList.add('hidden'); }
 
+  // Devices/Data van después de "Assign licenses" en el flujo: sin ninguna licencia
+  // asignada a un usuario no hay nada que mostrar, así que se redirige a Licenses.
+  function openRequireLicensesModal(sectionLabel){
+    document.getElementById('requireUsersTitle').textContent = `Assign a license to unlock ${sectionLabel}`;
+    document.getElementById('requireUsersDesc').textContent = `${sectionLabel} needs at least one license assigned to a user before you can access it.`;
+    document.getElementById('requireUsersModal').classList.remove('hidden');
+    showPage('licenses');
+  }
+
   // Cerrar al hacer click fuera del modal
   document.getElementById('siteModal').addEventListener('click', e => {
     if (e.target.id === 'siteModal') closeModal();
@@ -6787,11 +6828,17 @@
       // Sin ningún site, el resto de secciones quedan bloqueadas
       if (sites.length === 0){ openModal(); return; }
       if (page === 'users'){ showPage('users'); return; }
-      // Licenses/Dashboard/Devices/Data dependen de que exista al menos un usuario
+      // Licenses/Dashboard/Devices/Data dependen de que exista al menos un usuario.
+      // El Global Admin (you@company.com) vive en `managers`, así que también cuenta:
+      // con ese admin ya se puede entrar a Licenses para empezar a asignar.
+      const hasAnyUser = users.length > 0 || managers.length > 0;
       const USER_LOCKED_PAGES = { licenses:'Licenses', dashboard:'Dashboard', devices:'Devices', data:'Data' };
       if (USER_LOCKED_PAGES[page]){
-        if (users.length === 0){ openRequireUsersModal(USER_LOCKED_PAGES[page]); return; }
+        if (!hasAnyUser){ openRequireUsersModal(USER_LOCKED_PAGES[page]); return; }
         if (page === 'licenses'){ showPage('licenses'); return; }
+        // Devices/Data sólo tienen sentido una vez que hay licencias asignadas a un usuario
+        const licensesAssigned = licenses.some(l => l.userIndex !== null);
+        if (!licensesAssigned){ openRequireLicensesModal(USER_LOCKED_PAGES[page]); return; }
         if (page === 'devices'){ showPage('devices'); return; }
         if (page === 'data'){ showPage('data'); return; }
         // Dashboard no tiene página propia en este prototipo
@@ -6843,7 +6890,39 @@
   const PACK_SIZES = [10, 50, 100, 500, 1000];
   let creditPacks = Array.from({length:20}, (_,i)=>({ id:i+1, credits: PACK_SIZES[Math.floor(Math.random()*PACK_SIZES.length)] })); // pool sin asignar
   const LICENSE_COUNTRIES = ['France','Spain','Italy'];
-  let licenses = Array.from({length:11}, (_,i)=>({ id:i+1, packs:[], userIndex:null, location:LICENSE_COUNTRIES[i%3] })); // userIndex -> índice en `users`
+  // userIndex identifica a la persona asignada con una clave compuesta "user:i" / "admin:i"
+  // (i = índice en `users` o en `managers`), así una licencia puede asignarse tanto a un
+  // site user como a un admin user (p.ej. el Global Admin por defecto).
+  let licenses = Array.from({length:11}, (_,i)=>({ id:i+1, packs:[], userIndex:null, location:LICENSE_COUNTRIES[i%3] }));
+  function assigneeKey(kind, idx){ return `${kind}:${idx}`; }
+  function parseAssigneeKey(key){
+    const sep = String(key).indexOf(':');
+    return { kind: String(key).slice(0,sep), idx: Number(String(key).slice(sep+1)) };
+  }
+  // Lista unificada de personas a las que se puede asignar una licencia: site users + admin users.
+  function allAssignableUsers(){
+    return users.map((u,i)=>({ key: assigneeKey('user',i), name: u.name, site: u.site || '—', kind:'user' }))
+      .concat(managers.map((m,i)=>({ key: assigneeKey('admin',i), name: m.email, site: m.site || '—', kind:'admin' })));
+  }
+  // Personas sobre las que se generan datos mock (Devices / Data): site users + admin users.
+  // El Global Admin (you@company.com) es un usuario real de la organización, así que también
+  // produce devices y actividad aunque se guarde en `managers`.
+  function mockPeople(){
+    return users.concat((managers || []).map(m => ({
+      name: m.email || m.name || 'Admin user',
+      site: m.site || '',
+      device: m.device,
+      actions: U_ACTIONS,
+      nomad: !m.site,
+    })));
+  }
+  function resolveAssignee(key){
+    if (key===null || key===undefined) return null;
+    const { kind, idx } = parseAssigneeKey(key);
+    if (kind==='user') return users[idx] ? { name: users[idx].name, site: users[idx].site || '—', kind } : null;
+    if (kind==='admin') return managers[idx] ? { name: managers[idx].email, site: managers[idx].site || '—', kind } : null;
+    return null;
+  }
   // El botón Export solo tiene sentido una vez que hay datos de consumo generados por el
   // botón "Mock licenses (DEMO)" — antes de eso las licencias no tienen packs ni fechas.
   let licensesMocked = false;
@@ -6854,12 +6933,20 @@
     try{ localStorage.setItem(USERS_KEY, JSON.stringify({ users, managers })); }catch(e){}
   }
   function loadUsers(){
+    let hadSavedUsers = false;
     try{
       const raw = localStorage.getItem(USERS_KEY);
-      if(raw){ const o = JSON.parse(raw); if(o){ users = o.users||[]; managers = o.managers||[]; } }
+      if(raw){ const o = JSON.parse(raw); if(o){ users = o.users||[]; managers = o.managers||[]; hadSavedUsers = true; } }
     }catch(e){}
     let backfilled=false;
     users.forEach(u=>{ if(!u.device){ u.device = randomDevice(); backfilled=true; } });
+    // La organización siempre parte con un Global Admin: la persona que ha iniciado sesión
+    // en el portal. Se sembra solo la primera vez (sin datos guardados aún) para no revivirlo
+    // si el usuario lo borra explícitamente más tarde.
+    if(!hadSavedUsers && managers.length===0){
+      managers.push({ email:'you@company.com', role:'Global Admin', site:'', status:'created' });
+      backfilled = true;
+    }
     if(backfilled) persistUsers();
   }
 
@@ -6942,8 +7029,9 @@
     const card = document.getElementById('usersCard');
     if (!card) return;
 
-    // Mantener ambos timelines sincronizados (habilita el paso 3 al crear usuarios)
-    const sh = stepperHTML(sites.length>0, users.length>0);
+    // Mantener ambos timelines sincronizados (habilita el paso 3 al crear usuarios; cuenta
+    // también admin users, ya que el Global Admin por defecto ya es un usuario real)
+    const sh = stepperHTML(sites.length>0, users.length>0 || managers.length>0);
     const ss=document.getElementById('stepperSites'), su=document.getElementById('stepperUsers');
     if(ss) ss.innerHTML=sh; if(su) su.innerHTML=sh;
 
@@ -7595,17 +7683,17 @@
     return `<span class="badge-empty">no packs</span>`;
   }
 
-  function assignLicense(licenseId, userIndexStr){
-    if (userIndexStr === '') return;
+  function assignLicense(licenseId, assigneeKeyStr){
+    if (!assigneeKeyStr) return;
     const lic = licenses.find(l=>l.id===licenseId);
     if (!lic) return;
-    lic.userIndex = Number(userIndexStr);
+    lic.userIndex = assigneeKeyStr;
     renderLicenses();
   }
 
   /* ---------- Modal: buscar y asignar un usuario a una licencia ---------- */
   let assignUserTargetId = null;
-  let assignUserSelected = null; // índice del usuario elegido en el modal
+  let assignUserSelected = null; // clave (assigneeKey) de la persona elegida en el modal
 
   function openAssignUserModal(licenseId){
     assignUserTargetId = licenseId;
@@ -7621,23 +7709,23 @@
   function renderAssignUserList(){
     const list = document.getElementById('assignUserList');
     const f = document.getElementById('assignUserSearch').value.trim().toLowerCase();
-    const matches = users.map((u,i)=>({u,i})).filter(({u}) => !f || u.name.toLowerCase().includes(f) || (u.site||'').toLowerCase().includes(f));
+    const matches = allAssignableUsers().filter(p => !f || p.name.toLowerCase().includes(f) || (p.site||'').toLowerCase().includes(f));
     list.innerHTML = matches.length
-      ? matches.map(({u,i})=>`
-        <label class="pack-row" style="cursor:pointer;${assignUserSelected===i?'border-color:var(--blue);background:#eef4ff;':''}" onclick="selectAssignUser(${i})">
-          ${u.name}${u.site ? ` <span style="color:var(--muted2);font-weight:400;">— ${u.site}</span>` : ''}
+      ? matches.map(p=>`
+        <label class="pack-row" style="cursor:pointer;${assignUserSelected===p.key?'border-color:var(--blue);background:#eef4ff;':''}" onclick="selectAssignUser('${p.key}')">
+          ${p.name}${p.site && p.site!=='—' ? ` <span style="color:var(--muted2);font-weight:400;">— ${p.site}</span>` : ''}${p.kind==='admin' ? ` <span class="role-badge">Admin</span>` : ''}
         </label>`).join('')
       : `<p style="color:var(--muted2);font-size:13px;">No matching users.</p>`;
     const btn = document.getElementById('assignUserApplyBtn');
     if (btn) btn.disabled = assignUserSelected===null;
   }
-  function selectAssignUser(i){
-    assignUserSelected = i;
+  function selectAssignUser(key){
+    assignUserSelected = key;
     renderAssignUserList();
   }
   function confirmAssignUser(){
     if (assignUserSelected===null || assignUserTargetId===null) return;
-    assignLicense(assignUserTargetId, String(assignUserSelected));
+    assignLicense(assignUserTargetId, assignUserSelected);
     closeAssignUserModal();
   }
 
@@ -7882,20 +7970,20 @@
     tip.style.display = 'block';
   }
 
-  // Selección para el bulk-assign de la tab "Users without a license" (índices en `users`).
+  // Selección para el bulk-assign de la tab "Users without a license" (claves assigneeKey).
   let nolicenseSelected = new Set();
 
   function usersWithoutLicense(){
-    return users.map((u,i)=>({u,i})).filter(({i})=>!licenses.some(l=>l.userIndex===i));
+    return allAssignableUsers().filter(({key})=>!licenses.some(l=>l.userIndex===key));
   }
 
-  function toggleNolicenseSelect(i, checked){
+  function toggleNolicenseSelect(key, checked){
     const availableLicenses = licenses.filter(l=>l.userIndex===null).length;
     if (checked){
       if (nolicenseSelected.size >= availableLicenses) return; // no hay más licencias libres para repartir
-      nolicenseSelected.add(i);
+      nolicenseSelected.add(key);
     } else {
-      nolicenseSelected.delete(i);
+      nolicenseSelected.delete(key);
     }
     renderLicenses();
   }
@@ -7905,7 +7993,7 @@
   }
 
   /* ---------- Modal: bulk-assign de licencias a varios usuarios sin licencia ----------
-     El estado vive en `bulkAssignPicks` (userIndex -> licenseId|null), no se lee del DOM:
+     El estado vive en `bulkAssignPicks` (assigneeKey -> licenseId|null), no se lee del DOM:
      así, si dos usuarios terminan apuntando a la misma licencia, se resuelve de forma
      determinística (gana quien la acaba de elegir; al otro se le quita y queda "sin elegir"). */
   let bulkAssignPicks = {};
@@ -7914,23 +8002,22 @@
     if (!nolicenseSelected.size) return;
     const availableLics = licenses.filter(l=>l.userIndex===null);
     bulkAssignPicks = {};
-    Array.from(nolicenseSelected).forEach((i, idx)=>{ bulkAssignPicks[i] = availableLics[idx] ? availableLics[idx].id : null; });
+    Array.from(nolicenseSelected).forEach((key, idx)=>{ bulkAssignPicks[key] = availableLics[idx] ? availableLics[idx].id : null; });
     renderBulkAssignRows();
     document.getElementById('bulkAssignModal').classList.remove('hidden');
   }
   function closeBulkAssignModal(){
     document.getElementById('bulkAssignModal').classList.add('hidden');
   }
-  function bulkAssignPick(userIndex, licenseIdStr){
+  function bulkAssignPick(assigneeKeyStr, licenseIdStr){
     const licenseId = licenseIdStr === '' ? null : Number(licenseIdStr);
     if (licenseId !== null){
       // Si otro usuario ya tenía elegida esta misma licencia, se la quitamos y lo forzamos a elegir otra.
-      Object.keys(bulkAssignPicks).forEach(key=>{
-        const otherIndex = Number(key);
-        if (otherIndex !== userIndex && bulkAssignPicks[otherIndex] === licenseId) bulkAssignPicks[otherIndex] = null;
+      Object.keys(bulkAssignPicks).forEach(otherKey=>{
+        if (otherKey !== assigneeKeyStr && bulkAssignPicks[otherKey] === licenseId) bulkAssignPicks[otherKey] = null;
       });
     }
-    bulkAssignPicks[userIndex] = licenseId;
+    bulkAssignPicks[assigneeKeyStr] = licenseId;
     renderBulkAssignRows();
   }
   function renderBulkAssignRows(){
@@ -7940,15 +8027,15 @@
     const selectedUsers = Array.from(nolicenseSelected);
     const takenIds = new Set(Object.values(bulkAssignPicks).filter(v=>v!==null));
 
-    box.innerHTML = selectedUsers.map(i=>{
-      const u = users[i];
-      const pick = bulkAssignPicks[i] ?? null;
+    box.innerHTML = selectedUsers.map(key=>{
+      const person = resolveAssignee(key);
+      const pick = bulkAssignPicks[key] ?? null;
       // Cada select ve las licencias libres + la que él mismo tiene elegida (para no desaparecer de su propio select).
       const options = availableLics.filter(l=> l.id===pick || !takenIds.has(l.id));
       return `
       <div class="pack-row" style="cursor:default;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <span>${u.name}${u.site ? ` <span style="color:var(--muted2);font-weight:400;">— ${u.site}</span>` : ''}</span>
-        <select onchange="bulkAssignPick(${i}, this.value)" style="border:1px solid var(--border);border-radius:9px;padding:6px 8px;font-size:13px;color:var(--navy);">
+        <span>${person.name}${person.site && person.site!=='—' ? ` <span style="color:var(--muted2);font-weight:400;">— ${person.site}</span>` : ''}</span>
+        <select onchange="bulkAssignPick('${key}', this.value)" style="border:1px solid var(--border);border-radius:9px;padding:6px 8px;font-size:13px;color:var(--navy);">
           <option value="" ${pick===null?'selected':''}>Choose a license…</option>
           ${options.map(l=>`<option value="${l.id}" ${pick===l.id?'selected':''}>License #${l.id} — ${l.location}</option>`).join('')}
         </select>
@@ -7956,14 +8043,14 @@
     }).join('');
 
     const btn = document.getElementById('bulkAssignConfirmBtn');
-    if (btn) btn.disabled = selectedUsers.some(i => bulkAssignPicks[i]===null);
+    if (btn) btn.disabled = selectedUsers.some(key => bulkAssignPicks[key]===null);
   }
   function confirmBulkAssign(){
-    if (Array.from(nolicenseSelected).some(i => bulkAssignPicks[i]===null)) return;
+    if (Array.from(nolicenseSelected).some(key => bulkAssignPicks[key]===null)) return;
     Object.entries(bulkAssignPicks).forEach(([key, licenseId])=>{
       if (licenseId===null) return;
       const lic = licenses.find(l=>l.id===licenseId);
-      if (lic && lic.userIndex===null) lic.userIndex = Number(key);
+      if (lic && lic.userIndex===null) lic.userIndex = key;
     });
     nolicenseSelected.clear();
     bulkAssignPicks = {};
@@ -8055,16 +8142,18 @@
 
     // Repartir usuarios reales entre las licencias, dejando algunas sin asignar
     // (así se siguen poblando las tabs "No user assigned" / "Users without a license").
+    // Un usuario solo puede tener una licencia: sin wraparound, cada uno se usa como
+    // máximo una vez, así que si hay menos usuarios que licencias, el resto queda sin asignar.
     // Las licencias forzadas a "running low" (idx 0) y "expiring soon" (idx 1) siempre
-    // reciben usuario: sin usuario no pueden estar "active", y esos filtros dejarían de
-    // tener datos que mostrar.
-    const shuffledUsers = users.map((_,i)=>i).sort(()=>Math.random()-0.5);
+    // reciben usuario mientras queden disponibles: sin usuario no pueden estar "active",
+    // y esos filtros dejarían de tener datos que mostrar.
+    const shuffledUsers = allAssignableUsers().map(p=>p.key).sort(()=>Math.random()-0.5);
     let cursor = 0;
     licenses.forEach((lic, idx)=>{
-      if (!shuffledUsers.length) return;
+      if (cursor >= shuffledUsers.length) return; // no quedan usuarios sin licencia
       const forceAssign = idx === 0 || idx === 1;
       if (forceAssign || Math.random() < 0.8){
-        lic.userIndex = shuffledUsers[cursor % shuffledUsers.length];
+        lic.userIndex = shuffledUsers[cursor];
         cursor++;
       }
     });
@@ -8094,21 +8183,21 @@
 
     // Vista especial: usuarios que no tienen ninguna licencia asociada (no hay fila de licencia que mostrar).
     if (licensesTab === 'nolicense'){
-      const withoutLicense = usersWithoutLicense(); // [{u,i}]
-      const validIdx = new Set(withoutLicense.map(x=>x.i));
-      Array.from(nolicenseSelected).forEach(i=>{ if (!validIdx.has(i)) nolicenseSelected.delete(i); });
+      const withoutLicense = usersWithoutLicense(); // [{key,name,site,kind}]
+      const validKeys = new Set(withoutLicense.map(x=>x.key));
+      Array.from(nolicenseSelected).forEach(key=>{ if (!validKeys.has(key)) nolicenseSelected.delete(key); });
       const availableLicenses = licenses.filter(l=>l.userIndex===null).length;
       while (nolicenseSelected.size > availableLicenses) nolicenseSelected.delete(Array.from(nolicenseSelected).pop());
 
       const NL_GRID = 'grid-template-columns:36px 1.5fr 1fr 1fr;';
-      const nlRows = withoutLicense.map(({u,i})=>{
-        const checked = nolicenseSelected.has(i);
+      const nlRows = withoutLicense.map(({key,name,site,kind})=>{
+        const checked = nolicenseSelected.has(key);
         const disabled = !checked && nolicenseSelected.size>=availableLicenses;
         return `
         <div class="u-row" style="${NL_GRID}">
-          <span><input type="checkbox" ${checked?'checked':''} ${disabled?'disabled':''} onchange="toggleNolicenseSelect(${i},this.checked)"></span>
-          <span class="name" style="font-weight:600;">${u.name}</span>
-          <span class="u-site">${u.site || '—'}</span>
+          <span><input type="checkbox" ${checked?'checked':''} ${disabled?'disabled':''} onchange="toggleNolicenseSelect('${key}',this.checked)"></span>
+          <span class="name" style="font-weight:600;">${name}${kind==='admin' ? ` <span class="role-badge">Admin</span>` : ''}</span>
+          <span class="u-site">${site || '—'}</span>
           <span><span class="badge-empty">No license</span></span>
         </div>`;
       }).join('') || `<div class="draft-empty" style="padding:44px;">All users have a license.</div>`;
@@ -8126,7 +8215,7 @@
           <div></div><div>User</div><div>Site</div><div>License status</div>
         </div>
         ${nlRows}
-        <div class="table-footer"><span>${counts.nolicense} of ${users.length} users without a license</span></div>`;
+        <div class="table-footer"><span>${counts.nolicense} of ${users.length + managers.length} users without a license</span></div>`;
       return;
     }
 
@@ -8148,11 +8237,11 @@
       const stats = licenseStats(lic);
       const dates = licenseDates(lic);
       const status = licenseStatus(lic);
-      const assignedUser = lic.userIndex!==null ? users[lic.userIndex] : null;
+      const assignedUser = lic.userIndex!==null ? resolveAssignee(lic.userIndex) : null;
 
       const assignCell = assignedUser
         ? `<span class="name" style="font-weight:600;">${assignedUser.name}</span>`
-        : (users.length
+        : ((users.length + managers.length)
             ? `<button class="btn" style="padding:7px 14px;font-size:13px;" onclick="openAssignUserModal(${lic.id})">Assign user</button>`
             : `<span class="u-site">No users yet</span>`);
 
@@ -8252,7 +8341,7 @@
       const dates = licenseDates(lic);
       const status = licenseStatus(lic);
       const sc = LIC_STATUS_XLS_COLORS[status] || LIC_STATUS_XLS_COLORS.unassigned;
-      const assignedUser = lic.userIndex!==null ? users[lic.userIndex] : null;
+      const assignedUser = lic.userIndex!==null ? resolveAssignee(lic.userIndex) : null;
       const cells = [
         `<td style="${tdStyle}${zebra}">${xlsEscape(assignedUser ? assignedUser.name : '')}</td>`,
         `<td style="${tdStyle}${zebra}">${xlsEscape('License #'+lic.id)}</td>`,
@@ -8541,7 +8630,7 @@
   function mockDevices(){
     const day = 86400000;
     devicesPage = 1;
-    devices = users.map((u, i) => {
+    devices = mockPeople().map((u, i) => {
       const model = dataPick(DEVICE_EXIF_MODELS);
       const site = !u.nomad && sites.length ? dataPick(sites) : null;
       const updatedAt = mockDeviceUpdatedAt();
@@ -9022,7 +9111,7 @@
   let draftUid = 0;
   let selDraft = new Set();   // ids de filas seleccionadas (bulk)
 
-  function openUserWizard(){
+  function openUserWizard(tab){
     // clonar lo guardado a draft (con id para selección)
     // Empezar con estado limpio: el modal solo crea usuarios NUEVOS
     dUsers = [];
@@ -9032,7 +9121,7 @@
     document.getElementById('genSite').innerHTML = opts;
     document.getElementById('bulkSite').innerHTML = opts;
     genReset();
-    wizTab('users');
+    wizTab(tab === 'mgr' ? 'mgr' : 'users');
     renderDraftUsers();
     renderDraftMgrs();
     document.getElementById('userWizard').classList.remove('hidden');
