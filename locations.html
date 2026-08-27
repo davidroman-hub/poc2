@@ -112,6 +112,13 @@
   [data-theme="dark"] .badge-error{background:#2b1616;border-color:#5a2b2b;color:#ff8a80;}
   [data-theme="dark"] .site-pill{background:#16233b;}
   [data-theme="dark"] .info-box b,[data-theme="dark"] .preview-line b,[data-theme="dark"] .ud-v{color:var(--text);}
+  /* Alerts "What is ...": en oscuro el panel gris apagaba el texto. Se mantiene nativo del
+     tema (fondo oscuro con un tinte azul) y se sube el contraste del cuerpo + acento azul. */
+  [data-theme="dark"] .info-box.whatis{background:#1b2333;border:1px solid #2c3a56;border-left:3px solid var(--blue);color:#c8cfdb;box-shadow:none;}
+  [data-theme="dark"] .info-box.whatis b{color:var(--text);}
+  [data-theme="dark"] .info-box.whatis svg{color:var(--blue);}
+  [data-theme="dark"] .info-box.whatis .info-box-link{color:#84acff;}
+  [data-theme="dark"] .info-box.whatis .info-box-link:hover{color:#a6c4ff;}
   [data-theme="dark"] .modal-overlay{background:rgba(19,16,23,.6);}
   [data-theme="dark"] .empty .pic svg circle[fill="#eef1f7"],[data-theme="dark"] .modal .pic svg circle[fill="#eef1f7"]{fill:var(--card);}
 
@@ -1085,6 +1092,8 @@
   .info-box svg{width:17px;height:17px;color:var(--blue);flex-shrink:0;}
   .info-box-link{color:var(--blue);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
   .info-box-link:hover{color:var(--blue-hover);}
+  /* Variante "What is ...": acento azul a la izquierda para que se lea como callout sin gritar */
+  .info-box.whatis{background:#eef4ff;border:1px solid #dde6fb;border-left:3px solid var(--blue);padding:14px 16px;}
   .alloc-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-top:6px;}
   .alloc-title{font-weight:700;font-size:14px;color:var(--navy);}
   .alloc-title span{color:var(--muted);font-weight:500;}
@@ -1525,7 +1534,7 @@
           <div class="stepper" id="stepperSites"></div>
         </div>
 
-        <div class="info-box" style="align-items:flex-start;line-height:1.55;margin-top:-4px;">
+        <div class="info-box whatis" style="align-items:flex-start;line-height:1.55;margin-top:-4px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
           <span><b>What are Sites?</b> Sites are the physical locations your organization operates — silos, warehouses, labs or collection points where grain is stored and inspected. Users, licenses and analysis results are all tied to a site, and you can use <a role="button" tabindex="0" class="info-box-link" onclick="openGroupModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openGroupModal()}">site groups</a> to manage many at once. Add as many as you need.</span>
         </div>
@@ -1627,7 +1636,7 @@
         <div class="stepper" id="stepperUsers"></div>
       </div>
 
-      <div class="info-box" style="align-items:flex-start;line-height:1.55;margin-top:-4px;">
+      <div class="info-box whatis" style="align-items:flex-start;line-height:1.55;margin-top:-4px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
         <span><b>What are Users?</b> Users are the people and accounts that operate within your organization. Add <a role="button" tabindex="0" class="info-box-link" onclick="openUserWizard('users')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUserWizard('users')}">site users</a> so field operators can sign in to <b>PocketLab</b> and run analyses on-site. <a role="button" tabindex="0" class="info-box-link" onclick="openUserWizard('mgr')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUserWizard('mgr')}">Admin users</a> can also run analyses, and on top of that they manage sites, licenses and results from this dashboard. Add as many as you need.</span>
       </div>
@@ -1652,7 +1661,7 @@
       </div>
     </div>
     <div class="content" style="margin-top:22px;">
-      <div class="info-box" style="align-items:flex-start;line-height:1.55;">
+      <div class="info-box whatis" style="align-items:flex-start;line-height:1.55;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
         <span><b>What are Licenses?</b> A license grants a user access to <b>PocketLab</b> and draws from your organization's <a role="button" tabindex="0" class="info-box-link" onclick="openPoolModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPoolModal()}">credit packs pool</a> to run analyses. Assign a license to a user who needs to work on-site; unassigned licenses stay in the pool until you need them.</span>
       </div>
@@ -1703,7 +1712,7 @@
       </div>
     </div>
     <div class="content" style="margin-top:22px;">
-      <div class="info-box" style="align-items:flex-start;line-height:1.55;">
+      <div class="info-box whatis" style="align-items:flex-start;line-height:1.55;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
         <span><b>What are Devices?</b> Devices are the phones and tablets your field users run <b>PocketLab</b> on to capture samples and analyses. Each one appears here the first time a user uses it, together with its last activity so you can spot the devices that are inactive or stale.</span>
       </div>
@@ -1748,7 +1757,7 @@
     </div>
 
     <div class="map-page-wrap" style="margin-top:22px;">
-      <div class="info-box" style="align-items:flex-start;line-height:1.55;">
+      <div class="info-box whatis" style="align-items:flex-start;line-height:1.55;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
         <span><b>What is the Map?</b> The Map plots every site that has an address or coordinates, so you can see your organization's footprint at a glance, search for a specific site, and <a role="button" tabindex="0" class="info-box-link" onclick="openAddSiteChoice()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAddSiteChoice()}">add new sites</a> right where you need them.</span>
       </div>
@@ -1796,7 +1805,7 @@
     </div>
 
     <div class="content" style="margin-top:22px;">
-      <div class="info-box" style="align-items:flex-start;line-height:1.55;">
+      <div class="info-box whatis" style="align-items:flex-start;line-height:1.55;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
         <span><b>What is Data?</b> Data brings together every analysis run across your sites, devices and users. Explore individual results in the <a role="button" tabindex="0" class="info-box-link" onclick="setDataSection('data')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setDataSection('data')}">Data</a> tab, or switch to <a role="button" tabindex="0" class="info-box-link" onclick="setDataSection('activity')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setDataSection('activity')}">Activity</a> for usage trends by user, crop and site.</span>
       </div>
