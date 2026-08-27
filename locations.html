@@ -3585,20 +3585,22 @@
   let siteTileLayer = null;
   let siteClusterGroup = null;
   let siteMarkers = [];
-  // CARTO Positron/Dark Matter para claro/oscuro: mismo proveedor en ambos temas,
-  // no requiere API key (a diferencia de Stadia Maps, que bloquea dominios fuera de localhost).
+  // OpenStreetMap.Mapnik (keyless, sin restricción de dominio): el estilo clásico de OSM,
+  // agua azul y calles a color. No tiene variante oscura; se usa el mismo estilo en ambos
+  // temas (en oscuro el filtro CSS de .leaflet-tile-pane lo atenúa un poco).
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
   const MAP_TILE_CONFIG = {
     light: {
-      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      subdomains: 'abcd',
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      subdomains: 'abc',
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+      attribution: OSM_ATTR,
     },
     dark: {
-      url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      subdomains: 'abcd',
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      subdomains: 'abc',
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+      attribution: OSM_ATTR,
     },
   };
   function buildTileLayer(isDark){
