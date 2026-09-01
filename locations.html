@@ -1546,7 +1546,7 @@
             <div class="search"><input type="text" placeholder="Search sites..."></div>
             <button class="filters-btn">Filters</button>
             <div class="spacer"></div>
-            <button class="btn" id="btnToolbar" onclick="openAddSiteChoice()">
+            <button class="btn" id="btnToolbar" onclick="openSiteWizard()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
               Add new site
             </button>
@@ -1586,7 +1586,7 @@
             </div>
             <h3>Create your first site to continue the setup</h3>
             <p>A brand-new organization should start with 0 groups and no sites yet. Create the first site to unlock user onboarding and license assignment.</p>
-            <button class="btn btn-lg" onclick="openAddSiteChoice()">
+            <button class="btn btn-lg" onclick="openSiteWizard()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
               Add new site
             </button>
@@ -1759,7 +1759,7 @@
     <div class="map-page-wrap" style="margin-top:22px;">
       <div class="info-box whatis" style="align-items:flex-start;line-height:1.55;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-        <span><b>What is the Map?</b> The Map plots every site that has an address or coordinates, so you can see your organization's footprint at a glance, search for a specific site, and <a role="button" tabindex="0" class="info-box-link" onclick="openAddSiteChoice()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAddSiteChoice()}">add new sites</a> right where you need them.</span>
+        <span><b>What is the Map?</b> The Map plots every site that has an address or coordinates, so you can see your organization's footprint at a glance, search for a specific site, and <a role="button" tabindex="0" class="info-box-link" onclick="openSiteWizard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSiteWizard()}">add new sites</a> right where you need them.</span>
       </div>
       <div class="map-card">
         <div id="siteMap"></div>
@@ -1777,7 +1777,7 @@
             Date range
           </button>
         </div>
-        <button class="btn map-add-btn" onclick="openAddSiteChoice()">
+        <button class="btn map-add-btn" onclick="openSiteWizard()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
           Add new site
         </button>
@@ -1785,7 +1785,7 @@
           <div class="map-empty-card">
             <h3 id="mapEmptyTitle">No sites on the map yet</h3>
             <p id="mapEmptyDesc">Add a site with an address or coordinates to see it appear here.</p>
-            <button class="btn" onclick="openAddSiteChoice()">Add new site</button>
+            <button class="btn" onclick="openSiteWizard()">Add new site</button>
           </div>
         </div>
       </div>
@@ -1923,96 +1923,14 @@
     </div>
     <h3>Create your first site to continue the setup</h3>
     <p>A brand-new organization should start with 0 groups and no sites yet. Create the first site to unlock user onboarding and license assignment.</p>
-    <button class="btn btn-lg" onclick="closeModal(); openAddSiteChoice();">
+    <button class="btn btn-lg" onclick="closeModal(); openSiteWizard();">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
       Add new site
     </button>
   </div>
 </div>
 
-<!-- Modal: elegir "Single site" o "Multiple sites" al hacer click en "Add new site" -->
-<div class="modal-overlay hidden" id="addSiteChoiceModal">
-  <div class="form-modal" style="max-width:560px;">
-    <div class="form-scroll" style="padding:28px 30px 6px;">
-      <h3 class="storage-title" style="margin-bottom:4px;">Add new site</h3>
-      <p class="storage-sub" style="margin-bottom:20px;">How do you want to add sites?</p>
-      <div class="asc-grid">
-        <button type="button" class="asc-card" onclick="chooseSingleSite()">
-          <span class="asc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
-          <span class="asc-title">Single site</span>
-          <span class="asc-desc">Create one site with its address, coordinates and storages.</span>
-        </button>
-        <button type="button" class="asc-card" onclick="chooseMultiSite()">
-          <span class="asc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <g transform="translate(6,-1) scale(0.72)" opacity="0.5"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></g>
-            <g transform="translate(-2,1) scale(0.72)"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></g>
-          </svg></span>
-          <span class="asc-title">Multiple sites</span>
-          <span class="asc-desc">Add several sites at once.</span>
-        </button>
-      </div>
-    </div>
-    <div class="form-footer" style="justify-content:flex-end;">
-      <button class="btn-back" onclick="closeAddSiteChoice()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: formulario para crear un site -->
-<div class="modal-overlay hidden" id="formModal">
-  <div class="form-modal">
-    <div class="form-scroll">
-      <p class="form-top">Enter the basic details for this site.</p>
-
-      <div class="form-card">
-        <h4>Site details</h4>
-
-        <label class="fld-label">Site name <span class="req">*</span></label>
-        <input class="fld" id="fName" placeholder="Enter site name">
-
-        <label class="fld-label">Site type <span class="req">*</span></label>
-        <select class="fld" id="fType">
-          <option value="" disabled selected>Select a type</option>
-        </select>
-        <div class="fld-err" id="fTypeErr"></div>
-
-        <label class="fld-label">Search address (optional)</label>
-        <div class="fld-search" id="fAddressWrap" style="position:relative;">
-          <input class="fld" id="fAddress" placeholder="Search for an address" autocomplete="off"
-            oninput="onAddressInput()" onfocus="if(this.value.trim().length>=3) showAddressDropdown()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-          <div class="autocomplete-pop" id="fAddressDropdown" style="display:none;max-height:260px;overflow:auto;"></div>
-        </div>
-        <p class="addr-hint" id="fAddressHint" style="display:none;"></p>
-
-        <div class="divider-text">Coordinates</div>
-
-        <div class="two-col">
-          <div>
-            <label class="fld-label">Latitude <span class="req">*</span></label>
-            <input class="fld" id="fLat" type="number" step="any" min="-90" max="90" placeholder="e.g., 40.7128" oninput="validateCoordField('fLat',-90,90,'latitude')" onblur="validateCoordField('fLat',-90,90,'latitude',true)">
-            <div class="fld-err" id="fLatErr"></div>
-          </div>
-          <div>
-            <label class="fld-label">Longitude <span class="req">*</span></label>
-            <input class="fld" id="fLng" type="number" step="any" min="-180" max="180" placeholder="e.g., -74.0060" oninput="validateCoordField('fLng',-180,180,'longitude')" onblur="validateCoordField('fLng',-180,180,'longitude',true)">
-            <div class="fld-err" id="fLngErr"></div>
-          </div>
-        </div>
-
-        <label class="fld-label">Identifier (optional)</label>
-        <input class="fld" id="fId" placeholder="Enter identifier" style="margin-bottom:4px;">
-      </div>
-    </div>
-
-    <div class="form-footer">
-      <button class="btn-back" onclick="closeForm()">Back</button>
-      <button class="btn" onclick="submitForm()">Create site</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: wizard para añadir varios sites a la vez (mismo patrón que "Add users") -->
+<!-- Modal: wizard para añadir sites (mismo patrón que "Add users") -->
 <div class="modal-overlay hidden" id="siteWizard">
   <div class="form-modal" id="siteWizardModal">
     <div class="form-scroll">
@@ -2948,26 +2866,7 @@
     if (siteMap) refreshMapMarkers();
   }
 
-  // Modal "Add new site": elegir entre Single site (flujo existente) o Multiple sites (nuevo).
-  function openAddSiteChoice(){
-    document.getElementById('addSiteChoiceModal').classList.remove('hidden');
-  }
-  function closeAddSiteChoice(){
-    document.getElementById('addSiteChoiceModal').classList.add('hidden');
-  }
-  function chooseSingleSite(){
-    closeAddSiteChoice();
-    openForm();
-  }
-  function chooseMultiSite(){
-    closeAddSiteChoice();
-    openMultiSiteForm();
-  }
-  function openMultiSiteForm(){
-    openSiteWizard();
-  }
-
-  /* ================= WIZARD "Add sites" (multisite) =================
+  /* ================= WIZARD "Add sites" =================
      Mismo patrón que el wizard "Add users" (dUsers/dMgrs, draft-row, bulk-bar,
      review modal): se drafta en `dSites` y solo se escribe en `sites` al confirmar. */
   let dSites = [];
@@ -2981,7 +2880,7 @@
       Object.keys(SITE_TYPES).map(k => `<option value="${k}">${SITE_TYPES[k].label}</option>`).join('');
     document.getElementById('bulkSiteGroup').innerHTML =
       `<option value="">No group</option>` + groups.map(g => `<option>${escapeAttr(g.name)}</option>`).join('');
-    renderDraftSites();
+    addDraftSite();
     document.getElementById('siteWizard').classList.remove('hidden');
   }
   function closeSiteWizard(){
@@ -3381,145 +3280,10 @@
     showSnack(`${count} site${count!==1?'s':''} created`);
   }
 
-  // Abre el formulario de creación de site
-  function openForm(){
-    document.getElementById('formModal').classList.remove('hidden');
-    ['fName','fAddress','fLat','fLng','fId'].forEach(id => document.getElementById(id).value = '');
-    // Opciones de tipo generadas desde SITE_TYPES (única fuente de verdad), no hardcodeadas
-    document.getElementById('fType').innerHTML = '<option value="" disabled selected>Select a type</option>' +
-      Object.keys(SITE_TYPES).map(k => `<option value="${k}">${SITE_TYPES[k].label}</option>`).join('');
-    document.getElementById('fType').value = '';
-    document.getElementById('fType').classList.remove('err');
-    document.getElementById('fTypeErr').textContent = '';
-    clearCoordError('fLat'); clearCoordError('fLng');
-    setAddressHint('');
-    hideAddressDropdown();
-    document.getElementById('fName').focus();
-  }
-  function closeForm(){ document.getElementById('formModal').classList.add('hidden'); }
-
-  // Valida un campo de coordenada (lat o lng) en vivo y refleja el error en el campo
-  function coordFieldMessage(id, min, max, label){
-    const raw = document.getElementById(id).value.trim();
-    if (!raw) return `The ${label} is required.`;
-    if (isNaN(Number(raw))) return `The ${label} must be a number.`;
-    const val = Number(raw);
-    if (val < min || val > max) return `The ${label} must be between ${min} and ${max} degrees.`;
-    return '';
-  }
-  function clearCoordError(id){
-    const input = document.getElementById(id);
-    const errEl = document.getElementById(id + 'Err');
-    if (input) input.classList.remove('err');
-    if (errEl) errEl.textContent = '';
-  }
-  function validateCoordField(id, min, max, label, requireNow){
-    const raw = document.getElementById(id).value.trim();
-    // Mientras el usuario está escribiendo, no se marca "required" hasta que sale del campo (blur) o envía
-    if (!raw && !requireNow){ clearCoordError(id); return true; }
-    const msg = coordFieldMessage(id, min, max, label);
-    document.getElementById(id).classList.toggle('err', !!msg);
-    document.getElementById(id + 'Err').textContent = msg;
-    return !msg;
-  }
-
   /* ================= GEOCODER (buscador de direcciones) ================= */
   // Nominatim (OpenStreetMap) vía leaflet-control-geocoder: gratis, sin API key.
   const addressGeocoder = L.Control.Geocoder.nominatim();
-  let addrSearchToken = 0;   // descarta respuestas de búsquedas ya obsoletas
-  let addrDebounceTimer = null;
   const ADDR_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>`;
-
-  function onAddressInput(){
-    const q = document.getElementById('fAddress').value.trim();
-    setAddressHint('');
-    clearTimeout(addrDebounceTimer);
-    if (q.length < 3){ hideAddressDropdown(); return; }
-    addrDebounceTimer = setTimeout(() => runAddressSearch(q), 450);
-  }
-
-  function runAddressSearch(q){
-    const myToken = ++addrSearchToken;
-    renderAddressDropdown(null); // estado "Searching..."
-    showAddressDropdown();
-    addressGeocoder.geocode(q, results => {
-      if (myToken !== addrSearchToken) return; // llegó tarde, ya no aplica
-      renderAddressDropdown(results || []);
-    });
-  }
-
-  function renderAddressDropdown(results){
-    const dd = document.getElementById('fAddressDropdown');
-    if (!dd) return;
-    if (results === null){
-      dd.innerHTML = `<div class="addr-empty">Searching…</div>`;
-      return;
-    }
-    if (!results.length){
-      dd.innerHTML = `<div class="addr-empty">No addresses found.</div>`;
-      return;
-    }
-    dd.innerHTML = results.map((r, i) => `
-      <div class="addr-item" onclick="selectAddressResult(${i})">
-        ${ADDR_ICON}
-        <span>${r.name}</span>
-      </div>`).join('');
-    window._addrResults = results;
-  }
-
-  function selectAddressResult(i){
-    const r = (window._addrResults || [])[i];
-    if (!r) return;
-    document.getElementById('fAddress').value = r.name;
-    document.getElementById('fLat').value = r.center.lat.toFixed(6);
-    document.getElementById('fLng').value = r.center.lng.toFixed(6);
-    validateCoordField('fLat', -90, 90, 'latitude', true);
-    validateCoordField('fLng', -180, 180, 'longitude', true);
-    setAddressHint(`Coordinates set from address (${r.center.lat.toFixed(4)}, ${r.center.lng.toFixed(4)})`, true);
-    hideAddressDropdown();
-  }
-
-  function setAddressHint(text, ok){
-    const hint = document.getElementById('fAddressHint');
-    if (!hint) return;
-    hint.textContent = text;
-    hint.classList.toggle('ok', !!ok);
-    hint.style.display = text ? 'flex' : 'none';
-  }
-
-  // Posiciona el dropdown con position:fixed (mismo patrón que gSiteDropdown) para que
-  // no aporte altura al .form-scroll ni quede recortado por su overflow.
-  function positionAddressDropdown(){
-    const input = document.getElementById('fAddress');
-    const dd = document.getElementById('fAddressDropdown');
-    if (!input || !dd) return;
-    const r = input.getBoundingClientRect();
-    dd.style.left = r.left + 'px';
-    dd.style.top = (r.bottom + 5) + 'px';
-    dd.style.width = r.width + 'px';
-  }
-  function showAddressDropdown(){
-    const dd = document.getElementById('fAddressDropdown');
-    if (!dd) return;
-    positionAddressDropdown();
-    dd.style.display = 'block';
-  }
-  function hideAddressDropdown(){
-    const dd = document.getElementById('fAddressDropdown');
-    if (dd) dd.style.display = 'none';
-  }
-  document.addEventListener('click', e => {
-    const wrap = document.getElementById('fAddressWrap');
-    if (wrap && !wrap.contains(e.target)) hideAddressDropdown();
-  });
-  window.addEventListener('resize', () => {
-    const dd = document.getElementById('fAddressDropdown');
-    if (dd && dd.style.display === 'block') positionAddressDropdown();
-  });
-  document.addEventListener('scroll', () => {
-    const dd = document.getElementById('fAddressDropdown');
-    if (dd && dd.style.display === 'block') positionAddressDropdown();
-  }, true);
 
   // Borrado de site con confirmación
   let siteToDelete = null;
@@ -3535,44 +3299,6 @@
     render();
   }
 
-  // Crea el site a partir del formulario. Lat/Lng son obligatorios y deben respetar
-  // los rangos válidos de coordenadas (-90..90 / -180..180); sin eso no hay pin que mostrar en el mapa.
-  function submitForm(){
-    const name = document.getElementById('fName').value.trim();
-    const type = document.getElementById('fType').value;
-    const address = document.getElementById('fAddress').value.trim();
-
-    const typeEl = document.getElementById('fType');
-    const typeOk = !!type;
-    typeEl.classList.toggle('err', !typeOk);
-    document.getElementById('fTypeErr').textContent = typeOk ? '' : 'Please select a site type.';
-
-    const latOk = validateCoordField('fLat', -90, 90, 'latitude', true);
-    const lngOk = validateCoordField('fLng', -180, 180, 'longitude', true);
-
-    if (!name){ document.getElementById('fName').focus(); return; }
-    if (!typeOk){ typeEl.focus(); return; }
-    if (!latOk){ document.getElementById('fLat').focus(); return; }
-    if (!lngOk){ document.getElementById('fLng').focus(); return; }
-
-    const lat = Number(document.getElementById('fLat').value.trim());
-    const lng = Number(document.getElementById('fLng').value.trim());
-    const localisation = address || `${lat}, ${lng}`;
-
-    sites.push({ id: nextSiteId++, name, type, localisation, lat, lng, group: '—', storages: [] });
-    persistSites();
-    render();
-    closeForm();
-    showSnack('Site created');
-  }
-
-  // Cerrar el formulario al hacer click fuera
-  document.getElementById('formModal').addEventListener('click', e => {
-    if (e.target.id === 'formModal') closeForm();
-  });
-  document.getElementById('addSiteChoiceModal').addEventListener('click', e => {
-    if (e.target.id === 'addSiteChoiceModal') closeAddSiteChoice();
-  });
   document.getElementById('siteWizard').addEventListener('click', e => {
     if (e.target.id === 'siteWizard') closeSiteWizard();
   });
@@ -8823,7 +8549,7 @@
   function openPoolModal(){
     const body = document.getElementById('poolListBody');
     body.innerHTML = creditPacks.length
-      ? creditPacks.map(p=>`<div class="pack-row" style="cursor:default;">Pack #${p.id} — ${p.credits} credits</div>`).join('')
+      ? [...creditPacks].sort((a,b)=>b.credits-a.credits).map(p=>`<div class="pack-row" style="cursor:default;">Pack #${p.id} — ${p.credits} credits</div>`).join('')
       : `<p style="color:var(--muted2);font-size:13px;">No credit packs left in the pool — they've all been added to licenses.</p>`;
     document.getElementById('poolModal').classList.remove('hidden');
   }
@@ -8855,7 +8581,7 @@
     const body = document.getElementById('packListBody');
     if (!body) return;
     body.innerHTML = creditPacks.length
-      ? creditPacks.map(p=>`
+      ? [...creditPacks].sort((a,b)=>b.credits-a.credits).map(p=>`
         <label class="pack-row">
           <input type="checkbox" ${addPackSelected.includes(p.id)?'checked':''} onchange="togglePackSelect(${p.id})">
           Pack #${p.id} — ${p.credits} credits
